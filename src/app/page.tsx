@@ -25,12 +25,45 @@ import { ContactPage } from "@/components/pages/ContactPage";
 import { StaticPage } from "@/components/pages/StaticPage";
 import { CategoryPage } from "@/components/pages/CategoryPage";
 import { SectionPage } from "@/components/pages/SectionPage";
+import { LoginPage } from "@/components/pages/LoginPage";
+import { EditorPanel } from "@/components/panels/EditorPanel";
+import { AdminPanel } from "@/components/panels/AdminPanel";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
 
 export default function Home() {
-  const { current, nowPlaying } = useStore();
+  const { current, nowPlaying, user, sessionLoading, refreshSession } = useStore();
 
+  // Load session on first render
+  useEffect(() => {
+    refreshSession();
+  }, [refreshSession]);
+
+  // ─── Panel routes (full-screen, no public chrome) ─────────────────
+  if (current.type === "editor") {
+    // Auth gate
+    if (sessionLoading) return <FullScreenLoader />;
+    if (!user || (user.role !== "EDITOR" && user.role !== "ADMIN")) {
+      return <LoginPage />;
+    }
+    return <EditorPanel view={current.view} articleId={current.articleId} />;
+  }
+
+  if (current.type === "admin") {
+    if (sessionLoading) return <FullScreenLoader />;
+    if (!user || user.role !== "ADMIN") {
+      return <LoginPage />;
+    }
+    return <AdminPanel view={current.view} />;
+  }
+
+  // ─── Login route (no public chrome) ──────────────────────────────
+  if (current.type === "login") {
+    return <LoginGate />;
+  }
+
+  // ─── Public routes ────────────────────────────────────────────────
   const renderPage = () => {
     switch (current.type) {
       case "home":
@@ -38,7 +71,6 @@ export default function Home() {
       case "article":
         return <ArticlePage slug={current.slug} />;
       case "section":
-        // Live has its own dedicated page
         if (current.slug === "live") return <LivePage />;
         return <SectionPage slug={current.slug} />;
       case "category":
@@ -66,7 +98,7 @@ export default function Home() {
     }
   };
 
-  // Determine if the category bar should show (hide on some pages)
+  // Determine which chrome to show
   const showCategoryBar =
     current.type === "home" ||
     current.type === "category" ||
@@ -74,49 +106,90 @@ export default function Home() {
       current.slug !== "live" &&
       current.slug !== "podcasts");
 
-  // Determine if the breaking ticker should show (hide on some pages)
   const showBreakingTicker =
     current.type === "home" ||
     current.type === "category" ||
     (current.type === "section" && current.slug !== "live");
 
   return (
+    <PublicShell
+      showBreakingTicker={showBreakingTicker}
+      showCategoryBar={showCategoryBar}
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={JSON.stringify(current)}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+        >
+          {renderPage()}
+        </motion.div>
+      </AnimatePresence>
+    </PublicShell>
+  );
+}
+
+function PublicShell({
+  children,
+  showBreakingTicker = true,
+  showCategoryBar = true,
+  hideChrome = false,
+}: {
+  children: React.ReactNode;
+  showBreakingTicker?: boolean;
+  showCategoryBar?: boolean;
+  hideChrome?: boolean;
+}) {
+  const { nowPlaying } = useStore();
+  return (
     <div className="min-h-screen flex flex-col bg-background">
-      <ReadingProgress />
-      <Header />
-      {showBreakingTicker && <BreakingTicker />}
-      {showCategoryBar && <CategoryBar />}
+      {!hideChrome && <ReadingProgress />}
+      {!hideChrome && <Header />}
+      {!hideChrome && showBreakingTicker && <BreakingTicker />}
+      {!hideChrome && showCategoryBar && <CategoryBar />}
 
-      <main className="flex-1 pb-16 md:pb-0">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={JSON.stringify(current)}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-          >
-            {renderPage()}
-          </motion.div>
-        </AnimatePresence>
-      </main>
+      <main className="flex-1 pb-16 md:pb-0">{children}</main>
 
-      <Footer />
+      {!hideChrome && <Footer />}
+      {!hideChrome && <MobileNav />}
+      {!hideChrome && <MobileMenu />}
+      {!hideChrome && <SearchOverlay />}
+      {!hideChrome && <MiniPlayer />}
 
-      {/* Mobile bottom nav */}
-      <MobileNav />
-
-      {/* Mobile menu drawer */}
-      <MobileMenu />
-
-      {/* Search overlay */}
-      <SearchOverlay />
-
-      {/* Persistent audio mini-player */}
-      <MiniPlayer />
-
-      {/* Bottom padding when mini-player is visible (mobile) */}
-      {nowPlaying && <div className="h-16 md:h-14 md:hidden" aria-hidden />}
+      {!hideChrome && nowPlaying && <div className="h-16 md:h-14 md:hidden" aria-hidden />}
     </div>
+  );
+}
+
+function FullScreenLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="font-display text-2xl font-extrabold animate-pulse">
+        The<span className="text-brand">National</span>Dispatch
+      </div>
+    </div>
+  );
+}
+
+function LoginGate() {
+  const { user, sessionLoading, navigate } = useStore();
+
+  useEffect(() => {
+    if (!sessionLoading && user) {
+      const target = user.role === "ADMIN"
+        ? { type: "admin" as const, view: "dashboard" as const }
+        : { type: "editor" as const, view: "dashboard" as const };
+      navigate(target);
+    }
+  }, [user, sessionLoading, navigate]);
+
+  if (sessionLoading) return <FullScreenLoader />;
+  if (user) return <FullScreenLoader />;
+  return (
+    <PublicShell hideChrome>
+      <LoginPage />
+    </PublicShell>
   );
 }

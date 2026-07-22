@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma schema for The National Dispatch
+// Learn more: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -13,20 +10,311 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// ─────────────────────────────────────────────────────────────────────────────
+// Users & Auth
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  EDITOR
+  ADMIN
 }
 
-model Post {
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String
+  passwordHash String
+  role         UserRole      @default(EDITOR)
+  status       AccountStatus @default(ACTIVE)
+  bio          String?
+  avatar       String?
+  jobTitle     String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  articles      Article[]
+  ads           Ad[]
+  jobs          Job[]
+  liveUpdates   LiveUpdate[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Articles & Editorial
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum ArticleStatus {
+  DRAFT
+  PENDING
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+model Article {
+  id            String         @id @default(cuid())
+  slug           String         @unique
+  title          String
+  standfirst     String
+  body           String
+  categorySlug   String
+  tags           String        // JSON-encoded array of strings
+  stateTags      String?       // JSON-encoded array of state names
+  authorId       String
+  author         User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  status         ArticleStatus  @default(DRAFT)
+  isFeatured     Boolean        @default(false)
+  isBreaking     Boolean        @default(false)
+  hasAudio       Boolean        @default(false)
+  audioUrl       String?
+  audioDuration  String?
+  heroImage      String
+  heroCaption    String?
+  heroCredit     String?
+  readingTime    Int            @default(5)
+  views          Int            @default(0)
+  publishedAt    DateTime?
+  updatedAt      DateTime?
+  rejectionNote  String?
+  createdAt      DateTime       @default(now())
+  submittedAt    DateTime?
+  approvedAt     DateTime?
+  approvedById   String?
+  position       Int            @default(0)  // for homepage ordering
+
+  category       Category       @relation(fields: [categorySlug], references: [slug])
+
+  @@index([status])
+  @@index([categorySlug])
+  @@index([authorId])
+  @@index([publishedAt])
+  @@map("articles")
+}
+
+model Category {
+  slug        String    @id
+  name        String    @unique
+  description String
+  colorVar    String
+  sortOrder   Int       @default(0)
+  articles    Article[]
+
+  @@map("categories")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Podcasts
+// ─────────────────────────────────────────────────────────────────────────────
+
+model PodcastSeries {
+  id          String            @id @default(cuid())
+  name        String
+  description String
+  coverImage  String
+  category    String            // "News" | "Analysis" | "Interviews" | "Special Series"
+  episodes    PodcastEpisode[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@map("podcast_series")
+}
+
+model PodcastEpisode {
+  id            String         @id @default(cuid())
+  slug          String         @unique
+  seriesId      String
+  series        PodcastSeries  @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  title         String
+  description   String
+  publishedAt   DateTime       @default(now())
+  duration      String
+  audioUrl      String
+  coverImage    String
+  episodeNumber Int
+  showNotes     String         // JSON-encoded array of {time, label}
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([seriesId])
+  @@map("podcast_episodes")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Live & Breaking
+// ─────────────────────────────────────────────────────────────────────────────
+
+model LiveConfig {
+  id              String   @id @default("default")
+  youtubeUrl      String?
+  programTitle    String?
+  programDesc     String?
+  isLive          Boolean  @default(false)
+  viewerCount     Int      @default(0)
+  startedAt       DateTime?
+  nextBroadcastAt DateTime?
+  showOnHomepage  Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+
+  @@map("live_config")
+}
+
+model LiveUpdate {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
+  timestamp String
+  text      String
+  authorId  String?
+  author    User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  @@map("live_updates")
+}
+
+model BreakingNews {
+  id        String   @id @default(cuid())
+  text      String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("breaking_news")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Careers
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Job {
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  title           String
+  department      String           // "Editorial" | "Tech" | "Sales" | "Operations"
+  location        String
+  type            String           // "Full-time" | "Part-time" | "Contract" | "Internship"
+  description     String
+  responsibilities String          // JSON-encoded string[]
+  requirements    String           // JSON-encoded string[]
+  niceToHaves     String?          // JSON-encoded string[]
+  benefits        String           // JSON-encoded string[]
+  isActive        Boolean          @default(true)
+  postedById      String?
+  postedBy        User?            @relation(fields: [postedById], references: [id], onDelete: SetNull)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  applications    JobApplication[]
+
+  @@map("jobs")
+}
+
+model JobApplication {
+  id           String   @id @default(cuid())
+  jobId        String
+  job          Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  fullName     String
+  email        String
+  phone        String?
+  city         String?
+  linkedinUrl  String?
+  portfolioUrl String?
+  resumePath   String
+  coverLetter  String?
+  source       String?
+  createdAt    DateTime @default(now())
+
+  @@index([jobId])
+  @@map("job_applications")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Advertisements
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum AdStatus {
+  SCHEDULED
+  ACTIVE
+  EXPIRED
+  PAUSED
+}
+
+model Ad {
+  id           String   @id @default(cuid())
+  name         String
+  type         String   // "leaderboard" | "rectangle" | "mobile-banner" | "native"
+  placement    String   // "homepage-top" | "article-inline" | "sidebar" | etc.
+  imageUrl     String?
+  linkUrl      String?
+  htmlContent  String?
+  startDate    DateTime
+  endDate      DateTime
+  status       AdStatus @default(SCHEDULED)
+  createdById  String?
+  createdBy    User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  impressions  Int      @default(0)
+  clicks       Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status])
+  @@index([placement])
+  @@map("ads")
+}
+
+model AdvertiseInquiry {
+  id           String   @id @default(cuid())
+  fullName     String
+  email        String
+  phone        String?
+  company      String
+  websiteUrl   String?
+  formats      String   // JSON-encoded string[]
+  budget       String?
+  startDate    DateTime?
+  message      String?
+  status       String   @default("NEW") // "NEW" | "CONTACTED" | "WON" | "LOST"
+  createdAt    DateTime @default(now())
+
+  @@map("advertise_inquiries")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Engagement: Newsletter, Contact, Analytics
+// ─────────────────────────────────────────────────────────────────────────────
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  status    String   @default("ACTIVE") // "ACTIVE" | "UNSUBSCRIBED"
+  createdAt DateTime @default(now())
+
+  @@map("newsletter_subscribers")
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String
+  subject   String
+  message   String
+  status    String   @default("NEW") // "NEW" | "READ" | "REPLIED" | "ARCHIVED"
+  createdAt DateTime @default(now())
+
+  @@map("contact_messages")
+}
+
+// Lightweight per-article per-day analytics rollup
+model ArticleView {
+  id        String   @id @default(cuid())
+  articleId String
+  date      DateTime @default(now())
+  count     Int      @default(1)
+
+  @@unique([articleId, date])
+  @@index([articleId])
+  @@map("article_views")
 }

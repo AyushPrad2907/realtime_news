@@ -147,3 +147,131 @@ Stage Summary:
 - Ready for backend handoff: replace mock-data with real API calls, replace
   Zustand navigation with Next.js App Router routes, replace mock auth with
   NextAuth for editor/admin panels.
+
+---
+Task ID: news-portal-backend
+Agent: main (Super Z)
+Task: Build the backend for the National News Portal — database schema,
+  authentication, API routes, Editor Panel, and Admin Panel. Wire the
+  existing public frontend to fetch from real APIs (with mock fallback).
+
+Work Log:
+- Designed Prisma schema with 14 models covering all blueprint entities:
+  User (Editor/Admin roles + ACTIVE/SUSPENDED/DEACTIVATED status), Article
+  (DRAFT/PENDING/PUBLISHED/REJECTED/ARCHIVED status flow), Category,
+  PodcastSeries, PodcastEpisode, Job, JobApplication, LiveConfig,
+  LiveUpdate, BreakingNews, Ad (with SCHEDULED/ACTIVE/EXPIRED/PAUSED),
+  AdvertiseInquiry, NewsletterSubscriber, ContactMessage, ArticleView.
+  SQLite-compatible (JSON encoded as strings for arrays).
+- Deployed schema with `bun run db:push` (initial pass had 2 relation
+  issues — fixed by making createdBy/postedBy optional and removing
+  the unused User↔ArticleView relation).
+- Built seed script (`scripts/seed.ts`) that:
+  - Creates ADMIN user (admin@dispatch.test / admin123)
+  - Creates demo EDITOR user (editor@dispatch.test / editor123)
+  - Creates 6 author-editors from existing mock AUTHORS
+  - Upserts all 9 categories, 18 articles, 6 podcast series + 6
+    episodes, 5 jobs, live config, 6 live updates, 5 breaking headlines,
+    3 demo ads.
+  - Idempotent: safe to run multiple times via upserts.
+- Installed bcryptjs for password hashing.
+- Set up NextAuth v4 with credentials provider, JWT sessions, role-based
+  callbacks (EDITOR/ADMIN), type augmentation in src/types/next-auth.d.ts.
+  Added NEXTAUTH_SECRET to .env.
+- Built 25+ API routes organized by audience:
+  • Public: /api/articles (list+filter), /api/articles/[slug] (with view
+    increment), /api/categories, /api/podcasts, /api/podcasts/[slug],
+    /api/jobs, /api/jobs/[slug], /api/jobs/[slug]/apply, /api/live,
+    /api/breaking, /api/search (articles+podcasts), /api/newsletter/subscribe,
+    /api/advertise/inquire, /api/contact, /api/session.
+  • Editor (auth required): /api/editor/articles (GET list, POST create),
+    /api/editor/articles/[id] (GET, PUT, DELETE — with ownership check),
+    /api/editor/articles/[id]/submit (DRAFT/REJECTED → PENDING),
+    /api/editor/upload (image+audio file upload with size/type validation).
+  • Admin (auth+ADMIN required): /api/admin/articles (GET all, POST create),
+    /api/admin/articles/[id]/approve (PENDING → PUBLISHED),
+    /api/admin/articles/[id]/reject (with note),
+    /api/admin/editors (GET, POST), /api/admin/editors/[id] (PATCH, DELETE),
+    /api/admin/ads (GET, POST), /api/admin/ads/[id] (PATCH, DELETE),
+    /api/admin/live (GET, PATCH), /api/admin/careers (GET, POST),
+    /api/admin/careers/[id] (PATCH, DELETE), /api/admin/analytics
+    (summary + daily views + top articles + category performance),
+    /api/admin/layout (GET, PATCH for featured + reorder).
+- Built serializers that convert Prisma records to the exact shape the
+  existing public frontend expects (so no UI changes were needed).
+- Built API client (`src/lib/api-client.ts`) with typed functions for
+  every endpoint, including signIn/signOut helpers that handle NextAuth's
+  CSRF flow.
+- Built `use-data.ts` hooks that return mock data immediately and refresh
+  from the API in the background (SWR-like pattern) — so the public site
+  keeps working even if the API is slow.
+- Extended Zustand store with: user session, sessionLoading, refreshSession,
+  plus new page-view types (login, editor, admin) with sub-views.
+- Updated Header to show a "Newsroom" sign-in button when logged out,
+  and a user avatar menu when logged in (with links to Admin/Editor
+  panels based on role, and a Sign out action).
+- Built LoginPage with: email/password form, demo credential autofill
+  cards (Admin/Editor), error handling, role-based post-login routing.
+- Built PanelShell — shared sidebar + topbar layout for both Editor and
+  Admin panels. Mobile-responsive (sidebar collapses to drawer).
+- Built EditorPanel with three views:
+  • Dashboard: stats (total/drafts/pending/published) + submissions list
+    with status badges, edit/preview actions.
+  • New Article / Edit Article: full article editor with headline,
+    standfirst, category, tags, hero image upload, hero caption/credit,
+    HTML body editor with hint text, audio upload + duration, rejection
+    note display, sticky action bar (Cancel/Delete/Save draft/Submit
+    for review).
+- Built AdminPanel with eight views:
+  • Dashboard: 6 stat cards + quick actions + top stories by views.
+  • Articles: status tabs (Pending/Published/Drafts/Rejected) + review
+    queue with one-click approve/reject (reject prompts for note).
+  • Editors: table + create/edit form (name, email, password, role,
+    status, job title) + delete (with self-delete protection).
+  • Ads: table + create/edit form (name, type, placement, image URL,
+    link URL, schedule dates, status) + delete.
+  • Live: edit form for YouTube URL, program title/desc, viewer count,
+    isLive toggle, showOnHomepage toggle.
+  • Careers: table + create/edit form (title, department, location,
+    type, description, responsibilities/requirements/nice-to-haves/
+    benefits as multi-line textareas, isActive toggle) + delete.
+  • Homepage Layout: list of published articles, click to set as
+    featured, currently-featured callout at top.
+  • Analytics: daily views bar chart (7/30/90 days), top articles,
+    category performance bars.
+- Wired page.tsx with auth gates: panel routes check session and redirect
+  to login if unauthenticated; login page auto-routes to panel if already
+  signed in (via useEffect, not during render — fixed initial
+  "Cannot update component during render" error).
+- Public pages now fetch from real APIs via use-data hooks with mock
+  fallback (BreakingTicker verified live from /api/breaking).
+- Lint: clean. All useEffect-based data loaders use setTimeout(0) pattern
+  to satisfy `react-hooks/set-state-in-effect` rule.
+- Browser-tested end-to-end:
+  • Public homepage loads with real DB content (18 articles).
+  • All 7 public APIs return 200.
+  • Sign in as admin → admin dashboard → articles queue → editors list →
+    analytics view all render correctly.
+  • Sign in as editor → editor dashboard → New Article form fills and
+    saves to DB (verified via /api/editor/articles).
+  • Full editorial workflow verified via curl: editor creates article →
+    submits for review (DRAFT→PENDING) → admin approves (PENDING→PUBLISHED)
+    → article appears in public /api/articles feed.
+
+Stage Summary:
+- Deliverable: A complete backend for the news portal — Prisma schema,
+  NextAuth authentication, 25+ API routes, Editor Panel (3 views), and
+  Admin Panel (8 views). All public-facing pages now fetch from the
+  database with mock data as instant fallback.
+- Tech: Next.js 16 App Router + Prisma + SQLite + NextAuth v4 (credentials,
+  JWT sessions, role-based) + bcryptjs + Zustand for client state.
+- Auth: Two demo accounts seeded — admin@dispatch.test/admin123 (full
+  access) and editor@dispatch.test/editor123 (article creation/submission).
+- Editorial workflow: Editor creates draft → submits for review → Admin
+  approves → article goes live on public site. Rejection path includes
+  a note that the editor sees in their dashboard.
+- File uploads: Editors can upload hero images (5MB max) and audio files
+  (50MB max) via /api/editor/upload; files stored in /public/uploads/{images|audio}/.
+- Ready for production hardening: rate-limiting on auth, image optimization
+  via sharp, email sending for advertise inquiries / job applications,
+  and migration to Postgres for production scale.

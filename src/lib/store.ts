@@ -2,6 +2,14 @@
 
 import { create } from "zustand";
 import type { PageView, PodcastEpisode } from "./types";
+import { fetchSession } from "./api-client";
+
+interface SessionUser {
+  id: string;
+  email: string;
+  name: string;
+  role: "EDITOR" | "ADMIN";
+}
 
 interface NavState {
   // Navigation
@@ -32,6 +40,12 @@ interface NavState {
   // Reading progress (0..1)
   readingProgress: number;
   setReadingProgress: (p: number) => void;
+
+  // Auth
+  user: SessionUser | null;
+  sessionLoading: boolean;
+  setSession: (user: SessionUser | null) => void;
+  refreshSession: () => Promise<void>;
 }
 
 export const useStore = create<NavState>((set, get) => ({
@@ -45,7 +59,6 @@ export const useStore = create<NavState>((set, get) => ({
       mobileMenuOpen: false,
       searchOpen: false,
     });
-    // Scroll to top on navigation
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
     }
@@ -74,11 +87,23 @@ export const useStore = create<NavState>((set, get) => ({
 
   nowPlaying: null,
   isPlaying: false,
-  playEpisode: (episode) =>
-    set({ nowPlaying: episode, isPlaying: true }),
+  playEpisode: (episode) => set({ nowPlaying: episode, isPlaying: true }),
   togglePlay: () => set((s) => ({ isPlaying: !s.isPlaying })),
   stopPlayback: () => set({ nowPlaying: null, isPlaying: false }),
 
   readingProgress: 0,
   setReadingProgress: (p) => set({ readingProgress: p }),
+
+  user: null,
+  sessionLoading: true,
+  setSession: (user) => set({ user, sessionLoading: false }),
+  refreshSession: async () => {
+    set({ sessionLoading: true });
+    try {
+      const { user } = await fetchSession();
+      set({ user, sessionLoading: false });
+    } catch {
+      set({ user: null, sessionLoading: false });
+    }
+  },
 }));

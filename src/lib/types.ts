@@ -107,4 +107,8 @@ export type PageView =
   | { type: "about" }
   | { type: "contact" }
   | { type: "privacy" }
-  | { type: "terms" };
+  | { type: "terms" }
+  // Auth + panels
+  | { type: "login" }
+  | { type: "editor"; view?: "dashboard" | "new-article" | "edit-article"; articleId?: string }
+  | { type: "admin"; view?: "dashboard" | "articles" | "editors" | "ads" | "live" | "careers" | "layout" | "analytics" };

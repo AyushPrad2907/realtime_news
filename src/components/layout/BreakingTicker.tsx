@@ -2,20 +2,21 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { BREAKING_NEWS } from "@/lib/mock-data";
+import { ARTICLES_LIST } from "@/lib/mock-data";
+import { useBreaking } from "@/lib/use-data";
 import { AlertCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ARTICLES_LIST } from "@/lib/mock-data";
 
 export function BreakingTicker() {
   const [dismissed, setDismissed] = useState(false);
   const [paused, setPaused] = useState(false);
   const { navigate } = useStore();
+  const { data: headlines } = useBreaking();
 
-  if (dismissed) return null;
+  if (dismissed || headlines.length === 0) return null;
 
   // Triple the content so the loop is seamless
-  const tickerContent = [...BREAKING_NEWS, ...BREAKING_NEWS, ...BREAKING_NEWS];
+  const tickerContent = [...headlines, ...headlines, ...headlines];
 
   const onClickHeadline = (text: string) => {
     // Try to find matching article by partial title match

@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
-import { Search, Menu, Sun, Moon, Radio } from "lucide-react";
+import { Search, Menu, Sun, Moon, Radio, LogOut, Shield, PenLine, UserCircle2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { signOut } from "@/lib/api-client";
 
 const PRIMARY_NAV = [
   { label: "Home", view: { type: "home" as const } },
@@ -18,9 +19,10 @@ const PRIMARY_NAV = [
 ];
 
 export function Header() {
-  const { navigate, current, setMobileMenuOpen, setSearchOpen, isLive } = useStore();
+  const { navigate, current, setMobileMenuOpen, setSearchOpen, isLive, user, refreshSession } = useStore();
   const { theme, setTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   // Track hydration without triggering setState in effect
   const mounted = useHydrated();
 
@@ -140,6 +142,87 @@ export function Header() {
                 ) : (
                   <Moon className="h-4 w-4" />
                 )}
+              </button>
+            )}
+
+            {/* Auth: signed-in user menu OR sign-in button */}
+            {mounted && user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen((o) => !o)}
+                  className="hidden md:inline-flex items-center gap-2 px-2 h-9 rounded-md border border-border hover:bg-muted transition-colors"
+                >
+                  <div className="h-6 w-6 rounded-full bg-brand/15 text-brand flex items-center justify-center font-display text-xs font-bold">
+                    {user.name.charAt(0)}
+                  </div>
+                  <span className="font-ui text-xs font-medium max-w-[100px] truncate">
+                    {user.name.split(" ")[0]}
+                  </span>
+                </button>
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setUserMenuOpen(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 top-11 z-50 w-56 p-1.5 rounded-md border border-border bg-card shadow-lg"
+                      >
+                        <div className="px-3 py-2 border-b border-border mb-1">
+                          <p className="font-ui text-xs font-semibold truncate">{user.name}</p>
+                          <p className="font-ui text-[10px] text-ink-tertiary truncate">{user.email}</p>
+                        </div>
+                        {user.role === "ADMIN" && (
+                          <button
+                            onClick={() => {
+                              setUserMenuOpen(false);
+                              navigate({ type: "admin", view: "dashboard" });
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-left font-ui text-sm"
+                          >
+                            <Shield className="h-3.5 w-3.5 text-brand" />
+                            Admin Panel
+                          </button>
+                        )}
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            navigate({ type: "editor", view: "dashboard" });
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-left font-ui text-sm"
+                        >
+                          <PenLine className="h-3.5 w-3.5 text-brand" />
+                          Editor Panel
+                        </button>
+                        <button
+                          onClick={async () => {
+                            setUserMenuOpen(false);
+                            await signOut();
+                            await refreshSession();
+                            navigate({ type: "home" });
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-left font-ui text-sm text-destructive"
+                        >
+                          <LogOut className="h-3.5 w-3.5" />
+                          Sign out
+                        </button>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate({ type: "login" })}
+                className="hidden md:inline-flex items-center gap-1.5 px-3 h-9 rounded-md border border-border hover:bg-muted transition-colors font-ui text-xs font-semibold"
+              >
+                <UserCircle2 className="h-3.5 w-3.5" />
+                Newsroom
               </button>
             )}
 
