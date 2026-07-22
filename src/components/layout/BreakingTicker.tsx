@@ -1,0 +1,78 @@
+"use client";
+
+import { useState } from "react";
+import { useStore } from "@/lib/store";
+import { BREAKING_NEWS } from "@/lib/mock-data";
+import { AlertCircle, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ARTICLES_LIST } from "@/lib/mock-data";
+
+export function BreakingTicker() {
+  const [dismissed, setDismissed] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const { navigate } = useStore();
+
+  if (dismissed) return null;
+
+  // Triple the content so the loop is seamless
+  const tickerContent = [...BREAKING_NEWS, ...BREAKING_NEWS, ...BREAKING_NEWS];
+
+  const onClickHeadline = (text: string) => {
+    // Try to find matching article by partial title match
+    const match = ARTICLES_LIST.find((a) =>
+      text.toLowerCase().includes(a.title.toLowerCase().slice(0, 25).toLowerCase())
+    );
+    if (match) {
+      navigate({ type: "article", slug: match.slug });
+    } else {
+      navigate({ type: "section", slug: "breaking" });
+    }
+  };
+
+  return (
+    <div
+      className="bg-breaking text-white border-b border-white/10"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      role="region"
+      aria-label="Breaking news"
+    >
+      <div className="mx-auto max-w-[1280px] flex items-stretch">
+        <div className="shrink-0 flex items-center gap-2 px-3 md:px-5 py-2 bg-black/30 border-r border-white/10">
+          <AlertCircle className="h-3.5 w-3.5 text-red-300" />
+          <span className="font-ui text-[11px] md:text-xs font-bold uppercase tracking-wider">
+            Breaking
+          </span>
+        </div>
+
+        <div className="relative flex-1 overflow-hidden">
+          <div
+            className={cn(
+              "flex items-center whitespace-nowrap py-2 animate-ticker",
+              paused && "ticker-paused"
+            )}
+          >
+            {tickerContent.map((headline, i) => (
+              <button
+                key={i}
+                onClick={() => onClickHeadline(headline)}
+                className="inline-flex items-center gap-3 px-4 font-ui text-[13px] text-white/90 hover:text-white transition-colors"
+              >
+                <span className="h-1 w-1 rounded-full bg-white/60" />
+                {headline}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button
+          onClick={() => setDismissed(true)}
+          className="shrink-0 px-3 md:px-4 flex items-center text-white/70 hover:text-white transition-colors"
+          aria-label="Dismiss breaking news ticker"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}

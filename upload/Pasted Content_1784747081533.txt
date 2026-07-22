@@ -1,0 +1,1863 @@
+# MASTER UI/UX BLUEPRINT
+## Professional National News Portal
+### Product Design & UX Specification Document
+**Version 1.0 | Prepared by Senior UX Strategy Team**
+
+---
+
+> **Scope:** This document defines the complete product blueprint for a premium national news platform. It covers information architecture, page hierarchy, navigation flows, component design, responsive behavior, design system, and accessibility. No implementation code is included. This document is intended to serve as the authoritative reference for all frontend development.
+
+---
+
+## TABLE OF CONTENTS
+
+1. Design Philosophy & Principles
+2. User Types & Permissions Matrix
+3. Information Architecture & Sitemap
+4. Navigation Structure
+5. User Flow Maps
+6. Homepage Blueprint
+7. Article Page Blueprint
+8. Live Section Blueprint
+9. Podcast Blueprint
+10. Search Blueprint
+11. Advertise With Us Blueprint
+12. Careers Blueprint
+13. Admin Panel Blueprint
+14. Editor Panel Blueprint
+15. Advertisement Placement Blueprint
+16. Mobile Experience
+17. Tablet Experience
+18. Desktop Experience
+19. Design System
+20. Animation Blueprint
+21. Accessibility Blueprint
+22. Performance Blueprint
+
+---
+
+---
+
+# SECTION 1: DESIGN PHILOSOPHY & PRINCIPLES
+
+## Core Philosophy
+
+The platform must convey trust, authority, and editorial excellence at first glance. Every design decision — from typeface selection to the spacing between article cards — should serve the reader's experience, not the brand's ego.
+
+Think of the reading experience as the primary product. Every other element exists to support that core function.
+
+## Design Principles
+
+### 1. Editorial First
+Content is the hero. The UI recedes to give maximum visual weight to headlines, images, and text. Chrome (buttons, borders, backgrounds) is minimal and purposeful. Never let decoration compete with journalism.
+
+### 2. Trust Through Restraint
+Premium news publications earn trust by appearing composed and disciplined. Avoid flashy animations, aggressive color blocking, or gimmicky layouts. Use whitespace generously — it signals confidence.
+
+### 3. Hierarchy by Importance
+Every screen must communicate an order of importance at a glance. The reader's eye should flow naturally from the most significant story to the least. Achieve this through typography scale, contrast, and spatial positioning — not color noise.
+
+### 4. Speed as a Feature
+A slow site destroys reader trust. Every layout decision should account for perceived performance. Skeleton screens, lazy loading, and progressive rendering are not afterthoughts — they are first-class design features.
+
+### 5. Mobile as Primary
+The majority of news consumption happens on mobile. All layouts are designed mobile-first and then scaled up, not the reverse.
+
+### 6. Accessibility as Quality
+A design that excludes any reader is an incomplete design. Contrast ratios, keyboard navigation, and screen reader support are not optional enhancements — they are baseline requirements.
+
+---
+
+---
+
+# SECTION 2: USER TYPES & PERMISSIONS MATRIX
+
+## 2.1 Public Visitor
+
+**Authentication:** None required.
+
+**Capabilities:**
+- Browse all published articles
+- Watch embedded live video (YouTube)
+- Listen to audio versions of articles
+- Browse and play podcasts
+- Use search and filters
+- View all advertisements
+- Submit advertising inquiries via form
+- Browse and apply for careers
+- Access all static pages (About, Contact, Privacy, Terms)
+
+**Restrictions:**
+- Cannot access any editorial or administrative tools
+- Cannot modify any content
+- Cannot view unpublished or draft content
+
+---
+
+## 2.2 Editor
+
+**Authentication:** Required. Credential-based login.
+
+**Capabilities:**
+- Create new article drafts
+- Edit existing drafts assigned to them
+- Upload images, video thumbnails, and embedded media
+- Attach audio files to articles
+- Submit completed articles to Super Admin for review and approval
+- View their own submission history and status
+
+**Restrictions:**
+- Cannot publish articles directly
+- Cannot approve or reject articles
+- Cannot manage advertisements
+- Cannot manage user accounts
+- Cannot access analytics
+- Cannot manage careers or homepage layout
+
+---
+
+## 2.3 Super Admin
+
+**Authentication:** Required. Elevated credential-based login with optional 2FA.
+
+**Capabilities (Full Platform Control):**
+- Review, approve, reject, and publish all articles
+- Manage Editor accounts (create, suspend, deactivate)
+- Manage advertisement placements (upload, schedule, activate, deactivate)
+- Manage YouTube Live links on the Live section
+- Manage career postings (create, publish, close)
+- Control homepage layout (featured story, story order, pinned content)
+- Access platform analytics dashboard (page views, traffic, article performance)
+- Manage static content (About, Contact details)
+- Configure platform settings
+
+---
+
+---
+
+# SECTION 3: INFORMATION ARCHITECTURE & SITEMAP
+
+## 3.1 Site Map
+
+```
+Root (/)
+│
+├── Home (/)
+│
+├── Live (/live)
+│
+├── Breaking News (/breaking)
+│
+├── News
+│   ├── National (/national)
+│   ├── International (/international)
+│   └── State News (/state/:state-slug)
+│
+├── Categories
+│   ├── Politics (/category/politics)
+│   ├── Economy (/category/economy)
+│   ├── Technology (/category/technology)
+│   ├── Sports (/category/sports)
+│   ├── Health (/category/health)
+│   ├── Science (/category/science)
+│   ├── Entertainment (/category/entertainment)
+│   └── [Additional categories...]
+│
+├── Article Detail (/article/:slug)
+│
+├── Podcasts
+│   ├── Podcast Listing (/podcasts)
+│   └── Podcast Episode (/podcasts/:slug)
+│
+├── Search (/search?q=:query)
+│
+├── About (/about)
+│
+├── Contact (/contact)
+│
+├── Advertise With Us (/advertise)
+│
+├── Careers
+│   ├── Listing (/careers)
+│   ├── Job Detail (/careers/:job-slug)
+│   └── Application (/careers/:job-slug/apply)
+│
+├── Legal
+│   ├── Privacy Policy (/privacy)
+│   └── Terms of Service (/terms)
+│
+├── Editor Panel (/editor)
+│   ├── Dashboard (/editor/dashboard)
+│   ├── New Article (/editor/article/new)
+│   ├── Edit Article (/editor/article/:id/edit)
+│   └── My Submissions (/editor/submissions)
+│
+└── Admin Panel (/admin)
+    ├── Dashboard (/admin/dashboard)
+    ├── Articles (/admin/articles)
+    ├── Editors (/admin/editors)
+    ├── Advertisements (/admin/ads)
+    ├── Live (/admin/live)
+    ├── Careers (/admin/careers)
+    ├── Homepage Layout (/admin/layout)
+    └── Analytics (/admin/analytics)
+```
+
+---
+
+## 3.2 Content Taxonomy
+
+**Primary Sections:** National, International, State News, Live, Breaking News
+
+**Category Tags:** Each article is assigned one primary category and optional secondary tags. Categories power the navigation and category landing pages.
+
+**State Tags:** Articles can be tagged with one or more Indian states, enabling the State News section to filter by geography.
+
+**Content Types:** Article, Photo Essay, Video Story, Live Blog, Podcast Episode, Sponsored Story
+
+---
+
+---
+
+# SECTION 4: NAVIGATION STRUCTURE
+
+## 4.1 Primary Navigation (Desktop)
+
+The primary nav sits in a fixed header at the top of all public pages. It does not scroll away.
+
+**Left side:** Logo (text or SVG mark). Clicking returns to homepage.
+
+**Center:** Main navigation links. The recommended order:
+`Home | Live | Breaking | National | International | State News | Podcasts`
+
+**Right side:** Search icon (expands to search bar inline), optional language toggle if multilingual support is planned.
+
+**Secondary navigation bar** (below primary): A horizontally scrollable category pill row.
+`Politics | Economy | Sports | Health | Technology | Science | Entertainment | [more...]`
+
+This bar scrolls independently and does not wrap to multiple lines.
+
+---
+
+## 4.2 Mobile Navigation
+
+**Sticky Header:** Logo centered or left-aligned. Search icon right. Hamburger icon far right.
+
+**Bottom Navigation Bar (persistent):** Fixed to the bottom of the viewport on all mobile screens.
+- Home icon
+- Live icon (with animated red dot when live is active)
+- Search icon
+- Podcasts icon
+- Menu icon (opens full drawer)
+
+**Hamburger / Full Menu Drawer:** Slides in from the right (or bottom sheet pattern). Contains all navigation items, category links, state news links, and utility links (About, Careers, Advertise, Contact). Close via X button or swipe back.
+
+---
+
+## 4.3 Footer Navigation
+
+**Column 1:** About the Platform — About, Editorial Policy, Team, Contact
+
+**Column 2:** Coverage — National, International, State, Breaking, Live
+
+**Column 3:** Categories (top 6-8)
+
+**Column 4:** Connect — Advertise, Careers, Newsletter, Social Links
+
+**Bottom row:** Privacy Policy | Terms of Service | © Year Platform Name
+
+---
+
+---
+
+# SECTION 5: USER FLOW MAPS
+
+## 5.1 Public Visitor Flow — Article Reading
+
+```
+Homepage → Notices Featured Story
+        → Clicks headline or image
+        → Article Detail Page loads
+        → Reads article
+        → Sees Related News at bottom
+        → Clicks related article (new article loads)
+        → OR: Uses back button → Returns to Homepage
+        → OR: Scrolls to next article (infinite / Next Article block)
+```
+
+## 5.2 Public Visitor Flow — Live News
+
+```
+Homepage → Sees Live section preview with thumbnail
+         → Clicks "Watch Live" CTA
+         → Live Page loads with embedded YouTube player
+         → Player autoplays (muted by default)
+         → Reader scrolls down to see Live Updates Timeline
+         → Reads rolling text updates below the video
+```
+
+## 5.3 Public Visitor Flow — Search
+
+```
+Any page → Clicks search icon
+         → Search bar expands (inline or overlay)
+         → User types query → Suggestions appear in dropdown
+         → User presses Enter or selects suggestion
+         → Search Results Page loads
+         → User applies filters (category, date, type)
+         → Clicks result → Article Detail Page
+```
+
+## 5.4 Public Visitor Flow — Advertise
+
+```
+Footer or Nav link → Advertise With Us Page
+                   → Reads benefits and ad types
+                   → Scrolls to Inquiry Form
+                   → Fills form (name, company, budget, type)
+                   → Submits → Success message shown
+                   → Admin receives notification
+```
+
+## 5.5 Public Visitor Flow — Careers
+
+```
+Nav or Footer → Careers Listing Page
+              → Browses open positions
+              → Clicks job card
+              → Job Detail Page (description, requirements)
+              → Clicks "Apply Now"
+              → Application Form (name, contact, resume upload, cover letter)
+              → Submits → Success confirmation page
+```
+
+## 5.6 Editor Flow — Article Submission
+
+```
+Login → Editor Dashboard
+      → Click "New Article"
+      → Article Editor opens
+      → Fills: Headline, Subheadline, Body, Category, Tags, State Tags
+      → Uploads hero image, optional gallery
+      → Uploads or records audio version
+      → Previews article
+      → Clicks "Submit for Approval"
+      → Status changes to "Pending Review"
+      → Super Admin receives notification
+```
+
+## 5.7 Super Admin Flow — Article Approval
+
+```
+Login → Admin Dashboard
+      → Sees "Pending Articles" count
+      → Opens Articles list → Filters to "Pending"
+      → Clicks article → Preview opens
+      → Reviews content
+      → Clicks "Approve & Publish" or "Reject with Note"
+      → If approved: Article goes live on site immediately
+      → If rejected: Editor receives notification with note
+```
+
+---
+
+---
+
+# SECTION 6: HOMEPAGE BLUEPRINT
+
+The homepage is the platform's front page — it must communicate authority, breadth of coverage, and editorial judgment in a single scroll.
+
+## 6.1 Announcement Bar (Top, optional)
+
+**Purpose:** Alerts for critical events — election results, major breaking news, site maintenance.
+
+**Layout:** Full-width, single-line, colored background (use sparingly — bright amber or deep red). Centered text. Close (×) button on far right.
+
+**Behavior:** Dismissible per session. Controlled by admin toggle. Disappears when no active announcement.
+
+**Responsive:** Same on all breakpoints. Collapses gracefully on very small screens (reduce font size).
+
+---
+
+## 6.2 Header
+
+**Purpose:** Brand identity + primary navigation access on every page.
+
+**Layout:** Fixed (sticky) to top of viewport. Full width. Slightly translucent with backdrop blur when page is scrolled. Solid background when at top.
+
+**Desktop:** Logo left, Nav center, Search + utility icons right. Height: 64px.
+
+**Mobile:** Logo left, Search + Hamburger right. Height: 56px.
+
+**Visual:** Thin 1px bottom border in neutral tone. Subtle shadow on scroll.
+
+---
+
+## 6.3 Navigation Bar
+
+**Purpose:** Section and category access.
+
+**Desktop Layout:** Horizontal link row below header. Uses the full-width secondary bar for categories (scrollable). Active section indicated by bottom border underline, not background fill.
+
+**Mobile Layout:** Condensed. Category pills hidden behind "more" arrow or accessed via drawer.
+
+---
+
+## 6.4 Breaking News Ticker
+
+**Purpose:** Communicate urgency. Alert readers to developing stories.
+
+**Layout:** Full-width band immediately below the nav. Dark background (near-black or deep red). White text. Label on left: "BREAKING" in bold caps. Ticker text scrolls right-to-left. Multiple stories separated by a bullet (•) or pipe (|).
+
+**Behavior:** Auto-scrolls continuously. On hover (desktop) or tap (mobile), scroll pauses. Each headline is tappable — navigates to that article.
+
+**Admin control:** Super Admin can enable/disable the ticker and edit the list of breaking stories.
+
+**Responsive:** Same on all breakpoints. On very small screens, reduce label to icon only (red alert icon).
+
+---
+
+## 6.5 Featured Story (Hero)
+
+**Purpose:** The single most important story of the moment. Editorial showcase.
+
+**Layout — Desktop:**
+Full-width panel. Left two-thirds: Large hero image. Right one-third: Category label, large headline (H1 scale), standfirst/summary paragraph (2–3 lines), author name, timestamp, "Read More" CTA link.
+
+Alternatively: Full-bleed hero image with gradient overlay darkening bottom half. Text overlaid on gradient: category badge, headline, standfirst.
+
+**Layout — Mobile:**
+Image on top (16:9 or 3:2 ratio). Text block below. Headline scales down (H2 size). Standfirst truncated or hidden.
+
+**Visual hierarchy:** Headline is the largest text on the page. Category badge uses accent color. Timestamp in muted small text.
+
+**Interaction:** Entire card is clickable. No button needed — the cursor changes to pointer on hover.
+
+**Admin control:** Super Admin manually designates the featured story from the published pool.
+
+---
+
+## 6.6 Top Stories Grid
+
+**Purpose:** Showcase the next 4–6 highest-priority stories below the hero.
+
+**Layout — Desktop:**
+3-column grid. Left column: 1 large card (larger image + headline + standfirst). Center and right columns: 2–3 smaller cards stacked (smaller image + headline + metadata only).
+
+Or: A clean 3-column equal grid of medium cards.
+
+**Layout — Tablet:** 2-column grid.
+
+**Layout — Mobile:** Single column, stacked cards. Horizontal scrollable row as an alternative for "Top Stories" label section.
+
+**Card anatomy:**
+- Image (aspect ratio 16:9, lazy loaded)
+- Category label (colored badge, top-left on image or above headline)
+- Headline (H3 size)
+- Author + Timestamp (small, muted)
+- Optional: Reading time label
+
+**Interaction:** Entire card clickable. Image has subtle zoom on hover (desktop). Cards have very slight lift shadow on hover.
+
+---
+
+## 6.7 Latest News Feed
+
+**Purpose:** Real-time freshness. Shows the most recently published articles across all categories.
+
+**Layout — Desktop:** 1 column of compact list items with timestamp on the left and headline on the right. OR a 2-column masonry-lite grid of compact cards.
+
+**Layout — Mobile:** Single-column list of text-only headline items with small thumbnail on the right.
+
+**Update behavior:** New articles prepend to top. A subtle "New stories available — Tap to refresh" banner appears when new content is added without forcing a full page reload.
+
+**Label:** "LATEST NEWS" with a small animated green dot (live pulse animation) beside it.
+
+---
+
+## 6.8 Category Blocks
+
+**Purpose:** Organized editorial browsing by topic.
+
+**Layout:** 2–3 horizontal "ribbon" sections, each dedicated to one category (e.g., Politics, Economy, Sports). Each ribbon has:
+- Section label on the left with "View All →" link on the right
+- Horizontal row of 3–4 cards (scrollable on mobile)
+
+**Card size:** Medium. Image + headline + timestamp.
+
+**Behavior on mobile:** Each category block becomes a horizontal scroll container (swipeable card row).
+
+---
+
+## 6.9 State-Wise News
+
+**Purpose:** Serve readers who want news from their specific state.
+
+**Layout — Desktop:** 2-column. Left: State selector (vertical list of state names or a dropdown). Right: 3–5 article cards for the selected state.
+
+**Layout — Mobile:** State selector as a horizontal pill scroll at top. Below: article list updates when state is selected.
+
+**Default state:** Auto-detect or show a default popular state. User's selection persists for the session.
+
+**Interaction:** Clicking a state immediately updates the article panel without a page reload (filter interaction).
+
+---
+
+## 6.10 Live News Section
+
+**Purpose:** Promote the live broadcast with urgency.
+
+**Layout:** Full-width section with dark or brand-color background to differentiate it from surrounding content. Contains:
+- "LIVE NOW" badge with pulsing red dot
+- Thumbnail of current YouTube live stream (16:9)
+- Title of the live program
+- Viewer count (if available)
+- "Watch Live" CTA button
+
+**When no live stream is active:** Section collapses or shows "Upcoming Live" with next scheduled broadcast time and date.
+
+---
+
+## 6.11 Podcast Section
+
+**Purpose:** Promote audio content and podcast series.
+
+**Layout — Desktop:** Horizontal card strip (3–4 podcast episode cards). Each card: Episode thumbnail, podcast series name, episode title, duration, play button.
+
+**Layout — Mobile:** Horizontal scroll row. Cards are compact.
+
+**Interaction:** Play button launches a mini audio player (persistent bottom bar) without navigating away from the page. Card click navigates to the podcast episode detail page.
+
+---
+
+## 6.12 Trending Now
+
+**Purpose:** Social proof. Shows what others are reading right now.
+
+**Layout:** Full-width numbered list (1–10). Each item: rank number (large, muted), category tag, headline. No images in this section — text only for speed.
+
+**Algorithm:** Based on page view velocity (most viewed in last 2–4 hours), not all-time views.
+
+---
+
+## 6.13 Editor's Picks
+
+**Purpose:** Editorial curation. Distinguishes the platform's voice and judgment.
+
+**Layout:** 1 large featured card on left + 3 smaller cards stacked on right (desktop). Mobile: vertical card stack.
+
+**Visual difference from Top Stories:** This section has a subtle warm background tint or a thin left-border accent to differentiate it as a curated editorial block, not an algorithmic one. Label: "Editor's Picks" with an editor pen icon.
+
+---
+
+## 6.14 Advertisement Blocks
+
+**Purpose:** Revenue. Must be present but never disruptive.
+
+**Placement on homepage:**
+- **After Top Stories grid:** 1 leaderboard-style banner (728×90 desktop / 320×50 mobile).
+- **Within Latest News feed:** After every 5–6 articles, 1 inline native ad card styled similarly to regular article cards but with a small "Sponsored" label.
+- **Sidebar (desktop only):** If layout uses sidebar — a 300×250 medium rectangle.
+
+**Visual treatment:** Ad blocks should have a very subtle background differentiation (lightest possible gray) and a small, tasteful "Advertisement" label in the top-right corner in small muted text. They must not use borders or boxes that scream "ad."
+
+---
+
+## 6.15 Newsletter Signup
+
+**Purpose:** Audience retention and email list building.
+
+**Layout:** Full-width section. Clean, centered design. Bold headline: "Never Miss a Story." Subtext: one line about what subscribers receive. Email input field + "Subscribe" button inline (single row on desktop, stacked on mobile).
+
+**Behavior:** Inline validation. On success: input transforms to success message "You're in! Check your inbox." No page reload.
+
+---
+
+## 6.16 Footer
+
+**Purpose:** Utility navigation, legal, social, contact.
+
+**Layout:** Multi-column grid (4 columns desktop, 2 columns tablet, 1 column mobile). Full-width dark background (near-black) with white and muted text.
+
+**Includes:**
+- Logo + platform tagline
+- Navigation columns (as defined in Section 4.3)
+- Social media icons (Twitter/X, Facebook, Instagram, YouTube, Telegram)
+- Newsletter mini-signup
+- Copyright line
+- Privacy Policy, Terms of Service links
+
+---
+
+---
+
+# SECTION 7: ARTICLE PAGE BLUEPRINT
+
+The article page is where the product's core value is delivered. Every element must serve the reading experience.
+
+## 7.1 Page Structure (Top to Bottom)
+
+### Breadcrumb / Section Label
+Small text at top: `Home > National > [Headline short]` — helps reader orient within the site. On mobile: can be simplified to just the category label.
+
+### Hero Image
+Full-width image. Aspect ratio: 16:9 (desktop), 4:3 or 3:2 (mobile). Image has:
+- Alt text (required for accessibility)
+- Caption text below (small, muted, italicized)
+- Photo credit / source (far right of caption, even smaller)
+
+The image should be the largest, most dominant visual on the page.
+
+### Category Badge
+Colored pill above the headline. Clicking it navigates to that category page.
+
+### Headline (H1)
+The largest text on the page. Line height generous (1.3–1.4). Should never exceed 3 lines on desktop, 4 on mobile. Font: editorial serif or a premium sans-serif.
+
+### Sub-headline / Standfirst
+One paragraph of 20–40 words. Italic or slightly lighter weight than body. Acts as a compelling preview of the article.
+
+### Metadata Row
+Displayed in a compact single line (or two lines on mobile):
+- Author name (linked to author profile if implemented)
+- Publication date
+- Last updated timestamp (if different from published date)
+- Reading time estimate ("5 min read")
+- Views count (optional)
+
+### Audio Player (If attached)
+Compact inline audio bar: play/pause, seek bar, current time / total duration, speed control (0.75x, 1x, 1.25x, 1.5x), download option. Styled as a refined media player — not a default browser player.
+
+### Social Share Actions
+A compact horizontal row of share icons: Twitter/X, Facebook, WhatsApp, Telegram, Copy Link, Email. On desktop: displayed below metadata. On mobile: available as a floating action bar or at both top and bottom of article.
+
+### Reading Progress Indicator
+A thin horizontal progress bar at the top of the viewport (below the fixed header). Grows from left to right as the user scrolls through the article. Color matches the site's accent tone.
+
+---
+
+## 7.2 Article Body
+
+**Typography:** Body text at 17–18px (desktop), 16px (mobile). Line height 1.7–1.8 for comfortable reading. Maximum column width: 680–720px (never full-width — this is critical for readability).
+
+**Paragraph spacing:** 1.2–1.5em between paragraphs.
+
+**Inline formatting:**
+- Bold for emphasis (used sparingly)
+- Italic for quotes, titles, or foreign terms
+- Pull quotes (large, centered block with decorative left border) for key statements
+- Blockquotes styled with left border in accent color
+- Highlighted text optional (for interactive or special features)
+
+**Inline Images:** Images within the body can span either the article column width or extend to the full content width (bleed). Always include caption and credit.
+
+**Inline Video:** Embedded YouTube or native video player within body. Full column width. Aspect ratio preserved.
+
+**Data Tables:** Horizontal scroll on mobile. Clear header row with background differentiation.
+
+**Fact Boxes / Key Points Box:** A highlighted box (light tinted background, left-border accent) appearing mid-article to summarize key points. Optional but highly recommended for long reads.
+
+---
+
+## 7.3 Advertisement Placements Within Article
+
+- **After paragraph 3 (or first scroll break):** 1 inline responsive ad unit
+- **Mid-article (roughly 50% scroll):** 1 ad unit
+- **After article body ends:** 1 leaderboard or large rectangle
+- **Sidebar (desktop only):** 1 or 2 sticky sidebar ads that scroll with the reader until the footer is reached
+
+Ads must never interrupt mid-sentence. They should only appear between paragraphs.
+
+---
+
+## 7.4 Tags / Topic Labels
+
+Below the article body: a row of topic tags. E.g., `#Parliament #Budget2025 #Economy`. Each tag is a link to a filtered search page.
+
+---
+
+## 7.5 Author Card
+
+A small card below the tags:
+- Author avatar (circular, 48px)
+- Author name (bold)
+- Short bio (1–2 sentences)
+- "More articles by [Author]" link
+
+---
+
+## 7.6 Related News
+
+**Purpose:** Keep readers on the platform.
+
+**Layout:** "You may also like" or "Related Stories" section. 3-column grid of article cards (desktop). Single column list (mobile). Articles are selected by category and tag similarity.
+
+---
+
+## 7.7 Next Article Preview
+
+**Layout:** At the very bottom of the article, before the footer, a preview card of the next logical article:
+- Label: "Next Story"
+- Category + Headline
+- Summary (1 sentence)
+- "Continue Reading →" button
+
+**Mobile behavior:** On mobile, this can be implemented as a swipe-up gesture hinting with a slightly peeking card at the bottom of the screen.
+
+---
+
+## 7.8 Sticky Elements
+
+**Desktop Sticky Elements:**
+- Fixed header (always present)
+- Reading progress bar (fixed below header)
+- Sidebar ad (sticky within content area, stops before footer)
+- Share button cluster can appear as a left-floating vertical column on wide desktop
+
+**Mobile Sticky Elements:**
+- Fixed header (reduced height)
+- Bottom navigation bar
+- Mini audio player bar (when audio is playing) persists above bottom nav
+- Share button (a floating circular button, bottom-right, appears after 20% scroll)
+
+---
+
+---
+
+# SECTION 8: LIVE SECTION BLUEPRINT
+
+## 8.1 Homepage Preview (Live Widget)
+
+As described in Section 6.10. The homepage shows a compact promotional block for the live broadcast. This is not the full player — it is a teaser that drives the user to the dedicated Live page.
+
+## 8.2 Dedicated Live Page (`/live`)
+
+**Page Layout (Desktop):**
+
+**Left / Main column (70% width):**
+- Page heading: "Live News" with pulsing red dot
+- Embedded YouTube player (16:9 ratio, responsive)
+- Player controls: play/pause handled by YouTube embed. The platform wraps it in a clean container with the platform's visual language.
+- Below player: Episode/program title, description, air time.
+
+**Right / Sidebar column (30% width):**
+- Live Updates Timeline (see 8.3)
+- Share options
+
+**Below player + sidebar (full width):**
+- Related stories grid (3 columns)
+- Upcoming Broadcasts schedule table
+
+---
+
+## 8.3 Live Updates Timeline
+
+**Purpose:** Text-based rolling updates for readers who cannot watch video, or as a companion to the video.
+
+**Layout:** A vertically scrolling timeline. Each entry:
+- Timestamp (left, in bold, updated in real-time)
+- Short update text (right)
+- Entries appear newest-at-top
+- New entries have a brief highlight animation before settling
+
+**Behavior:** Auto-updates without page reload. A subtle "New update" notification appears at the top of the timeline when new entries arrive. Clicking scrolls the user to the new entry.
+
+---
+
+## 8.4 Live Status States
+
+**Active Live:** Red "LIVE" badge, pulsing dot, player visible and playing.
+
+**Pre-broadcast:** Blue "UPCOMING" badge. Countdown timer. Program details. Subscribe/remind button.
+
+**Replay / VOD:** Gray "REPLAY" badge. Timestamp of original broadcast. Player shows replay.
+
+**No broadcast scheduled:** Section shows most recent replay with clear labeling. "Next broadcast: [date/time]" message.
+
+---
+
+## 8.5 Responsive Behavior
+
+**Mobile:** Player is full viewport width (16:9). Lives Updates timeline below. Sidebar column stacks below both. Related stories become a single-column vertical list.
+
+**Tablet:** Player is 60% width. Timeline sidebar appears to the right. Related stories in a 2-column grid.
+
+---
+
+---
+
+# SECTION 9: PODCAST BLUEPRINT
+
+## 9.1 Podcast Listing Page (`/podcasts`)
+
+**Purpose:** Discovery hub for all audio content.
+
+**Page Header:** Large title "Podcasts" + subtitle. Optional horizontal filter row: All | News | Analysis | Interviews | Special Series.
+
+**Layout — Desktop:** 3-column grid of podcast series cards.
+
+**Layout — Mobile:** 2-column grid, or single column with larger cards.
+
+### Podcast Series Card
+- Series cover art (square, 1:1 ratio)
+- Series name (bold)
+- Episode count
+- Latest episode date
+- Short description (2 lines, truncated)
+- Play latest episode button (play icon, no text)
+
+---
+
+## 9.2 Podcast Episode Detail Page (`/podcasts/:slug`)
+
+**Top section:**
+- Episode title (H1)
+- Series name + cover art (compact, 64px square)
+- Episode number + publish date
+- Duration
+
+**Audio Player (prominent, sticky on scroll):**
+- Large play/pause button (minimum 44×44px touch target)
+- Seek bar with current position and total duration
+- Playback speed selector
+- Volume control
+- Download button (downloads MP3)
+- Share button
+
+The audio player sits just below the page header and sticks to the top (below the site header) as the user scrolls down, so playback continues without interruption while reading show notes.
+
+**Show Notes / Transcript:**
+- Full episode description
+- Timestamps for key moments (clickable to seek)
+- Optional: full transcript (collapsible section)
+
+**Episode list sidebar (desktop):** Other episodes in the series listed as compact rows. Allows browsing without leaving.
+
+**Mobile layout:** Audio player is full width. Episode list appears below show notes.
+
+---
+
+## 9.3 Mini Audio Player (Persistent)
+
+When the user starts playing a podcast episode from ANY page (e.g., the homepage podcast section), a persistent mini player bar appears at the bottom of the screen (above the mobile bottom nav).
+
+**Contains:**
+- Small episode thumbnail
+- Episode title (truncated)
+- Play/Pause button
+- Progress bar (thin)
+- Expand button (to go to full episode page)
+- Close/dismiss button
+
+This bar persists across page navigation until the user dismisses it or audio ends.
+
+---
+
+---
+
+# SECTION 10: SEARCH BLUEPRINT
+
+## 10.1 Search Entry Points
+
+- Search icon in the header (all pages)
+- Bottom navigation bar (mobile)
+- Keyboard shortcut hint (desktop): `Ctrl+K` or `Cmd+K`
+
+## 10.2 Search Bar Behavior
+
+**Trigger:** Clicking the search icon expands an input field inline within the header (desktop). On mobile, tapping the icon navigates to a full-screen search overlay.
+
+**Desktop inline expansion:** The center nav links hide, and a full-width search input slides in. An X closes it and restores the nav.
+
+**Mobile overlay:** Full-screen white/dark panel slides down from top. Input auto-focuses. Back button or swipe-down closes.
+
+---
+
+## 10.3 Suggestions Dropdown
+
+As the user types (after 2+ characters), a dropdown appears below the input with:
+- **Article suggestions** (3–5 results): Headline + category pill
+- **Category shortcut:** "See all results in Politics →"
+- **Trending searches:** If query is empty, shows 5 recent trending searches
+- Keyboard navigable (up/down arrow, Enter selects, Escape closes)
+
+---
+
+## 10.4 Search Results Page (`/search?q=:query`)
+
+**Header:** "Results for: '[query]'" with result count.
+
+**Filter Bar (horizontal, scrollable on mobile):**
+- Date: Anytime | Today | This Week | This Month
+- Category: All | National | International | Sports | [etc.]
+- Type: All | Articles | Podcasts | Videos
+
+**Results Layout:** 2-column card grid (desktop). Single column (mobile). Each result card:
+- Thumbnail (right on mobile — text-dominant)
+- Category badge
+- Headline (H3)
+- Standfirst or excerpt (2 lines)
+- Author + date
+- Content type icon (article, podcast, video)
+
+**Sorting:** Relevance | Newest First | Most Read
+
+**Pagination:** "Load More" button at the bottom (not infinite scroll, to maintain search result navigability).
+
+---
+
+## 10.5 No Results Page
+
+**Display:**
+- Search term shown: "No results found for '[query]'"
+- Suggestion: "Check your spelling or try a different term"
+- Trending searches shown as suggestions
+- Link to browse all categories
+
+**Never:** Show a dead-end empty state. Always provide pathways forward.
+
+---
+
+---
+
+# SECTION 11: ADVERTISE WITH US BLUEPRINT
+
+## 11.1 Page Purpose
+
+Convert potential advertising clients from interest to inquiry. This page is a sales and credibility page, not a utility page.
+
+## 11.2 Page Sections (Top to Bottom)
+
+### Hero Section
+**Layout:** Full-width. Dark, premium background. Centered text.
+- Headline: Compelling, value-focused. E.g., "Reach Millions of Engaged Readers."
+- Subheadline: One sentence on the platform's audience.
+- Primary CTA button: "Get in Touch" (scrolls to inquiry form)
+- Optional: platform logo + partner brand logos (social proof)
+
+### Audience Statistics
+**Layout:** 3–4 stat blocks in a horizontal row. Each:
+- Large bold number (e.g., "12M+ Monthly Readers")
+- Small descriptor below
+- Icon above
+
+Stats to include: Monthly unique visitors, daily page views, social media followers, average session duration, geographic reach.
+
+**Visual treatment:** Clean white cards with accent borders. No excessive decoration.
+
+### Why Advertise Here?
+3-column grid of benefit cards:
+- Premium audience (educated, high-income)
+- Editorial credibility (brand-safe environment)
+- Broad reach (national + regional coverage)
+- Multiple formats (banner, native, sponsored content)
+- Transparent reporting (analytics access)
+
+### Available Ad Formats
+A clear visual table or grid showing each format:
+- Display Banner (728×90, 300×250, 320×50)
+- Native / Sponsored Article
+- Video Pre-roll
+- Podcast Sponsor Mention
+- Newsletter Banner
+- Homepage Takeover
+
+For each: name, dimensions, placement, estimated reach, brief description.
+
+### How It Works — Process Timeline
+**Layout:** Horizontal 4-step timeline (desktop), vertical on mobile.
+1. Submit inquiry → 2. Team contacts you → 3. Choose format & dates → 4. Go live
+
+### FAQ Section
+5–8 collapsible accordion items answering common questions about pricing approach, turnaround time, content restrictions, analytics access.
+
+### Inquiry Form
+**Fields:**
+- Full Name (required)
+- Email Address (required)
+- Phone Number (optional)
+- Company / Brand Name (required)
+- Website URL (optional)
+- Interested Ad Formats (multi-select checkbox or dropdown)
+- Approximate Monthly Budget (dropdown ranges)
+- Campaign Start Date (date picker)
+- Message / Additional Notes (textarea)
+- Submit Button
+
+**Validation:** Inline, immediate. Required fields marked with asterisk. Email format validated. On submission: success message inline (no page reload). Sends automated acknowledgment email to the submitter.
+
+---
+
+---
+
+# SECTION 12: CAREERS BLUEPRINT
+
+## 12.1 Careers Landing Page (`/careers`)
+
+**Header:** "Join Our Team" — mission statement about journalism and the platform's values. Photo of the team or newsroom (authentic, not stock photography).
+
+**Open Positions List:**
+- Filterable by: Department (Editorial, Tech, Sales, Operations), Location, Type (Full-time, Part-time, Contract, Internship)
+- Each position shown as a card:
+  - Job title (H3)
+  - Department badge
+  - Location (or "Remote")
+  - Employment type badge
+  - Brief one-line description
+  - "View Details →" button
+
+**If no open positions:** Show a genuine message + "Send a speculative CV" option.
+
+---
+
+## 12.2 Job Detail Page (`/careers/:job-slug`)
+
+- Breadcrumb: `Careers > [Job Title]`
+- Job title (H1) + Department + Location + Type
+- "Apply Now" button (sticky on mobile — fixed to bottom)
+- Full job description: Role summary, responsibilities (bulleted), requirements (bulleted), nice-to-haves
+- What we offer: Benefits, culture highlights
+- Application section heading + "Apply Now" button (anchor scrolls to or navigates to form)
+
+---
+
+## 12.3 Application Form (`/careers/:job-slug/apply`)
+
+**Fields:**
+- Full Name
+- Email Address
+- Phone Number
+- City / Location
+- LinkedIn Profile URL (optional)
+- Portfolio URL (optional)
+- Resume / CV upload (PDF, max 5MB)
+- Cover Letter (textarea, optional but encouraged)
+- How did you hear about us? (dropdown)
+- Submit Application button
+
+**Behavior:** Inline validation. Progress indicator if multi-step. On success: full-page success screen with confirmation and timeline expectation ("We'll review your application and respond within 2 weeks").
+
+---
+
+---
+
+# SECTION 13: ADMIN PANEL BLUEPRINT
+
+The Admin panel is a separate authenticated interface, not stylistically identical to the public site but still professional and coherent.
+
+## 13.1 Admin Layout
+
+**Left sidebar:** Fixed navigation with icons + labels. Collapsible to icon-only on smaller screens.
+
+- Dashboard
+- Articles (with "Pending" badge count)
+- Editors
+- Advertisements
+- Live Management
+- Careers
+- Homepage Layout
+- Analytics
+- Settings
+
+**Top bar:** Admin name + avatar, notifications bell, logout button.
+
+**Main content area:** Fluid width. Uses a table and card-based layout system.
+
+---
+
+## 13.2 Admin Dashboard
+
+**Widgets (at a glance):**
+- Today's page views (number + sparkline)
+- Pending articles for review (count + shortcut button)
+- Active editors (count)
+- Live status (ON / OFF toggle + next broadcast)
+- Recent published articles (compact list, last 5)
+- Quick Actions: New Career Post, Upload Ad, Toggle Live
+
+---
+
+## 13.3 Article Management
+
+**List view:** Table with columns: Headline, Author, Category, Submitted Date, Status (Draft / Pending / Published / Rejected).
+
+**Filters:** By status, category, author, date range.
+
+**Actions per row:** View Preview, Approve & Publish, Reject (with modal for note), Edit, Delete.
+
+**Article preview:** Opens in a side panel or modal showing the article as it will appear on the public site. Approve / Reject buttons within the preview.
+
+---
+
+## 13.4 Editor Management
+
+**Table:** Editor name, email, articles submitted (count), articles published (count), account status (Active / Suspended), actions (Edit, Suspend, Reactivate, Delete).
+
+**Create Editor:** Form modal — name, email, set temporary password.
+
+---
+
+## 13.5 Advertisement Management
+
+**Table:** Ad name, type, placement, start date, end date, status (Active / Scheduled / Expired), actions.
+
+**Create/Edit Ad:** Upload creative (image/video), select placement zone, set schedule dates, set link URL, preview.
+
+---
+
+## 13.6 Live Management
+
+**Simple form:** Current YouTube Live URL (text input), program title, program description, next broadcast schedule (date + time). Toggle: "Show Live Section on Homepage" ON/OFF.
+
+---
+
+## 13.7 Homepage Layout Manager
+
+**Interface:** Drag-and-drop article selector for the Featured Story position. Ordered list of Top Stories (drag to reorder). Toggle visibility of sections (Live, Podcast, Trending). This is a visual layout manager, not a code editor.
+
+---
+
+## 13.8 Analytics Dashboard
+
+**Charts and metrics:**
+- Daily / Weekly / Monthly page views (line chart)
+- Top articles by views (ranked table)
+- Traffic sources (pie/donut chart)
+- Geographic breakdown (bar chart)
+- Device breakdown (mobile vs desktop vs tablet)
+- Category performance (views per category)
+
+Date range selector. Export to CSV option.
+
+---
+
+---
+
+# SECTION 14: EDITOR PANEL BLUEPRINT
+
+## 14.1 Editor Layout
+
+Same sidebar + topbar pattern as Admin, but with fewer menu items:
+- My Dashboard
+- New Article
+- My Drafts
+- My Submissions
+
+---
+
+## 14.2 Article Editor
+
+**Interface approach:** A clean, distraction-free writing environment. Not a traditional CMS form — more like a publishing tool.
+
+**Fields:**
+
+- **Headline** (large text input at top — styled like the actual headline)
+- **Sub-headline / Standfirst** (medium input below)
+- **Category** (dropdown, required)
+- **Tags** (multi-select autocomplete input)
+- **State Tags** (multi-select for state-level tagging)
+- **Body** (rich text editor — support for: paragraphs, H2/H3 subheadings, bold, italic, blockquote, pull quote, unordered list, ordered list, hyperlinks, inline images, embedded video URL)
+- **Hero Image** (drag-and-drop upload zone or URL input. Cropping tool included. Caption + credit fields below)
+- **Image Gallery** (optional multiple image upload)
+- **Audio Attachment** (file upload or record link)
+- **Featured toggle** (suggests article as homepage feature — Super Admin controls final placement)
+
+**Toolbar:** Minimal. Only essential formatting options. Clean sans-serif typography in the editor to match the eventual published look.
+
+**Preview button:** Renders a faithful preview of how the article will appear on the public site. Opens in a new tab or an overlay.
+
+**Save as Draft:** Auto-saves every 60 seconds. Manual save button also available.
+
+**Submit for Approval:** Confirmation dialog: "Submit this article for review? You will not be able to edit it until the admin responds." Confirms submission.
+
+---
+
+---
+
+# SECTION 15: ADVERTISEMENT PLACEMENT BLUEPRINT
+
+## 15.1 Placement Zones
+
+### Zone A — Leaderboard (Homepage, top of feed)
+- Dimensions: 728×90 (desktop) / 320×50 (mobile)
+- Position: After the featured story, before the Top Stories grid
+- Visibility: High — first scroll position
+
+### Zone B — Medium Rectangle (Sidebar)
+- Dimensions: 300×250
+- Position: Right sidebar on Article pages and Category pages (desktop only)
+- Behavior: Sticky — scrolls with user until article body ends
+
+### Zone C — Inline Article Ad
+- Dimensions: 320×100 (mobile) / 468×60 or native card (desktop)
+- Position: After paragraph 3 and at mid-article
+- Format: Can be image banner or native card (same card design as article cards, with "Sponsored" label)
+
+### Zone D — Below Article / Content
+- Dimensions: 728×90 or 300×250
+- Position: After article body ends, before Related News
+- Visibility: High — readers who finish articles are highly engaged
+
+### Zone E — Footer Banner
+- Dimensions: Full-width banner, max 90px tall
+- Position: Above the footer on all pages
+- Visibility: Medium
+
+### Zone F — Sponsored Story (Native)
+- Format: Article card identical in design to regular article cards
+- Label: Small "Sponsored" badge in place of category badge
+- Position: Mixed into the Latest News feed or Top Stories grid (1 per 6 articles maximum)
+- Behavior: Navigates to a landing page URL, not an internal article
+
+### Zone G — Podcast Sponsor
+- Format: Text-based sponsor mention on podcast episode pages
+- Position: Below the audio player
+- Example: "This episode is brought to you by [Brand]"
+
+---
+
+## 15.2 Ad Rendering Principles
+
+- Ads should never cause layout shift (CLS). Reserve the space before the ad loads using a placeholder of the correct dimensions.
+- All ad containers include a subtle "Advertisement" label. This is non-negotiable for reader trust.
+- No auto-playing video ads with sound.
+- No ads that expand beyond their container on user interaction.
+- No full-screen interstitials or pop-overs that block content.
+- Sponsored stories are clearly labeled and never disguised as editorial content.
+
+---
+
+---
+
+# SECTION 16: MOBILE EXPERIENCE
+
+Mobile is the primary platform. Every decision below is a first-class design requirement, not a fallback.
+
+## 16.1 Bottom Navigation Bar
+
+**Purpose:** Primary navigation for mobile users. Keeps key actions within thumb reach.
+
+**Layout:** Fixed bar at bottom of viewport. 5 items max. Icons with short labels.
+
+**Items:** Home | Live | Search | Podcasts | Menu
+
+**Visual:** Active item uses accent color (icon + label). Inactive items use muted gray. The bar has a thin top border and a very slight shadow. Background is white (light mode) or near-black (dark mode).
+
+**Live indicator:** The Live icon shows a small pulsing red dot when a live stream is active.
+
+**Menu item:** Tapping opens a full-screen drawer (bottom sheet or slide-in panel) with all secondary navigation.
+
+---
+
+## 16.2 Sticky Header
+
+- Height: 56px
+- Shrinks on scroll-down, re-expands on scroll-up (hide-on-scroll behavior)
+- Contains: Logo (left), Search icon, Hamburger/Menu icon (right)
+- Category pills appear in a separate row below the header — this row may hide when scrolling down and reappear when scrolling up
+
+---
+
+## 16.3 Article Swipe Navigation
+
+- On the Article page, once the user reaches the bottom, they can swipe up to transition to the next article
+- A "peeking" preview of the next article's headline and image is visible at the very bottom of the page as a visual affordance
+- Swipe is smooth with momentum. If the user swipes only partway, it snaps back or forward based on threshold (> 30% of screen height triggers navigation)
+
+---
+
+## 16.4 Touch Targets
+
+- All interactive elements (buttons, links, icons) have a minimum touch target of 44×44px as per Apple HIG and Google Material guidelines
+- Navigation items in the bottom bar are evenly distributed across the full screen width
+- Podcast play buttons are minimum 44px, ideally 48px
+
+---
+
+## 16.5 Mobile Typography
+
+- Body text: 16px minimum, line height 1.7
+- Headline (H1): 26–30px
+- Subheadline: 18–20px
+- Metadata: 12–13px
+- No text below 12px on mobile
+
+---
+
+## 16.6 Responsive Cards on Mobile
+
+- Cards stack vertically in a single column
+- Images in cards: full width, aspect ratio 16:9 maintained
+- Text in cards: headline (H3 size), category + date in a single metadata row below
+- Card padding: 16px horizontal, 12px vertical
+- Cards separated by thin 1px divider or 8px gap
+
+---
+
+## 16.7 Loading States on Mobile
+
+- Skeleton screens on all card and article list loads (not spinners — skeletons prevent layout shift)
+- Hero image uses a low-quality image placeholder (LQIP) that transitions to full resolution
+- Progress bar visible on any action that takes >300ms
+
+---
+
+## 16.8 Gesture Support
+
+- Pull-to-refresh on feed/homepage
+- Swipe right to go back (standard iOS behavior, respect it)
+- Swipe between articles on detail page (horizontal scroll snapping approach with restraint)
+- Long-press on article card: preview / share action sheet (optional enhancement)
+
+---
+
+---
+
+# SECTION 17: TABLET EXPERIENCE
+
+## 17.1 Grid Adjustments
+
+Tablets (768px–1024px) use a 2-column grid for article cards and category sections. The single-column mobile layout is too sparse; the full 3-column desktop layout is too crowded.
+
+- Top Stories: 2-column grid
+- Category blocks: 2 cards visible horizontally
+- Related News: 2-column grid
+
+## 17.2 Navigation
+
+- Bottom navigation bar is removed on tablet
+- Top header navigation is shown (same as desktop pattern)
+- Hamburger menu may still be used for secondary navigation if screen is narrow enough
+- Category pill bar is shown below the header
+
+## 17.3 Article Page on Tablet
+
+- Article body column is centered, max 640px wide, with whitespace on both sides
+- No sidebar on tablet in portrait orientation
+- In landscape orientation, a narrow sidebar (240px) can appear with a "Most Read" or sticky ad
+
+## 17.4 Landscape Behavior
+
+- Homepage switches to 2-column grid
+- Featured story can use a side-by-side image + text layout (similar to desktop)
+- Navigation remains horizontal
+
+---
+
+---
+
+# SECTION 18: DESKTOP EXPERIENCE
+
+## 18.1 Multi-column Layouts
+
+Desktop breakpoint begins at 1024px. Full 3-column layouts are used for article grids. The homepage features a rich multi-zone layout.
+
+- Homepage hero: 2/3 image + 1/3 text, or full-bleed with text overlay
+- Top Stories: 3-column grid
+- Category Blocks: 4 cards per row
+- Article page: centered content column + sidebar
+
+## 18.2 Sidebar on Desktop
+
+- Present on: Article Detail pages, Category pages, Search results
+- Width: 280–300px
+- Contents: Sticky "Most Read" list, 1–2 ad units, newsletter mini-widget
+- Behavior: Sidebar scrolls with the page. Ad unit is sticky within the content area. "Most Read" list is static.
+
+## 18.3 Hover Interactions
+
+- Article cards: image zooms subtly (scale 1.03) on hover. Card elevates with shadow. Headline underlines.
+- Navigation links: Bottom border animated in from left on hover.
+- Buttons: Background lightens or darkens by 10% on hover. Cursor is pointer.
+- Tags/badges: Slight background fill on hover.
+- All hover transitions: 200ms ease timing.
+
+## 18.4 Wide Screen / Large Monitor
+
+- Max content width: 1280px, centered with equal side margins
+- At very wide widths (1440px+): margins increase, content never stretches beyond 1280px
+- Full-bleed background sections (hero, Live, Newsletter) still span the full viewport width, but inner content is constrained
+- Typography does not increase beyond desktop scale even at larger breakpoints
+
+---
+
+---
+
+# SECTION 19: DESIGN SYSTEM
+
+## 19.1 Typography
+
+### Type Scale
+| Token | Usage | Size | Weight | Line Height |
+|---|---|---|---|---|
+| Display | Hero Headline | 48–56px | 700 | 1.1 |
+| H1 | Article Headline | 32–38px | 700 | 1.2 |
+| H2 | Section Heading | 24–28px | 700 | 1.3 |
+| H3 | Card Headline | 18–22px | 600 | 1.3 |
+| H4 | Sub-section | 16–18px | 600 | 1.4 |
+| Body Large | Standfirst | 18–20px | 400 | 1.6 |
+| Body | Article body | 17px | 400 | 1.75 |
+| Body Small | Metadata, captions | 13–14px | 400 | 1.5 |
+| Label | Badges, tags, buttons | 11–13px | 600 | 1.2 |
+
+### Font Recommendations
+- **Heading Font:** A premium serif for authority (e.g., Playfair Display, Lora) or a high-quality editorial sans (e.g., Source Serif, Fraunces). The heading font defines the editorial personality.
+- **Body Font:** A highly legible news text font — optimized for long reading. (e.g., Georgia, Merriweather, Source Serif Pro)
+- **UI Font:** A clean sans-serif for all UI chrome — navigation, labels, buttons, metadata. (e.g., Inter, DM Sans, Work Sans)
+
+### Font Pairing Rule
+Heading font (serif) + UI font (sans-serif) is the recommended pairing for a premium editorial feel. Body can match heading or have a separate companion serif.
+
+---
+
+## 19.2 Color Palette
+
+### Core Palette
+
+| Token | Role | Value (Example) |
+|---|---|---|
+| `--color-brand` | Primary brand accent | Deep red `#C0392B` or navy `#1A3A5C` |
+| `--color-brand-light` | Hover/tint states | 10–20% lighter version of brand |
+| `--color-ink` | Primary text | Near-black `#1A1A1A` |
+| `--color-ink-secondary` | Secondary text, metadata | Muted dark `#5A5A5A` |
+| `--color-ink-tertiary` | Captions, placeholders | `#8A8A8A` |
+| `--color-surface` | Page background | `#FFFFFF` |
+| `--color-surface-alt` | Section background tints | Very light gray `#F7F7F7` |
+| `--color-border` | Dividers, card borders | `#E5E5E5` |
+| `--color-live` | Live indicator | Pure red `#E53935` |
+| `--color-breaking` | Breaking news ticker | Deep red `#B71C1C` |
+| `--color-success` | Success states | Green `#2E7D32` |
+| `--color-error` | Error states | Red `#C62828` |
+
+### Category Colors
+Each category has a unique accent color used for category badges. These should be harmonious but distinct:
+- Politics: Navy Blue
+- Economy: Dark Green
+- Sports: Deep Orange
+- Health: Teal
+- Technology: Indigo
+- Science: Purple
+- Entertainment: Magenta
+
+These colors are used ONLY for the small category badge — never as large background fills.
+
+### Dark Mode
+The platform should support dark mode. All color tokens are defined in light and dark variants. Dark mode:
+- Background: `#0F0F0F`
+- Surface alt: `#1A1A1A`
+- Ink: `#F0F0F0`
+- Ink secondary: `#A0A0A0`
+- Border: `#2E2E2E`
+
+---
+
+## 19.3 Spacing Scale
+
+Uses a base-8 spacing system. All spacing values are multiples of 4px (micro scale) or 8px (macro scale).
+
+| Token | Value | Use Case |
+|---|---|---|
+| `space-1` | 4px | Icon internal padding, micro gaps |
+| `space-2` | 8px | Inline element gaps, badge padding |
+| `space-3` | 12px | Small component padding |
+| `space-4` | 16px | Standard component padding, card padding |
+| `space-6` | 24px | Section internal spacing, form field gaps |
+| `space-8` | 32px | Between card grid items, section top padding |
+| `space-12` | 48px | Between major sections on mobile |
+| `space-16` | 64px | Between major sections on desktop |
+| `space-24` | 96px | Hero section vertical padding |
+
+---
+
+## 19.4 Border Radius
+
+| Token | Value | Use Case |
+|---|---|---|
+| `radius-sm` | 4px | Badges, tags, small buttons |
+| `radius-md` | 8px | Cards, inputs, dropdowns |
+| `radius-lg` | 12px | Modal dialogs, drawers |
+| `radius-xl` | 20px | Large feature cards |
+| `radius-pill` | 999px | Pill badges, rounded buttons |
+| `radius-circle` | 50% | Avatars |
+
+---
+
+## 19.5 Elevation System (Shadows)
+
+| Level | CSS Shadow | Use Case |
+|---|---|---|
+| 0 | none | Flat elements, cards in normal state |
+| 1 | `0 1px 3px rgba(0,0,0,0.08)` | Resting card state, subtle lift |
+| 2 | `0 4px 12px rgba(0,0,0,0.12)` | Card hover state, dropdown menus |
+| 3 | `0 8px 24px rgba(0,0,0,0.16)` | Modals, drawers |
+| 4 | `0 16px 48px rgba(0,0,0,0.24)` | Full-screen overlays, toasts |
+
+---
+
+## 19.6 Button System
+
+### Button Variants
+- **Primary:** Filled background with `--color-brand`. White text. Used for main CTAs.
+- **Secondary:** Outlined with `--color-brand` border. Brand color text. Used for secondary actions.
+- **Ghost:** No background, no border. Used for tertiary actions (close buttons, cancel).
+- **Destructive:** Red fill. Used only for irreversible actions (delete, deactivate) in admin.
+- **Icon button:** Circular or square, icon only. Must have ARIA label.
+
+### Button Sizes
+- Large: 48px height, 18px font. Used for primary hero CTAs.
+- Medium: 40px height, 14–16px font. Standard button.
+- Small: 32px height, 13px font. Used in compact contexts.
+
+### Button States
+All buttons must have distinct: default, hover, focus (visible outline), active/pressed, disabled states.
+
+---
+
+## 19.7 Cards
+
+### Article Card (Standard)
+- Image (16:9)
+- Category badge (top-left on image or above headline)
+- Headline (H3)
+- Author + Date (single metadata row)
+- Optional: Reading time
+
+### Article Card (Compact / List View)
+- Small thumbnail (right side, 60px × 60px or 80px × 60px)
+- Category + Headline (text-dominant)
+- Date below
+
+### Podcast Card
+- Square cover art (1:1)
+- Series name (caption style)
+- Episode title (H3)
+- Duration
+- Play button
+
+### Sponsored Card
+- Same as Article Card but "Sponsored" replaces the category badge
+- May have a subtle border treatment to indicate it is non-editorial
+
+---
+
+## 19.8 Input System
+
+- All inputs: 40px height (desktop), 44px (mobile)
+- Border: 1px solid `--color-border`
+- Focus: 2px solid `--color-brand` ring (not outline) — no box shadow
+- Error state: Red border, error message below
+- Success state: Green checkmark icon inside field
+- Placeholder text: `--color-ink-tertiary`
+- Label: Always above the input, never inside (avoid floating labels for news portal — clarity over cleverness)
+
+---
+
+## 19.9 Component Library Summary
+
+| Component | Notes |
+|---|---|
+| Tag / Badge | Category, Sponsored, Breaking, Live, Upcoming labels |
+| Divider | Horizontal 1px line in `--color-border`. Used sparingly. |
+| Avatar | Circular image. 32px / 48px / 64px sizes. Fallback: initials in a colored circle. |
+| Progress Bar | Reading progress indicator. Thin (3px), accent color, top of viewport. |
+| Skeleton | Animated gray shimmer block. Matches layout of real content. |
+| Toast / Notification | Bottom-right (desktop), bottom-center (mobile). Auto-dismisses in 4s. |
+| Modal | Centered overlay. Dark backdrop. Max width 540px. Focus trapped inside. |
+| Accordion | FAQ and collapsible sections. Chevron icon rotates 180° when open. |
+| Tabs | Horizontal tab row. Active tab: bottom border in brand color. |
+| Tooltip | Small text popup on hover (desktop only — not on mobile). |
+| Audio Player | Custom-styled. Not a default browser element. |
+
+---
+
+## 19.10 Grid System
+
+| Breakpoint | Columns | Gutter | Margin |
+|---|---|---|---|
+| Mobile (< 640px) | 4 columns | 16px | 16px |
+| Tablet (640–1023px) | 8 columns | 24px | 24px |
+| Desktop (1024–1279px) | 12 columns | 24px | 32px |
+| Wide (1280px+) | 12 columns | 32px | Auto (centered) |
+
+Max content width: 1280px.
+
+---
+
+---
+
+# SECTION 20: ANIMATION BLUEPRINT
+
+## 20.1 Animation Philosophy
+
+Animations serve communication, not entertainment. Every animation on this platform should reduce cognitive load, not add to it. Animations are used to:
+- Orient the user (where did this element come from? where is it going?)
+- Confirm interactions (the button responded)
+- Signal loading states (something is happening)
+- Aid transitions (we're moving to a new context)
+
+If an animation doesn't serve one of these four purposes, it is not needed.
+
+## 20.2 Animation Timing
+
+| Type | Duration | Easing |
+|---|---|---|
+| Micro-interactions (hover, press) | 150–200ms | `ease-out` |
+| Element entrance (fade/slide in) | 250–350ms | `ease-out` |
+| Page transitions | 300–400ms | `ease-in-out` |
+| Drawers & modals | 300ms | `cubic-bezier(0.4, 0, 0.2, 1)` |
+| Skeleton shimmer | 1500ms | Looping linear |
+| Breaking ticker scroll | 20–40s (loop) | Linear |
+| Live dot pulse | 2s | Looping ease-in-out |
+
+---
+
+## 20.3 Page Transitions
+
+When navigating between pages, the content area performs a quick fade-in (opacity 0→1 over 200ms) as the new page renders. Avoid slide transitions between pages as they can feel disorienting in a content-rich environment.
+
+On mobile, article open transitions: the article content fades in with a very slight upward translate (8–12px, 250ms). This simulates a "lifting" effect without being theatrical.
+
+---
+
+## 20.4 Scroll Animations
+
+Elements entering the viewport (article cards below the fold, section headings) fade in with a subtle upward translate of 16px over 300ms. This is triggered once — elements do not animate every time they enter the viewport.
+
+The Breaking News ticker scrolls continuously at a speed calibrated to be readable (~150 pixels per second). It loops seamlessly.
+
+The Reading Progress bar animates in real-time as the user scrolls — no easing or delay. It must feel perfectly in sync with scroll position.
+
+---
+
+## 20.5 Hover Animations (Desktop)
+
+- **Article card image:** Scale from 1.0 to 1.03 over 300ms. Overflow hidden on the card so the image scales within its container.
+- **Article card elevation:** Shadow increases from Level 0 to Level 2 over 200ms.
+- **Navigation links:** Underline animates from left to right over 200ms.
+- **Buttons:** Background color shift over 150ms.
+- **Category badges:** Subtle background fill appears over 150ms.
+- **Accordion chevron:** Rotates 180° over 200ms when open/close toggled.
+
+---
+
+## 20.6 Loading Animations
+
+**Skeleton screens:** All card grids, article feeds, and list views show skeleton placeholders while loading. Skeleton elements match the exact layout of real content. A smooth shimmer (a lighter highlight that moves left-to-right) indicates active loading.
+
+**Image loading:** Use a low-quality blurred placeholder (LQIP) that transitions to full resolution as the image loads. No jarring "pop" of content.
+
+**Button loading state:** When a form is submitting, the button shows a small inline spinner and its label changes to "Submitting…". The button is disabled during this state.
+
+---
+
+## 20.7 Micro-interactions
+
+- **Search icon tap (mobile):** The overlay slides down from the top with a 250ms ease-out.
+- **Share button tap:** Action sheet slides up from bottom (mobile) in 250ms.
+- **Audio play/pause:** The play icon transitions to a pause icon with a quick cross-fade, not an abrupt switch.
+- **Newsletter subscribe success:** The input field and button transition to a success message — the form elements fade out as the success text fades in.
+- **Accordion open:** Height animates from 0 to auto (use max-height technique for CSS, or JS-measured for precision). Content fades in simultaneously.
+- **Toast appearance:** Slides in from bottom-right (desktop) or bottom-center (mobile). Slides back out on dismiss.
+
+---
+
+## 20.8 Modal & Drawer Animations
+
+**Modal:** Background overlay fades to 50% opacity (200ms). Modal panel scales from 97% to 100% and fades in (250ms). Combined effect is subtle and elegant.
+
+**Mobile Drawer (menu):** Slides in from the right edge of the screen over 300ms. Backdrop darkens simultaneously. Swipe-right to close also at 300ms.
+
+**Bottom Sheet (mobile):** Slides up from the bottom over 300ms. Spring physics are not recommended here — use simple ease-out for a premium, controlled feel.
+
+---
+
+## 20.9 Reduced Motion
+
+All animations respect the `prefers-reduced-motion` media query. When enabled:
+- Page transitions are instant (no fade)
+- Scroll animations are disabled
+- Hover effects are instant (no transition duration)
+- Skeleton shimmer is static (no movement)
+- Ticker scrolls at half speed or is replaced with a static display
+
+---
+
+---
+
+# SECTION 21: ACCESSIBILITY BLUEPRINT
+
+## 21.1 Color Contrast
+
+- All body text on white background: minimum 7:1 contrast ratio (WCAG AA requires 4.5:1; the platform targets the higher AA Large / AAA standard)
+- Large text (heading, display): minimum 4.5:1
+- UI components (button labels, input borders): minimum 3:1
+- Category badges: text on badge background must meet 4.5:1
+- Error text on white: must meet 4.5:1
+
+All contrast ratios to be verified with a tool (e.g., Colour Contrast Analyser) during the design review stage.
+
+---
+
+## 21.2 Font Sizing
+
+- No text smaller than 12px in the published interface (12px is an absolute minimum for micro-labels)
+- Body text: 16px minimum on all breakpoints
+- Users can scale text using browser zoom — the layout must not break at 200% zoom
+- Do not use CSS that prevents text scaling (`-webkit-text-size-adjust: none`)
+
+---
+
+## 21.3 Keyboard Navigation
+
+- Every interactive element (links, buttons, inputs, modals, dropdowns) must be fully operable via keyboard
+- Tab order must match the logical visual flow of the page (top-left to bottom-right)
+- Modal dialogs must trap focus inside when open
+- Dropdown menus must be navigable with arrow keys; Escape closes them
+- Skip navigation link: A "Skip to main content" link is the first focusable element on every page, hidden until focused
+
+---
+
+## 21.4 Focus States
+
+- All focusable elements must have a clearly visible focus indicator — the browser's default outline is acceptable but ideally the platform provides a custom focus style (2px solid ring in the brand accent color, 2px offset from element)
+- Focus indicators must never be removed with `outline: none` without a custom replacement
+- Focus indicators must meet 3:1 contrast ratio against adjacent colors
+
+---
+
+## 21.5 Screen Reader Support
+
+- All images must have meaningful `alt` text. Decorative images use `alt=""`
+- The reading progress bar must be marked `aria-hidden="true"` (decorative)
+- The Breaking News ticker region must be an `aria-live="polite"` region or updates must be non-disruptive
+- Live status indicators ("LIVE", "BREAKING") must convey meaning via text, not color alone
+- Audio player controls must have ARIA labels (`aria-label="Play episode"`, etc.)
+- Article cards must be implemented as links (`<a>`) wrapping the entire card, or as individual link elements with meaningful link text
+- Navigation landmark roles: `<header>`, `<nav>`, `<main>`, `<aside>`, `<footer>` must all be used correctly
+- Forms: All inputs must have associated `<label>` elements (not just placeholder text)
+
+---
+
+## 21.6 Touch Targets
+
+- Minimum touch target: 44×44px on all interactive elements
+- Targets should have at least 8px spacing between adjacent interactive elements to prevent mis-taps
+- The bottom navigation bar items must each have the full height of the bar as a touch target
+
+---
+
+## 21.7 Semantic HTML Hierarchy
+
+- One `<h1>` per page only (the article headline or page title)
+- Heading levels never skip (H1 → H2 → H3, not H1 → H3)
+- Article body sub-headings use H2 and H3 inside the article `<article>` element
+- Lists are marked up with `<ul>` / `<ol>` + `<li>`, never simulated with line breaks
+- Tables include `<thead>`, `<tbody>`, `<th scope="col">` for screen reader navigation
+
+---
+
+## 21.8 Forms Accessibility
+
+- Error messages appear adjacent to the relevant field (not just at the top of the form)
+- Error messages are announced via `role="alert"` or `aria-live="assertive"` after submission failure
+- Required fields are marked with `aria-required="true"` in addition to visual indicators
+- Autocomplete attributes are used on common fields (name, email, tel) for assistive technology compatibility
+
+---
+
+---
+
+# SECTION 22: PERFORMANCE BLUEPRINT
+
+## 22.1 Loading Philosophy
+
+The user's first impression is formed in the first 2 seconds. If the site feels slow in that window, trust is damaged before any content has been read. Performance is a design deliverable, not a technical afterthought.
+
+## 22.2 Core Web Vitals Targets
+
+| Metric | Target |
+|---|---|
+| LCP (Largest Contentful Paint) | < 2.0 seconds |
+| FID / INP (Interaction Delay) | < 100ms |
+| CLS (Cumulative Layout Shift) | < 0.1 |
+| TTFB (Time to First Byte) | < 600ms |
+
+---
+
+## 22.3 Image Optimization
+
+- All images served in modern formats: WebP primary, JPEG fallback
+- Responsive images using `srcset` and `sizes` — the browser downloads only the resolution needed for the device
+- Hero images: preloaded (`<link rel="preload">`) to improve LCP
+- All images below the fold: lazy loaded (`loading="lazy"`)
+- No images with intrinsic dimensions left unspecified (always set `width` and `height` attributes to prevent CLS)
+- Low-quality image placeholders (LQIP) for perceived performance
+
+---
+
+## 22.4 Skeleton Screens
+
+Every list, grid, and feed shows skeleton placeholder elements during the data fetch. Skeletons:
+- Match the exact layout of the real content
+- Use an animated shimmer effect
+- Never show a spinning loader as a replacement for content layout (spinners cause CLS and feel slower)
+
+---
+
+## 22.5 Lazy Loading
+
+- Images below the fold: `loading="lazy"`
+- Comments section (if added): loaded only when user scrolls near it
+- Advertisement scripts: loaded asynchronously, deferred until after main content
+- Third-party embeds (YouTube, etc.): facade pattern — show a thumbnail with a play button; the iframe only loads when the user clicks play
+
+---
+
+## 22.6 Infinite Scrolling vs. Pagination
+
+- **Homepage Latest News feed:** Infinite scroll (or "Load More" button as a hybrid) — users expect continuous scrolling for news feeds
+- **Search results:** Paginated with "Load More" — allows users to maintain position when navigating back from a result
+- **Category pages:** "Load More" button preferred — gives users control over the loading moment
+- All infinite scroll implementations must include a "You've reached the end" state and "Back to Top" affordance
+
+---
+
+## 22.7 Caching Strategy
+
+- Static assets (CSS, JS, fonts, logo): aggressively cached with long TTL (1 year, with content hash in filename for cache-busting on updates)
+- Article pages: short-to-medium cache (5–15 minutes) with stale-while-revalidate pattern
+- Breaking news ticker and live updates: no caching (always fresh)
+- Homepage: short cache (60–120 seconds) with background revalidation
+
+---
+
+## 22.8 Font Loading
+
+- Use `font-display: swap` for all web fonts to prevent invisible text during load
+- Preload the heading font and body font `woff2` files in the document `<head>`
+- Limit the number of font files: 2 typefaces maximum, each in 2–3 weights. More fonts = more network requests = slower load.
+- System font stack as fallback while web fonts load (ensure the system font is dimensionally similar to the target font to prevent CLS from font swap)
+
+---
+
+## 22.9 Third-Party Scripts
+
+- All third-party scripts (analytics, ads) loaded asynchronously
+- No third-party scripts in the critical rendering path
+- Ad scripts use `async` and `defer` attributes
+- YouTube player uses facade (poster + play button) until interaction — prevents the YouTube iframe from blocking page load
+
+---
+
+---
+
+*End of Document*
+
+---
+
+**Document Version:** 1.0
+**Status:** Final Draft — Ready for Development Handoff
+**Prepared by:** UX Strategy & Product Design Team
+**Intended Audience:** Frontend Development Team, Engineering Lead, Product Manager
+
+---

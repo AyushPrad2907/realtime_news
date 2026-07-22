@@ -1,0 +1,763 @@
+## 13.5 Advertisement Management
+
+**Table:** Ad name, type, placement, start date, end date, status (Active / Scheduled / Expired), actions.
+
+**Create/Edit Ad:** Upload creative (image/video), select placement zone, set schedule dates, set link URL, preview.
+
+---
+
+## 13.6 Live Management
+
+**Simple form:** Current YouTube Live URL (text input), program title, program description, next broadcast schedule (date + time). Toggle: "Show Live Section on Homepage" ON/OFF.
+
+---
+
+## 13.7 Homepage Layout Manager
+
+**Interface:** Drag-and-drop article selector for the Featured Story position. Ordered list of Top Stories (drag to reorder). Toggle visibility of sections (Live, Podcast, Trending). This is a visual layout manager, not a code editor.
+
+---
+
+## 13.8 Analytics Dashboard
+
+**Charts and metrics:**
+- Daily / Weekly / Monthly page views (line chart)
+- Top articles by views (ranked table)
+- Traffic sources (pie/donut chart)
+- Geographic breakdown (bar chart)
+- Device breakdown (mobile vs desktop vs tablet)
+- Category performance (views per category)
+
+Date range selector. Export to CSV option.
+
+---
+
+---
+
+# SECTION 14: EDITOR PANEL BLUEPRINT
+
+## 14.1 Editor Layout
+
+Same sidebar + topbar pattern as Admin, but with fewer menu items:
+- My Dashboard
+- New Article
+- My Drafts
+- My Submissions
+
+---
+
+## 14.2 Article Editor
+
+**Interface approach:** A clean, distraction-free writing environment. Not a traditional CMS form — more like a publishing tool.
+
+**Fields:**
+
+- **Headline** (large text input at top — styled like the actual headline)
+- **Sub-headline / Standfirst** (medium input below)
+- **Category** (dropdown, required)
+- **Tags** (multi-select autocomplete input)
+- **State Tags** (multi-select for state-level tagging)
+- **Body** (rich text editor — support for: paragraphs, H2/H3 subheadings, bold, italic, blockquote, pull quote, unordered list, ordered list, hyperlinks, inline images, embedded video URL)
+- **Hero Image** (drag-and-drop upload zone or URL input. Cropping tool included. Caption + credit fields below)
+- **Image Gallery** (optional multiple image upload)
+- **Audio Attachment** (file upload or record link)
+- **Featured toggle** (suggests article as homepage feature — Super Admin controls final placement)
+
+**Toolbar:** Minimal. Only essential formatting options. Clean sans-serif typography in the editor to match the eventual published look.
+
+**Preview button:** Renders a faithful preview of how the article will appear on the public site. Opens in a new tab or an overlay.
+
+**Save as Draft:** Auto-saves every 60 seconds. Manual save button also available.
+
+**Submit for Approval:** Confirmation dialog: "Submit this article for review? You will not be able to edit it until the admin responds." Confirms submission.
+
+---
+
+---
+
+# SECTION 15: ADVERTISEMENT PLACEMENT BLUEPRINT
+
+## 15.1 Placement Zones
+
+### Zone A — Leaderboard (Homepage, top of feed)
+- Dimensions: 728×90 (desktop) / 320×50 (mobile)
+- Position: After the featured story, before the Top Stories grid
+- Visibility: High — first scroll position
+
+### Zone B — Medium Rectangle (Sidebar)
+- Dimensions: 300×250
+- Position: Right sidebar on Article pages and Category pages (desktop only)
+- Behavior: Sticky — scrolls with user until article body ends
+
+### Zone C — Inline Article Ad
+- Dimensions: 320×100 (mobile) / 468×60 or native card (desktop)
+- Position: After paragraph 3 and at mid-article
+- Format: Can be image banner or native card (same card design as article cards, with "Sponsored" label)
+
+### Zone D — Below Article / Content
+- Dimensions: 728×90 or 300×250
+- Position: After article body ends, before Related News
+- Visibility: High — readers who finish articles are highly engaged
+
+### Zone E — Footer Banner
+- Dimensions: Full-width banner, max 90px tall
+- Position: Above the footer on all pages
+- Visibility: Medium
+
+### Zone F — Sponsored Story (Native)
+- Format: Article card identical in design to regular article cards
+- Label: Small "Sponsored" badge in place of category badge
+- Position: Mixed into the Latest News feed or Top Stories grid (1 per 6 articles maximum)
+- Behavior: Navigates to a landing page URL, not an internal article
+
+### Zone G — Podcast Sponsor
+- Format: Text-based sponsor mention on podcast episode pages
+- Position: Below the audio player
+- Example: "This episode is brought to you by [Brand]"
+
+---
+
+## 15.2 Ad Rendering Principles
+
+- Ads should never cause layout shift (CLS). Reserve the space before the ad loads using a placeholder of the correct dimensions.
+- All ad containers include a subtle "Advertisement" label. This is non-negotiable for reader trust.
+- No auto-playing video ads with sound.
+- No ads that expand beyond their container on user interaction.
+- No full-screen interstitials or pop-overs that block content.
+- Sponsored stories are clearly labeled and never disguised as editorial content.
+
+---
+
+---
+
+# SECTION 16: MOBILE EXPERIENCE
+
+Mobile is the primary platform. Every decision below is a first-class design requirement, not a fallback.
+
+## 16.1 Bottom Navigation Bar
+
+**Purpose:** Primary navigation for mobile users. Keeps key actions within thumb reach.
+
+**Layout:** Fixed bar at bottom of viewport. 5 items max. Icons with short labels.
+
+**Items:** Home | Live | Search | Podcasts | Menu
+
+**Visual:** Active item uses accent color (icon + label). Inactive items use muted gray. The bar has a thin top border and a very slight shadow. Background is white (light mode) or near-black (dark mode).
+
+**Live indicator:** The Live icon shows a small pulsing red dot when a live stream is active.
+
+**Menu item:** Tapping opens a full-screen drawer (bottom sheet or slide-in panel) with all secondary navigation.
+
+---
+
+## 16.2 Sticky Header
+
+- Height: 56px
+- Shrinks on scroll-down, re-expands on scroll-up (hide-on-scroll behavior)
+- Contains: Logo (left), Search icon, Hamburger/Menu icon (right)
+- Category pills appear in a separate row below the header — this row may hide when scrolling down and reappear when scrolling up
+
+---
+
+## 16.3 Article Swipe Navigation
+
+- On the Article page, once the user reaches the bottom, they can swipe up to transition to the next article
+- A "peeking" preview of the next article's headline and image is visible at the very bottom of the page as a visual affordance
+- Swipe is smooth with momentum. If the user swipes only partway, it snaps back or forward based on threshold (> 30% of screen height triggers navigation)
+
+---
+
+## 16.4 Touch Targets
+
+- All interactive elements (buttons, links, icons) have a minimum touch target of 44×44px as per Apple HIG and Google Material guidelines
+- Navigation items in the bottom bar are evenly distributed across the full screen width
+- Podcast play buttons are minimum 44px, ideally 48px
+
+---
+
+## 16.5 Mobile Typography
+
+- Body text: 16px minimum, line height 1.7
+- Headline (H1): 26–30px
+- Subheadline: 18–20px
+- Metadata: 12–13px
+- No text below 12px on mobile
+
+---
+
+## 16.6 Responsive Cards on Mobile
+
+- Cards stack vertically in a single column
+- Images in cards: full width, aspect ratio 16:9 maintained
+- Text in cards: headline (H3 size), category + date in a single metadata row below
+- Card padding: 16px horizontal, 12px vertical
+- Cards separated by thin 1px divider or 8px gap
+
+---
+
+## 16.7 Loading States on Mobile
+
+- Skeleton screens on all card and article list loads (not spinners — skeletons prevent layout shift)
+- Hero image uses a low-quality image placeholder (LQIP) that transitions to full resolution
+- Progress bar visible on any action that takes >300ms
+
+---
+
+## 16.8 Gesture Support
+
+- Pull-to-refresh on feed/homepage
+- Swipe right to go back (standard iOS behavior, respect it)
+- Swipe between articles on detail page (horizontal scroll snapping approach with restraint)
+- Long-press on article card: preview / share action sheet (optional enhancement)
+
+---
+
+---
+
+# SECTION 17: TABLET EXPERIENCE
+
+## 17.1 Grid Adjustments
+
+Tablets (768px–1024px) use a 2-column grid for article cards and category sections. The single-column mobile layout is too sparse; the full 3-column desktop layout is too crowded.
+
+- Top Stories: 2-column grid
+- Category blocks: 2 cards visible horizontally
+- Related News: 2-column grid
+
+## 17.2 Navigation
+
+- Bottom navigation bar is removed on tablet
+- Top header navigation is shown (same as desktop pattern)
+- Hamburger menu may still be used for secondary navigation if screen is narrow enough
+- Category pill bar is shown below the header
+
+## 17.3 Article Page on Tablet
+
+- Article body column is centered, max 640px wide, with whitespace on both sides
+- No sidebar on tablet in portrait orientation
+- In landscape orientation, a narrow sidebar (240px) can appear with a "Most Read" or sticky ad
+
+## 17.4 Landscape Behavior
+
+- Homepage switches to 2-column grid
+- Featured story can use a side-by-side image + text layout (similar to desktop)
+- Navigation remains horizontal
+
+---
+
+---
+
+# SECTION 18: DESKTOP EXPERIENCE
+
+## 18.1 Multi-column Layouts
+
+Desktop breakpoint begins at 1024px. Full 3-column layouts are used for article grids. The homepage features a rich multi-zone layout.
+
+- Homepage hero: 2/3 image + 1/3 text, or full-bleed with text overlay
+- Top Stories: 3-column grid
+- Category Blocks: 4 cards per row
+- Article page: centered content column + sidebar
+
+## 18.2 Sidebar on Desktop
+
+- Present on: Article Detail pages, Category pages, Search results
+- Width: 280–300px
+- Contents: Sticky "Most Read" list, 1–2 ad units, newsletter mini-widget
+- Behavior: Sidebar scrolls with the page. Ad unit is sticky within the content area. "Most Read" list is static.
+
+## 18.3 Hover Interactions
+
+- Article cards: image zooms subtly (scale 1.03) on hover. Card elevates with shadow. Headline underlines.
+- Navigation links: Bottom border animated in from left on hover.
+- Buttons: Background lightens or darkens by 10% on hover. Cursor is pointer.
+- Tags/badges: Slight background fill on hover.
+- All hover transitions: 200ms ease timing.
+
+## 18.4 Wide Screen / Large Monitor
+
+- Max content width: 1280px, centered with equal side margins
+- At very wide widths (1440px+): margins increase, content never stretches beyond 1280px
+- Full-bleed background sections (hero, Live, Newsletter) still span the full viewport width, but inner content is constrained
+- Typography does not increase beyond desktop scale even at larger breakpoints
+
+---
+
+---
+
+# SECTION 19: DESIGN SYSTEM
+
+## 19.1 Typography
+
+### Type Scale
+| Token | Usage | Size | Weight | Line Height |
+|---|---|---|---|---|
+| Display | Hero Headline | 48–56px | 700 | 1.1 |
+| H1 | Article Headline | 32–38px | 700 | 1.2 |
+| H2 | Section Heading | 24–28px | 700 | 1.3 |
+| H3 | Card Headline | 18–22px | 600 | 1.3 |
+| H4 | Sub-section | 16–18px | 600 | 1.4 |
+| Body Large | Standfirst | 18–20px | 400 | 1.6 |
+| Body | Article body | 17px | 400 | 1.75 |
+| Body Small | Metadata, captions | 13–14px | 400 | 1.5 |
+| Label | Badges, tags, buttons | 11–13px | 600 | 1.2 |
+
+### Font Recommendations
+- **Heading Font:** A premium serif for authority (e.g., Playfair Display, Lora) or a high-quality editorial sans (e.g., Source Serif, Fraunces). The heading font defines the editorial personality.
+- **Body Font:** A highly legible news text font — optimized for long reading. (e.g., Georgia, Merriweather, Source Serif Pro)
+- **UI Font:** A clean sans-serif for all UI chrome — navigation, labels, buttons, metadata. (e.g., Inter, DM Sans, Work Sans)
+
+### Font Pairing Rule
+Heading font (serif) + UI font (sans-serif) is the recommended pairing for a premium editorial feel. Body can match heading or have a separate companion serif.
+
+---
+
+## 19.2 Color Palette
+
+### Core Palette
+
+| Token | Role | Value (Example) |
+|---|---|---|
+| `--color-brand` | Primary brand accent | Deep red `#C0392B` or navy `#1A3A5C` |
+| `--color-brand-light` | Hover/tint states | 10–20% lighter version of brand |
+| `--color-ink` | Primary text | Near-black `#1A1A1A` |
+| `--color-ink-secondary` | Secondary text, metadata | Muted dark `#5A5A5A` |
+| `--color-ink-tertiary` | Captions, placeholders | `#8A8A8A` |
+| `--color-surface` | Page background | `#FFFFFF` |
+| `--color-surface-alt` | Section background tints | Very light gray `#F7F7F7` |
+| `--color-border` | Dividers, card borders | `#E5E5E5` |
+| `--color-live` | Live indicator | Pure red `#E53935` |
+| `--color-breaking` | Breaking news ticker | Deep red `#B71C1C` |
+| `--color-success` | Success states | Green `#2E7D32` |
+| `--color-error` | Error states | Red `#C62828` |
+
+### Category Colors
+Each category has a unique accent color used for category badges. These should be harmonious but distinct:
+- Politics: Navy Blue
+- Economy: Dark Green
+- Sports: Deep Orange
+- Health: Teal
+- Technology: Indigo
+- Science: Purple
+- Entertainment: Magenta
+
+These colors are used ONLY for the small category badge — never as large background fills.
+
+### Dark Mode
+The platform should support dark mode. All color tokens are defined in light and dark variants. Dark mode:
+- Background: `#0F0F0F`
+- Surface alt: `#1A1A1A`
+- Ink: `#F0F0F0`
+- Ink secondary: `#A0A0A0`
+- Border: `#2E2E2E`
+
+---
+
+## 19.3 Spacing Scale
+
+Uses a base-8 spacing system. All spacing values are multiples of 4px (micro scale) or 8px (macro scale).
+
+| Token | Value | Use Case |
+|---|---|---|
+| `space-1` | 4px | Icon internal padding, micro gaps |
+| `space-2` | 8px | Inline element gaps, badge padding |
+| `space-3` | 12px | Small component padding |
+| `space-4` | 16px | Standard component padding, card padding |
+| `space-6` | 24px | Section internal spacing, form field gaps |
+| `space-8` | 32px | Between card grid items, section top padding |
+| `space-12` | 48px | Between major sections on mobile |
+| `space-16` | 64px | Between major sections on desktop |
+| `space-24` | 96px | Hero section vertical padding |
+
+---
+
+## 19.4 Border Radius
+
+| Token | Value | Use Case |
+|---|---|---|
+| `radius-sm` | 4px | Badges, tags, small buttons |
+| `radius-md` | 8px | Cards, inputs, dropdowns |
+| `radius-lg` | 12px | Modal dialogs, drawers |
+| `radius-xl` | 20px | Large feature cards |
+| `radius-pill` | 999px | Pill badges, rounded buttons |
+| `radius-circle` | 50% | Avatars |
+
+---
+
+## 19.5 Elevation System (Shadows)
+
+| Level | CSS Shadow | Use Case |
+|---|---|---|
+| 0 | none | Flat elements, cards in normal state |
+| 1 | `0 1px 3px rgba(0,0,0,0.08)` | Resting card state, subtle lift |
+| 2 | `0 4px 12px rgba(0,0,0,0.12)` | Card hover state, dropdown menus |
+| 3 | `0 8px 24px rgba(0,0,0,0.16)` | Modals, drawers |
+| 4 | `0 16px 48px rgba(0,0,0,0.24)` | Full-screen overlays, toasts |
+
+---
+
+## 19.6 Button System
+
+### Button Variants
+- **Primary:** Filled background with `--color-brand`. White text. Used for main CTAs.
+- **Secondary:** Outlined with `--color-brand` border. Brand color text. Used for secondary actions.
+- **Ghost:** No background, no border. Used for tertiary actions (close buttons, cancel).
+- **Destructive:** Red fill. Used only for irreversible actions (delete, deactivate) in admin.
+- **Icon button:** Circular or square, icon only. Must have ARIA label.
+
+### Button Sizes
+- Large: 48px height, 18px font. Used for primary hero CTAs.
+- Medium: 40px height, 14–16px font. Standard button.
+- Small: 32px height, 13px font. Used in compact contexts.
+
+### Button States
+All buttons must have distinct: default, hover, focus (visible outline), active/pressed, disabled states.
+
+---
+
+## 19.7 Cards
+
+### Article Card (Standard)
+- Image (16:9)
+- Category badge (top-left on image or above headline)
+- Headline (H3)
+- Author + Date (single metadata row)
+- Optional: Reading time
+
+### Article Card (Compact / List View)
+- Small thumbnail (right side, 60px × 60px or 80px × 60px)
+- Category + Headline (text-dominant)
+- Date below
+
+### Podcast Card
+- Square cover art (1:1)
+- Series name (caption style)
+- Episode title (H3)
+- Duration
+- Play button
+
+### Sponsored Card
+- Same as Article Card but "Sponsored" replaces the category badge
+- May have a subtle border treatment to indicate it is non-editorial
+
+---
+
+## 19.8 Input System
+
+- All inputs: 40px height (desktop), 44px (mobile)
+- Border: 1px solid `--color-border`
+- Focus: 2px solid `--color-brand` ring (not outline) — no box shadow
+- Error state: Red border, error message below
+- Success state: Green checkmark icon inside field
+- Placeholder text: `--color-ink-tertiary`
+- Label: Always above the input, never inside (avoid floating labels for news portal — clarity over cleverness)
+
+---
+
+## 19.9 Component Library Summary
+
+| Component | Notes |
+|---|---|
+| Tag / Badge | Category, Sponsored, Breaking, Live, Upcoming labels |
+| Divider | Horizontal 1px line in `--color-border`. Used sparingly. |
+| Avatar | Circular image. 32px / 48px / 64px sizes. Fallback: initials in a colored circle. |
+| Progress Bar | Reading progress indicator. Thin (3px), accent color, top of viewport. |
+| Skeleton | Animated gray shimmer block. Matches layout of real content. |
+| Toast / Notification | Bottom-right (desktop), bottom-center (mobile). Auto-dismisses in 4s. |
+| Modal | Centered overlay. Dark backdrop. Max width 540px. Focus trapped inside. |
+| Accordion | FAQ and collapsible sections. Chevron icon rotates 180° when open. |
+| Tabs | Horizontal tab row. Active tab: bottom border in brand color. |
+| Tooltip | Small text popup on hover (desktop only — not on mobile). |
+| Audio Player | Custom-styled. Not a default browser element. |
+
+---
+
+## 19.10 Grid System
+
+| Breakpoint | Columns | Gutter | Margin |
+|---|---|---|---|
+| Mobile (< 640px) | 4 columns | 16px | 16px |
+| Tablet (640–1023px) | 8 columns | 24px | 24px |
+| Desktop (1024–1279px) | 12 columns | 24px | 32px |
+| Wide (1280px+) | 12 columns | 32px | Auto (centered) |
+
+Max content width: 1280px.
+
+---
+
+---
+
+# SECTION 20: ANIMATION BLUEPRINT
+
+## 20.1 Animation Philosophy
+
+Animations serve communication, not entertainment. Every animation on this platform should reduce cognitive load, not add to it. Animations are used to:
+- Orient the user (where did this element come from? where is it going?)
+- Confirm interactions (the button responded)
+- Signal loading states (something is happening)
+- Aid transitions (we're moving to a new context)
+
+If an animation doesn't serve one of these four purposes, it is not needed.
+
+## 20.2 Animation Timing
+
+| Type | Duration | Easing |
+|---|---|---|
+| Micro-interactions (hover, press) | 150–200ms | `ease-out` |
+| Element entrance (fade/slide in) | 250–350ms | `ease-out` |
+| Page transitions | 300–400ms | `ease-in-out` |
+| Drawers & modals | 300ms | `cubic-bezier(0.4, 0, 0.2, 1)` |
+| Skeleton shimmer | 1500ms | Looping linear |
+| Breaking ticker scroll | 20–40s (loop) | Linear |
+| Live dot pulse | 2s | Looping ease-in-out |
+
+---
+
+## 20.3 Page Transitions
+
+When navigating between pages, the content area performs a quick fade-in (opacity 0→1 over 200ms) as the new page renders. Avoid slide transitions between pages as they can feel disorienting in a content-rich environment.
+
+On mobile, article open transitions: the article content fades in with a very slight upward translate (8–12px, 250ms). This simulates a "lifting" effect without being theatrical.
+
+---
+
+## 20.4 Scroll Animations
+
+Elements entering the viewport (article cards below the fold, section headings) fade in with a subtle upward translate of 16px over 300ms. This is triggered once — elements do not animate every time they enter the viewport.
+
+The Breaking News ticker scrolls continuously at a speed calibrated to be readable (~150 pixels per second). It loops seamlessly.
+
+The Reading Progress bar animates in real-time as the user scrolls — no easing or delay. It must feel perfectly in sync with scroll position.
+
+---
+
+## 20.5 Hover Animations (Desktop)
+
+- **Article card image:** Scale from 1.0 to 1.03 over 300ms. Overflow hidden on the card so the image scales within its container.
+- **Article card elevation:** Shadow increases from Level 0 to Level 2 over 200ms.
+- **Navigation links:** Underline animates from left to right over 200ms.
+- **Buttons:** Background color shift over 150ms.
+- **Category badges:** Subtle background fill appears over 150ms.
+- **Accordion chevron:** Rotates 180° over 200ms when open/close toggled.
+
+---
+
+## 20.6 Loading Animations
+
+**Skeleton screens:** All card grids, article feeds, and list views show skeleton placeholders while loading. Skeleton elements match the exact layout of real content. A smooth shimmer (a lighter highlight that moves left-to-right) indicates active loading.
+
+**Image loading:** Use a low-quality blurred placeholder (LQIP) that transitions to full resolution as the image loads. No jarring "pop" of content.
+
+**Button loading state:** When a form is submitting, the button shows a small inline spinner and its label changes to "Submitting…". The button is disabled during this state.
+
+---
+
+## 20.7 Micro-interactions
+
+- **Search icon tap (mobile):** The overlay slides down from the top with a 250ms ease-out.
+- **Share button tap:** Action sheet slides up from bottom (mobile) in 250ms.
+- **Audio play/pause:** The play icon transitions to a pause icon with a quick cross-fade, not an abrupt switch.
+- **Newsletter subscribe success:** The input field and button transition to a success message — the form elements fade out as the success text fades in.
+- **Accordion open:** Height animates from 0 to auto (use max-height technique for CSS, or JS-measured for precision). Content fades in simultaneously.
+- **Toast appearance:** Slides in from bottom-right (desktop) or bottom-center (mobile). Slides back out on dismiss.
+
+---
+
+## 20.8 Modal & Drawer Animations
+
+**Modal:** Background overlay fades to 50% opacity (200ms). Modal panel scales from 97% to 100% and fades in (250ms). Combined effect is subtle and elegant.
+
+**Mobile Drawer (menu):** Slides in from the right edge of the screen over 300ms. Backdrop darkens simultaneously. Swipe-right to close also at 300ms.
+
+**Bottom Sheet (mobile):** Slides up from the bottom over 300ms. Spring physics are not recommended here — use simple ease-out for a premium, controlled feel.
+
+---
+
+## 20.9 Reduced Motion
+
+All animations respect the `prefers-reduced-motion` media query. When enabled:
+- Page transitions are instant (no fade)
+- Scroll animations are disabled
+- Hover effects are instant (no transition duration)
+- Skeleton shimmer is static (no movement)
+- Ticker scrolls at half speed or is replaced with a static display
+
+---
+
+---
+
+# SECTION 21: ACCESSIBILITY BLUEPRINT
+
+## 21.1 Color Contrast
+
+- All body text on white background: minimum 7:1 contrast ratio (WCAG AA requires 4.5:1; the platform targets the higher AA Large / AAA standard)
+- Large text (heading, display): minimum 4.5:1
+- UI components (button labels, input borders): minimum 3:1
+- Category badges: text on badge background must meet 4.5:1
+- Error text on white: must meet 4.5:1
+
+All contrast ratios to be verified with a tool (e.g., Colour Contrast Analyser) during the design review stage.
+
+---
+
+## 21.2 Font Sizing
+
+- No text smaller than 12px in the published interface (12px is an absolute minimum for micro-labels)
+- Body text: 16px minimum on all breakpoints
+- Users can scale text using browser zoom — the layout must not break at 200% zoom
+- Do not use CSS that prevents text scaling (`-webkit-text-size-adjust: none`)
+
+---
+
+## 21.3 Keyboard Navigation
+
+- Every interactive element (links, buttons, inputs, modals, dropdowns) must be fully operable via keyboard
+- Tab order must match the logical visual flow of the page (top-left to bottom-right)
+- Modal dialogs must trap focus inside when open
+- Dropdown menus must be navigable with arrow keys; Escape closes them
+- Skip navigation link: A "Skip to main content" link is the first focusable element on every page, hidden until focused
+
+---
+
+## 21.4 Focus States
+
+- All focusable elements must have a clearly visible focus indicator — the browser's default outline is acceptable but ideally the platform provides a custom focus style (2px solid ring in the brand accent color, 2px offset from element)
+- Focus indicators must never be removed with `outline: none` without a custom replacement
+- Focus indicators must meet 3:1 contrast ratio against adjacent colors
+
+---
+
+## 21.5 Screen Reader Support
+
+- All images must have meaningful `alt` text. Decorative images use `alt=""`
+- The reading progress bar must be marked `aria-hidden="true"` (decorative)
+- The Breaking News ticker region must be an `aria-live="polite"` region or updates must be non-disruptive
+- Live status indicators ("LIVE", "BREAKING") must convey meaning via text, not color alone
+- Audio player controls must have ARIA labels (`aria-label="Play episode"`, etc.)
+- Article cards must be implemented as links (`<a>`) wrapping the entire card, or as individual link elements with meaningful link text
+- Navigation landmark roles: `<header>`, `<nav>`, `<main>`, `<aside>`, `<footer>` must all be used correctly
+- Forms: All inputs must have associated `<label>` elements (not just placeholder text)
+
+---
+
+## 21.6 Touch Targets
+
+- Minimum touch target: 44×44px on all interactive elements
+- Targets should have at least 8px spacing between adjacent interactive elements to prevent mis-taps
+- The bottom navigation bar items must each have the full height of the bar as a touch target
+
+---
+
+## 21.7 Semantic HTML Hierarchy
+
+- One `<h1>` per page only (the article headline or page title)
+- Heading levels never skip (H1 → H2 → H3, not H1 → H3)
+- Article body sub-headings use H2 and H3 inside the article `<article>` element
+- Lists are marked up with `<ul>` / `<ol>` + `<li>`, never simulated with line breaks
+- Tables include `<thead>`, `<tbody>`, `<th scope="col">` for screen reader navigation
+
+---
+
+## 21.8 Forms Accessibility
+
+- Error messages appear adjacent to the relevant field (not just at the top of the form)
+- Error messages are announced via `role="alert"` or `aria-live="assertive"` after submission failure
+- Required fields are marked with `aria-required="true"` in addition to visual indicators
+- Autocomplete attributes are used on common fields (name, email, tel) for assistive technology compatibility
+
+---
+
+---
+
+# SECTION 22: PERFORMANCE BLUEPRINT
+
+## 22.1 Loading Philosophy
+
+The user's first impression is formed in the first 2 seconds. If the site feels slow in that window, trust is damaged before any content has been read. Performance is a design deliverable, not a technical afterthought.
+
+## 22.2 Core Web Vitals Targets
+
+| Metric | Target |
+|---|---|
+| LCP (Largest Contentful Paint) | < 2.0 seconds |
+| FID / INP (Interaction Delay) | < 100ms |
+| CLS (Cumulative Layout Shift) | < 0.1 |
+| TTFB (Time to First Byte) | < 600ms |
+
+---
+
+## 22.3 Image Optimization
+
+- All images served in modern formats: WebP primary, JPEG fallback
+- Responsive images using `srcset` and `sizes` — the browser downloads only the resolution needed for the device
+- Hero images: preloaded (`<link rel="preload">`) to improve LCP
+- All images below the fold: lazy loaded (`loading="lazy"`)
+- No images with intrinsic dimensions left unspecified (always set `width` and `height` attributes to prevent CLS)
+- Low-quality image placeholders (LQIP) for perceived performance
+
+---
+
+## 22.4 Skeleton Screens
+
+Every list, grid, and feed shows skeleton placeholder elements during the data fetch. Skeletons:
+- Match the exact layout of the real content
+- Use an animated shimmer effect
+- Never show a spinning loader as a replacement for content layout (spinners cause CLS and feel slower)
+
+---
+
+## 22.5 Lazy Loading
+
+- Images below the fold: `loading="lazy"`
+- Comments section (if added): loaded only when user scrolls near it
+- Advertisement scripts: loaded asynchronously, deferred until after main content
+- Third-party embeds (YouTube, etc.): facade pattern — show a thumbnail with a play button; the iframe only loads when the user clicks play
+
+---
+
+## 22.6 Infinite Scrolling vs. Pagination
+
+- **Homepage Latest News feed:** Infinite scroll (or "Load More" button as a hybrid) — users expect continuous scrolling for news feeds
+- **Search results:** Paginated with "Load More" — allows users to maintain position when navigating back from a result
+- **Category pages:** "Load More" button preferred — gives users control over the loading moment
+- All infinite scroll implementations must include a "You've reached the end" state and "Back to Top" affordance
+
+---
+
+## 22.7 Caching Strategy
+
+- Static assets (CSS, JS, fonts, logo): aggressively cached with long TTL (1 year, with content hash in filename for cache-busting on updates)
+- Article pages: short-to-medium cache (5–15 minutes) with stale-while-revalidate pattern
+- Breaking news ticker and live updates: no caching (always fresh)
+- Homepage: short cache (60–120 seconds) with background revalidation
+
+---
+
+## 22.8 Font Loading
+
+- Use `font-display: swap` for all web fonts to prevent invisible text during load
+- Preload the heading font and body font `woff2` files in the document `<head>`
+- Limit the number of font files: 2 typefaces maximum, each in 2–3 weights. More fonts = more network requests = slower load.
+- System font stack as fallback while web fonts load (ensure the system font is dimensionally similar to the target font to prevent CLS from font swap)
+
+---
+
+## 22.9 Third-Party Scripts
+
+- All third-party scripts (analytics, ads) loaded asynchronously
+- No third-party scripts in the critical rendering path
+- Ad scripts use `async` and `defer` attributes
+- YouTube player uses facade (poster + play button) until interaction — prevents the YouTube iframe from blocking page load
+
+---
+
+---
+
+*End of Document*
+
+---
+
+**Document Version:** 1.0
+**Status:** Final Draft — Ready for Development Handoff
+**Prepared by:** UX Strategy & Product Design Team
+**Intended Audience:** Frontend Development Team, Engineering Lead, Product Manager
+
