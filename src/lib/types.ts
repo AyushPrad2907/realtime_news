@@ -95,6 +95,7 @@ export interface Job {
 
 export type PageView =
   | { type: "home" }
+  | { type: "pib-news" }
   | { type: "article"; slug: string }
   | { type: "category"; slug: CategorySlug }
   | { type: "section"; slug: "live" | "breaking" | "national" | "international" | "podcasts" }

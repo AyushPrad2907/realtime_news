@@ -18,6 +18,7 @@ const PRIMARY_NAV = [
   { label: "National", view: { type: "section" as const, slug: "national" as const } },
   { label: "International", view: { type: "section" as const, slug: "international" as const } },
   { label: "Podcasts", view: { type: "section" as const, slug: "podcasts" as const } },
+  { label: "Govt Releases", view: { type: "pib-news" as const } },
 ];
 
 export function Header() {
@@ -42,6 +43,7 @@ export function Header() {
     if (label === "National") return (current.type === "section" && current.slug === "national") || (current.type === "category" && current.slug === "national");
     if (label === "International") return (current.type === "section" && current.slug === "international") || (current.type === "category" && current.slug === "international");
     if (label === "Podcasts") return current.type === "section" && current.slug === "podcasts" || current.type === "podcast-episode";
+    if (label === "Govt Releases") return current.type === "pib-news";
     return false;
   };
 

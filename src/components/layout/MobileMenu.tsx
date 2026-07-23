@@ -13,6 +13,7 @@ const PRIMARY_LINKS = [
   { label: "National", view: { type: "section" as const, slug: "national" as const } },
   { label: "International", view: { type: "section" as const, slug: "international" as const } },
   { label: "Podcasts", view: { type: "section" as const, slug: "podcasts" as const } },
+  { label: "Govt Releases", view: { type: "pib-news" as const } },
 ];
 
 const UTILITY_LINKS = [

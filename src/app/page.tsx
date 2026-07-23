@@ -29,6 +29,7 @@ import { LoginPage } from "@/components/pages/LoginPage";
 import { EditorPanel } from "@/components/panels/EditorPanel";
 import { AdminPanel } from "@/components/panels/AdminPanel";
 import { DateArchivePage } from "@/components/pages/DateArchivePage";
+import { PibNewsPage } from "@/components/pages/PibNewsPage";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
@@ -69,6 +70,8 @@ export default function Home() {
     switch (current.type) {
       case "home":
         return <HomePage />;
+      case "pib-news":
+        return <PibNewsPage />;
       case "article":
         return <ArticlePage slug={current.slug} />;
       case "section":
