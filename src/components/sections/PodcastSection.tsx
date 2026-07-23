@@ -5,6 +5,7 @@ import { PODCAST_EPISODES } from "@/lib/mock-data";
 import { PodcastCard } from "@/components/cards/PodcastCard";
 import { ArrowRight, Headphones } from "lucide-react";
 import type { PodcastEpisode } from "@/lib/types";
+import { useT } from "@/hooks/use-t";
 
 interface PodcastSectionProps {
   episodes?: PodcastEpisode[];
@@ -12,6 +13,7 @@ interface PodcastSectionProps {
 
 export function PodcastSection({ episodes: episodeProp }: PodcastSectionProps) {
   const { navigate } = useStore();
+  const t = useT();
   const episodes = episodeProp ?? PODCAST_EPISODES;
   const featured = episodes.slice(0, 4);
 
@@ -22,13 +24,13 @@ export function PodcastSection({ episodes: episodeProp }: PodcastSectionProps) {
       <div className="flex items-end justify-between mb-5 md:mb-6 border-b border-border pb-3">
         <h2 className="h-section flex items-center gap-2">
           <Headphones className="h-5 w-5 text-brand" />
-          Latest Podcasts
+          {t("section.latestPodcasts")}
         </h2>
         <button
           onClick={() => navigate({ type: "section", slug: "podcasts" })}
           className="font-ui text-xs font-semibold text-brand hover:text-brand-dark transition-colors flex items-center gap-1"
         >
-          All podcasts <ArrowRight className="h-3 w-3" />
+          {t("section.viewAll")}
         </button>
       </div>
 

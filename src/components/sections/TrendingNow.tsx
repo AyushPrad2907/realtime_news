@@ -7,6 +7,7 @@ import { getCategory } from "@/lib/utils-news";
 import { TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Article } from "@/lib/types";
+import { useT } from "@/hooks/use-t";
 
 interface TrendingNowProps {
   articles?: Article[];
@@ -14,6 +15,7 @@ interface TrendingNowProps {
 
 export function TrendingNow({ articles: articleProp }: TrendingNowProps) {
   const { navigate } = useStore();
+  const t = useT();
   const list = articleProp ?? ARTICLES_LIST;
 
   // Sort by views (as a proxy for trending)
@@ -29,9 +31,8 @@ export function TrendingNow({ articles: articleProp }: TrendingNowProps) {
       <div className="flex items-end justify-between mb-5 md:mb-6 border-b border-border pb-3">
         <h2 className="h-section flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-brand" />
-          Trending Now
+          {t("section.trendingNow")}
         </h2>
-        <span className="font-ui text-xs text-ink-tertiary">Last 4 hours</span>
       </div>
 
       <ol className="grid md:grid-cols-2 gap-x-10 gap-y-0">

@@ -49,8 +49,71 @@ function LazySection({ children }: { children: React.ReactNode }) {
 
 export function HomePage() {
   // Fetch from real API; mock data is returned instantly as fallback
-  const { data: articles } = useArticles({ limit: 50 });
+  const { data: articles, loading } = useArticles({ limit: 50 });
   const { data: podcastData } = usePodcasts();
+
+  // Show a beautiful, shimmering skeleton loading state to prevent layout flash
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-8 animate-pulse">
+        {/* Hero Story Skeleton */}
+        <div className="mb-10 md:mb-16">
+          <div className="aspect-[16/10] md:aspect-[16/9] bg-muted/60 rounded-xl relative flex flex-col justify-end p-4 md:p-10">
+            <div className="h-4 w-24 bg-muted/90 rounded mb-3" />
+            <div className="h-8 md:h-12 w-3/4 bg-muted/90 rounded mb-4" />
+            <div className="h-8 md:h-12 w-1/2 bg-muted/90 rounded mb-6" />
+            <div className="h-4 w-40 bg-muted/90 rounded" />
+          </div>
+        </div>
+
+        {/* Top Stories Skeleton */}
+        <div className="mb-12 md:mb-16">
+          <div className="flex items-end justify-between mb-6 border-b border-border pb-3">
+            <div className="h-6 w-32 bg-muted/70 rounded" />
+            <div className="h-4 w-16 bg-muted/70 rounded" />
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+            <div className="col-span-1 space-y-4">
+              <div className="aspect-[16/9] bg-muted/60 rounded-md" />
+              <div className="h-4 w-20 bg-muted/70 rounded" />
+              <div className="h-6 w-full bg-muted/70 rounded" />
+              <div className="h-4 w-3/4 bg-muted/70 rounded" />
+            </div>
+            <div className="col-span-2 grid grid-cols-2 gap-6 lg:gap-8">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="space-y-3">
+                  <div className="aspect-[16/9] bg-muted/60 rounded-md" />
+                  <div className="h-3 w-16 bg-muted/70 rounded" />
+                  <div className="h-5 w-full bg-muted/70 rounded" />
+                  <div className="h-3 w-2/3 bg-muted/70 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Latest News Skeleton */}
+        <div className="grid lg:grid-cols-[1fr_300px] gap-8 lg:gap-12">
+          <div className="space-y-6">
+            <div className="h-6 w-28 bg-muted/70 rounded border-b border-border pb-2 mb-4" />
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex gap-4 items-start py-4 border-b border-border">
+                <div className="flex-1 space-y-3">
+                  <div className="h-5 w-5/6 bg-muted/70 rounded" />
+                  <div className="h-3 w-1/2 bg-muted/70 rounded" />
+                </div>
+                <div className="h-16 w-24 bg-muted/60 rounded" />
+              </div>
+            ))}
+          </div>
+          <div className="hidden lg:block space-y-6">
+            <div className="h-6 w-24 bg-muted/70 rounded mb-4" />
+            <div className="h-48 bg-muted/50 rounded-md" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Until articles load, use mock data so the page renders instantly
   const list = articles.length > 0 ? articles : ARTICLES_LIST;

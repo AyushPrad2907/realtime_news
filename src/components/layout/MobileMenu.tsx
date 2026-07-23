@@ -5,28 +5,29 @@ import { CATEGORIES, INDIAN_STATES } from "@/lib/mock-data";
 import { X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
+import { useT } from "@/hooks/use-t";
 
 const PRIMARY_LINKS = [
-  { label: "Home", view: { type: "home" as const } },
-  { label: "Live", view: { type: "section" as const, slug: "live" as const } },
-  { label: "Breaking", view: { type: "section" as const, slug: "breaking" as const } },
-  { label: "National", view: { type: "section" as const, slug: "national" as const } },
-  { label: "International", view: { type: "section" as const, slug: "international" as const } },
-  { label: "Podcasts", view: { type: "section" as const, slug: "podcasts" as const } },
-  { label: "Govt Releases", view: { type: "pib-news" as const } },
+  { label: "Home", key: "nav.home" as const, view: { type: "home" as const } },
+  { label: "Live", key: "nav.live" as const, view: { type: "section" as const, slug: "live" as const } },
+  { label: "Breaking", key: "nav.breaking" as const, view: { type: "section" as const, slug: "breaking" as const } },
+  { label: "National", key: "cat.national" as const, view: { type: "section" as const, slug: "national" as const } },
+  { label: "International", key: "cat.international" as const, view: { type: "section" as const, slug: "international" as const } },
+  { label: "Podcasts", key: "nav.podcasts" as const, view: { type: "section" as const, slug: "podcasts" as const } },
 ];
 
 const UTILITY_LINKS = [
-  { label: "About Us", view: { type: "about" as const } },
-  { label: "Contact", view: { type: "contact" as const } },
-  { label: "Advertise With Us", view: { type: "advertise" as const } },
-  { label: "Careers", view: { type: "careers" as const } },
-  { label: "Privacy Policy", view: { type: "privacy" as const } },
-  { label: "Terms of Service", view: { type: "terms" as const } },
+  { label: "About Us", key: "misc.aboutUs" as const, view: { type: "about" as const } },
+  { label: "Contact", key: "misc.contact" as const, view: { type: "contact" as const } },
+  { label: "Advertise With Us", key: "misc.advertise" as const, view: { type: "advertise" as const } },
+  { label: "Careers", key: "misc.careers" as const, view: { type: "careers" as const } },
+  { label: "Privacy Policy", key: "misc.privacy" as const, view: { type: "privacy" as const } },
+  { label: "Terms of Service", key: "misc.terms" as const, view: { type: "terms" as const } },
 ];
 
 export function MobileMenu() {
   const { mobileMenuOpen, setMobileMenuOpen, navigate } = useStore();
+  const t = useT();
 
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -77,7 +78,7 @@ export function MobileMenu() {
               {/* Primary nav */}
               <div className="space-y-1">
                 <p className="font-ui text-[11px] font-bold uppercase tracking-wider text-ink-tertiary mb-3">
-                  Sections
+                  {t("misc.sections")}
                 </p>
                 {PRIMARY_LINKS.map((l) => (
                   <button
@@ -85,7 +86,7 @@ export function MobileMenu() {
                     onClick={() => navigate(l.view)}
                     className="w-full flex items-center justify-between py-2.5 px-2 -mx-2 rounded-md hover:bg-muted transition-colors text-left"
                   >
-                    <span className="font-display text-xl font-bold">{l.label}</span>
+                    <span className="font-display text-xl font-bold">{t(l.key)}</span>
                     <ChevronRight className="h-4 w-4 text-ink-tertiary" />
                   </button>
                 ))}
@@ -94,7 +95,7 @@ export function MobileMenu() {
               {/* Categories */}
               <div className="mt-8 space-y-1">
                 <p className="font-ui text-[11px] font-bold uppercase tracking-wider text-ink-tertiary mb-3">
-                  Categories
+                  {t("misc.categories")}
                 </p>
                 <div className="grid grid-cols-2 gap-1">
                   {CATEGORIES.map((c) => (
@@ -107,7 +108,7 @@ export function MobileMenu() {
                         className="h-1.5 w-1.5 rounded-full shrink-0"
                         style={{ background: c.colorVar }}
                       />
-                      <span className="font-ui text-sm">{c.name}</span>
+                      <span className="font-ui text-sm">{t(`cat.${c.slug}` as any) || c.name}</span>
                     </button>
                   ))}
                 </div>
@@ -116,7 +117,7 @@ export function MobileMenu() {
               {/* State news */}
               <div className="mt-8 space-y-1">
                 <p className="font-ui text-[11px] font-bold uppercase tracking-wider text-ink-tertiary mb-3">
-                  State News
+                  {t("misc.stateNews")}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {INDIAN_STATES.slice(0, 10).map((s) => (
@@ -133,7 +134,7 @@ export function MobileMenu() {
               {/* Utility */}
               <div className="mt-8 space-y-1">
                 <p className="font-ui text-[11px] font-bold uppercase tracking-wider text-ink-tertiary mb-3">
-                  More
+                  {t("misc.more")}
                 </p>
                 {UTILITY_LINKS.map((l) => (
                   <button
@@ -141,7 +142,7 @@ export function MobileMenu() {
                     onClick={() => navigate(l.view)}
                     className="block w-full py-2 px-2 -mx-2 rounded-md hover:bg-muted transition-colors text-left font-ui text-sm"
                   >
-                    {l.label}
+                    {t(l.key)}
                   </button>
                 ))}
               </div>

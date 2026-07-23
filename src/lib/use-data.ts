@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useStore } from "@/lib/store";
 import {
   fetchArticles,
   fetchCategories,
@@ -30,6 +31,7 @@ function useApiData<T>(
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
     fetcher()
       .then((result) => {
         if (!cancelled) {
@@ -59,8 +61,9 @@ export function useArticles(params: {
   limit?: number;
   sort?: "newest" | "popular";
 } = {}) {
+  const language = useStore((s) => s.language);
   return useApiData(
-    () => fetchArticles(params),
+    () => fetchArticles({ ...params, lang: language }),
     ARTICLES_LIST.filter((a) => {
       if (params.category && a.category !== params.category) return false;
       if (params.state && !(a.states ?? []).includes(params.state)) return false;
@@ -69,7 +72,7 @@ export function useArticles(params: {
       if (params.limit) return ARTICLES_LIST.indexOf(a) < params.limit;
       return true;
     }),
-    [JSON.stringify(params)]
+    [JSON.stringify(params), language]
   );
 }
 

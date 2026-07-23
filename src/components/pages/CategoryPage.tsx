@@ -1,6 +1,7 @@
 "use client";
 
 import { useStore } from "@/lib/store";
+import { useArticles } from "@/lib/use-data";
 import { ARTICLES_LIST } from "@/lib/mock-data";
 import type { CategorySlug } from "@/lib/types";
 import { ArticleCard } from "@/components/cards/ArticleCard";
@@ -8,6 +9,7 @@ import { getCategory } from "@/lib/utils-news";
 import { AdBanner } from "@/components/sections/AdBanner";
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/hooks/use-t";
 
 interface CategoryPageProps {
   slug: CategorySlug;
@@ -15,23 +17,49 @@ interface CategoryPageProps {
 
 export function CategoryPage({ slug }: CategoryPageProps) {
   const { navigate } = useStore();
+  const t = useT();
   const [sort, setSort] = useState<"newest" | "popular">("newest");
   const [visibleCount, setVisibleCount] = useState(9);
 
+  const { data: fetchedArticles, loading } = useArticles({ category: slug, limit: 100 });
   const cat = getCategory(slug);
+  const categoryTitle = t(`cat.${slug}` as any) || cat.name;
 
   const articles = useMemo(() => {
-    const filtered = ARTICLES_LIST.filter((a) => a.category === slug);
+    const list = fetchedArticles.length > 0 ? fetchedArticles : ARTICLES_LIST.filter((a) => a.category === slug);
     if (sort === "newest") {
-      return filtered.sort(
+      return [...list].sort(
         (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
       );
     }
-    return filtered.sort((a, b) => b.views - a.views);
-  }, [slug, sort]);
+    return [...list].sort((a, b) => b.views - a.views);
+  }, [fetchedArticles, slug, sort]);
 
   const visible = articles.slice(0, visibleCount);
   const [lead, ...rest] = visible;
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-8 animate-pulse">
+        <header className="mb-8 md:mb-10 pb-6 border-b border-border">
+          <div className="h-10 w-48 bg-muted/70 rounded mb-3" />
+          <div className="h-5 w-2/3 bg-muted/70 rounded mb-4" />
+          <div className="h-4 w-20 bg-muted/70 rounded" />
+        </header>
+        <div className="aspect-[16/9] bg-muted/60 rounded-xl mb-10" />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="space-y-3">
+              <div className="aspect-[16/9] bg-muted/60 rounded-md" />
+              <div className="h-3 w-16 bg-muted/70 rounded" />
+              <div className="h-5 w-full bg-muted/70 rounded" />
+              <div className="h-3 w-2/3 bg-muted/70 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-8">
@@ -44,7 +72,7 @@ export function CategoryPage({ slug }: CategoryPageProps) {
             aria-hidden
           />
           <h1 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight">
-            {cat.name}
+            {categoryTitle}
           </h1>
         </div>
         <p className="font-serif text-lg text-ink-secondary max-w-2xl">
@@ -109,7 +137,7 @@ export function CategoryPage({ slug }: CategoryPageProps) {
             onClick={() => setVisibleCount((c) => c + 6)}
             className="inline-flex items-center gap-2 px-6 h-12 rounded-md border border-border hover:bg-muted font-ui text-sm font-semibold"
           >
-            Load more stories
+            {t("section.viewAll")}
           </button>
           <p className="font-ui text-xs text-ink-tertiary mt-2">
             {articles.length - visibleCount} more stories available
@@ -126,7 +154,7 @@ export function CategoryPage({ slug }: CategoryPageProps) {
             onClick={() => navigate({ type: "home" })}
             className="inline-flex items-center gap-2 px-5 h-11 rounded-md bg-brand hover:bg-brand-dark text-white font-ui text-sm font-semibold"
           >
-            Back to homepage
+            {t("article.backToHome")}
           </button>
         </div>
       )}

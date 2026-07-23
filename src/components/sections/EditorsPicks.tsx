@@ -4,12 +4,14 @@ import { useStore } from "@/lib/store";
 import type { Article } from "@/lib/types";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { PenLine } from "lucide-react";
+import { useT } from "@/hooks/use-t";
 
 interface EditorsPicksProps {
   articles: Article[];
 }
 
 export function EditorsPicks({ articles }: EditorsPicksProps) {
+  const t = useT();
   if (articles.length === 0) return null;
   const [lead, ...rest] = articles;
 
@@ -18,11 +20,8 @@ export function EditorsPicks({ articles }: EditorsPicksProps) {
       <div className="flex items-end justify-between mb-5 md:mb-6 border-b border-border pb-3">
         <h2 className="h-section flex items-center gap-2">
           <PenLine className="h-5 w-5 text-brand" />
-          Editor&rsquo;s Picks
+          {t("section.editorsPicks")}
         </h2>
-        <span className="font-ui text-xs text-ink-tertiary italic">
-          Curated by the editorial desk
-        </span>
       </div>
 
       {/* Mobile: stack */}

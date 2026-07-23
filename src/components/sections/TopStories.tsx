@@ -4,6 +4,7 @@ import { useStore } from "@/lib/store";
 import type { Article } from "@/lib/types";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { ArrowRight } from "lucide-react";
+import { useT } from "@/hooks/use-t";
 
 interface TopStoriesProps {
   articles: Article[];
@@ -11,6 +12,7 @@ interface TopStoriesProps {
 
 export function TopStories({ articles }: TopStoriesProps) {
   const { navigate } = useStore();
+  const t = useT();
   if (articles.length === 0) return null;
 
   const [lead, ...rest] = articles;
@@ -18,12 +20,12 @@ export function TopStories({ articles }: TopStoriesProps) {
   return (
     <section className="mb-12 md:mb-16">
       <div className="flex items-end justify-between mb-5 md:mb-6 border-b border-border pb-3">
-        <h2 className="h-section">Top Stories</h2>
+        <h2 className="h-section">{t("section.topStories")}</h2>
         <button
           onClick={() => navigate({ type: "section", slug: "national" })}
           className="font-ui text-xs font-semibold text-brand hover:text-brand-dark transition-colors flex items-center gap-1"
         >
-          View all <ArrowRight className="h-3 w-3" />
+          {t("section.viewAll")}
         </button>
       </div>
 

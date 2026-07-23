@@ -66,12 +66,28 @@ export async function GET(request: Request) {
     }
 
     const htmlText = await res.text();
-    const cleanedHtmlText = htmlText.replace(/&(?!(amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);)/g, "&amp;");
-    const extractedContent = extractPdfDiv(cleanedHtmlText);
+    const cleanEntities = htmlText
+      .replace(/&zwj;/gi, "\u200d")
+      .replace(/&ndash;/gi, "–")
+      .replace(/&mdash;/gi, "—")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&rsquo;/gi, "’")
+      .replace(/&lsquo;/gi, "‘")
+      .replace(/&rdquo;/gi, "”")
+      .replace(/&ldquo;/gi, "“");
+    const cleanedHtmlText = cleanEntities.replace(/&(?!(amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);)/g, "&amp;");
+    let extractedContent = extractPdfDiv(cleanedHtmlText);
 
     if (!extractedContent) {
       return NextResponse.json({ error: "Could not locate release content block on the page" }, { status: 404 });
     }
+
+    // Sanitize the HTML to strip out legacy styling that overrides our theme text color
+    extractedContent = extractedContent
+      .replace(/<style[\s\S]*?<\/style>/gi, "") // Remove embedded style blocks
+      .replace(/<font[^>]*>/gi, "") // Strip font opening tags
+      .replace(/<\/font>/gi, "") // Strip font closing tags
+      .replace(/style=["'][^"']*(?:color|background)[^"']*["']/gi, ""); // Strip style attributes setting color/bg
 
     return NextResponse.json({ html: extractedContent });
   } catch (error: any) {

@@ -5,6 +5,7 @@ import type { Article } from "@/lib/types";
 import { getCategory, getAuthor } from "@/lib/utils-news";
 import { Clock, Headphones, ArrowRight } from "lucide-react";
 import { TimeAgo } from "@/components/TimeAgo";
+import { useT } from "@/hooks/use-t";
 
 interface HeroStoryProps {
   article: Article;
@@ -12,8 +13,10 @@ interface HeroStoryProps {
 
 export function HeroStory({ article }: HeroStoryProps) {
   const { navigate } = useStore();
+  const t = useT();
   const cat = getCategory(article.category);
   const author = getAuthor(article.authorId);
+  const categoryTitle = t(`cat.${article.category}` as any) || cat.name;
 
   return (
     <section className="mb-10 md:mb-16">
@@ -40,7 +43,7 @@ export function HeroStory({ article }: HeroStoryProps) {
                 className="px-2 py-0.5 md:px-2.5 md:py-1 rounded text-white font-ui text-[10px] md:text-[11px] font-bold uppercase tracking-wide"
                 style={{ background: cat.colorVar }}
               >
-                {cat.name}
+                {categoryTitle}
               </span>
               {article.isBreaking && (
                 <span className="px-2 py-0.5 md:px-2.5 md:py-1 rounded bg-live text-white font-ui text-[10px] md:text-[11px] font-bold uppercase tracking-wide flex items-center gap-1">
@@ -48,7 +51,7 @@ export function HeroStory({ article }: HeroStoryProps) {
                     <span className="animate-live-pulse absolute inline-flex h-full w-full rounded-full bg-white" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
                   </span>
-                  Breaking
+                  {t("nav.breaking")}
                 </span>
               )}
             </div>
@@ -62,13 +65,13 @@ export function HeroStory({ article }: HeroStoryProps) {
             </p>
 
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 md:mt-5 font-ui text-xs md:text-sm text-white/80">
-              <span className="font-medium text-white/95">By {author.name}</span>
+              <span className="font-medium text-white/95">{t("article.by")} {author.name}</span>
               <span aria-hidden>·</span>
               <span><TimeAgo iso={article.publishedAt} /></span>
               <span aria-hidden className="hidden md:inline">·</span>
               <span className="hidden md:flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                {article.readingTime} min read
+                {article.readingTime} {t("article.minRead")}
               </span>
               {article.hasAudio && (
                 <>
@@ -82,8 +85,7 @@ export function HeroStory({ article }: HeroStoryProps) {
             </div>
 
             <div className="mt-4 md:mt-6 inline-flex items-center gap-1.5 text-white font-ui text-xs md:text-sm font-semibold group-hover:gap-2.5 transition-all">
-              Read story
-              <ArrowRight className="h-4 w-4" />
+              {t("section.viewAll")} <ArrowRight className="h-4 w-4" />
             </div>
           </div>
         </div>

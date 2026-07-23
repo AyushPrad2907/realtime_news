@@ -6,6 +6,7 @@ import { getCategory, getAuthor } from "@/lib/utils-news";
 import { Clock, Headphones } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TimeAgo } from "@/components/TimeAgo";
+import { useT } from "@/hooks/use-t";
 
 interface ArticleCardProps {
   article: Article;
@@ -23,8 +24,10 @@ export function ArticleCard({
   className,
 }: ArticleCardProps) {
   const { navigate } = useStore();
+  const t = useT();
   const cat = getCategory(article.category);
   const author = getAuthor(article.authorId);
+  const categoryTitle = t(`cat.${article.category}` as any) || cat.name;
 
   const go = () => navigate({ type: "article", slug: article.slug });
 
@@ -42,7 +45,7 @@ export function ArticleCard({
             {article.title}
           </p>
           <p className="font-ui text-[11px] text-ink-tertiary mt-1">
-            {cat.name} · {article.readingTime} min read
+            {categoryTitle} · {article.readingTime} {t("article.minRead")}
           </p>
         </div>
         {showImage && (
@@ -77,7 +80,7 @@ export function ArticleCard({
           className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide text-white mb-1.5"
           style={{ background: cat.colorVar }}
         >
-          {cat.name}
+          {categoryTitle}
         </div>
         <h4 className="font-display text-sm font-bold leading-snug line-clamp-3 group-hover:text-brand transition-colors">
           {article.title}
@@ -102,13 +105,13 @@ export function ArticleCard({
               className="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide text-white mb-1.5"
               style={{ background: cat.colorVar }}
             >
-              {cat.name}
+              {categoryTitle}
             </div>
             <h4 className="font-display text-[15px] font-bold leading-snug line-clamp-3 group-hover:text-brand transition-colors">
               {article.title}
             </h4>
             <p className="font-ui text-[11px] text-ink-tertiary mt-1.5">
-              <TimeAgo iso={article.publishedAt} /> · {article.readingTime} min read
+              <TimeAgo iso={article.publishedAt} /> · {article.readingTime} {t("article.minRead")}
             </p>
           </div>
           {showImage && (
@@ -149,7 +152,7 @@ export function ArticleCard({
         className="inline-block self-start px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide text-white mb-2"
         style={{ background: cat.colorVar }}
       >
-        {cat.name}
+        {categoryTitle}
       </div>
       <h3 className="font-display text-lg md:text-xl font-bold leading-tight line-clamp-3 group-hover:text-brand transition-colors">
         {article.title}
@@ -166,7 +169,7 @@ export function ArticleCard({
         <span aria-hidden>·</span>
         <span className="flex items-center gap-1">
           <Clock className="h-3 w-3" />
-          {article.readingTime} min
+          {article.readingTime} {t("article.minRead")}
         </span>
         {article.hasAudio && (
           <>

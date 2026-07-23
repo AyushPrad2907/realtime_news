@@ -41,6 +41,10 @@ interface NavState {
   readingProgress: number;
   setReadingProgress: (p: number) => void;
 
+  // Language
+  language: "en" | "hi";
+  setLanguage: (lang: "en" | "hi") => void;
+
   // Auth
   user: SessionUser | null;
   sessionLoading: boolean;
@@ -50,6 +54,8 @@ interface NavState {
 
 export const useStore = create<NavState>((set, get) => ({
   current: { type: "home" },
+  language: "hi",
+  setLanguage: (lang) => set({ language: lang }),
   history: [],
   navigate: (view) => {
     const { current, history } = get();

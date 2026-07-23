@@ -12,8 +12,11 @@ interface PibArticle {
   contentSnippet?: string;
 }
 
+import { useT } from "@/hooks/use-t";
+
 export function PibNewsPage() {
   const { navigate } = useStore();
+  const t = useT();
   const [articles, setArticles] = useState<PibArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -284,7 +287,7 @@ export function PibNewsPage() {
             <div className="flex items-center gap-3 mb-3">
               <span className="h-8 w-1.5 rounded-full bg-brand" aria-hidden />
               <h1 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight">
-                Government Releases
+                {t("section.govtReleases")}
               </h1>
             </div>
             <p className="font-serif text-lg text-ink-secondary max-w-2xl">

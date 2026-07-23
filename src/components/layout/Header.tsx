@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
-import { Search, Menu, Sun, Moon, Radio, LogOut, Shield, PenLine, UserCircle2, Calendar as CalendarIcon } from "lucide-react";
+import { Search, Menu, Sun, Moon, Radio, LogOut, Shield, PenLine, UserCircle2, Calendar as CalendarIcon, Languages } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -11,18 +11,20 @@ import { signOut } from "@/lib/api-client";
 import { LiveClock } from "@/components/LiveClock";
 import { DatePicker } from "@/components/DatePicker";
 
+import { useT } from "@/hooks/use-t";
+
 const PRIMARY_NAV = [
-  { label: "Home", view: { type: "home" as const } },
-  { label: "Live", view: { type: "section" as const, slug: "live" as const } },
-  { label: "Breaking", view: { type: "section" as const, slug: "breaking" as const } },
-  { label: "National", view: { type: "section" as const, slug: "national" as const } },
-  { label: "International", view: { type: "section" as const, slug: "international" as const } },
-  { label: "Podcasts", view: { type: "section" as const, slug: "podcasts" as const } },
-  { label: "Govt Releases", view: { type: "pib-news" as const } },
+  { label: "Home", key: "nav.home" as const, view: { type: "home" as const } },
+  { label: "Live", key: "nav.live" as const, view: { type: "section" as const, slug: "live" as const } },
+  { label: "Breaking", key: "nav.breaking" as const, view: { type: "section" as const, slug: "breaking" as const } },
+  { label: "National", key: "cat.national" as const, view: { type: "section" as const, slug: "national" as const } },
+  { label: "International", key: "cat.international" as const, view: { type: "section" as const, slug: "international" as const } },
+  { label: "Podcasts", key: "nav.podcasts" as const, view: { type: "section" as const, slug: "podcasts" as const } },
 ];
 
 export function Header() {
-  const { navigate, current, setMobileMenuOpen, setSearchOpen, isLive, user, refreshSession } = useStore();
+  const { navigate, current, setMobileMenuOpen, setSearchOpen, isLive, user, refreshSession, language, setLanguage } = useStore();
+  const t = useT();
   const { theme, setTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -43,7 +45,6 @@ export function Header() {
     if (label === "National") return (current.type === "section" && current.slug === "national") || (current.type === "category" && current.slug === "national");
     if (label === "International") return (current.type === "section" && current.slug === "international") || (current.type === "category" && current.slug === "international");
     if (label === "Podcasts") return current.type === "section" && current.slug === "podcasts" || current.type === "podcast-episode";
-    if (label === "Govt Releases") return current.type === "pib-news";
     return false;
   };
 
@@ -107,7 +108,7 @@ export function Header() {
               >
                 {item.label === "Live" ? (
                   <span className="flex items-center gap-1.5">
-                    {item.label}
+                    {t(item.key)}
                     {isLive && (
                       <span className="relative flex h-1.5 w-1.5">
                         <span className="animate-live-pulse absolute inline-flex h-full w-full rounded-full bg-live" />
@@ -116,7 +117,7 @@ export function Header() {
                     )}
                   </span>
                 ) : (
-                  item.label
+                  t(item.key)
                 )}
               </button>
             ))}
@@ -135,7 +136,7 @@ export function Header() {
               className="hidden md:inline-flex items-center gap-1.5 px-3 h-9 rounded-md bg-live/10 text-live font-ui text-xs font-semibold uppercase tracking-wide hover:bg-live/20 transition-colors"
             >
               <Radio className="h-3.5 w-3.5" />
-              {isLive ? "Live Now" : "Live"}
+              {isLive ? t("live.liveNow") : t("nav.live")}
             </button>
 
             {/* Date picker - desktop */}
@@ -148,7 +149,7 @@ export function Header() {
               aria-label="Open search (Ctrl+K)"
             >
               <Search className="h-4 w-4" />
-              <span className="text-xs">Search</span>
+              <span className="text-xs">{t("search.label")}</span>
               <kbd className="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono rounded border border-border bg-muted">
                 ⌘K
               </kbd>
@@ -166,6 +167,18 @@ export function Header() {
                 ) : (
                   <Moon className="h-4 w-4" />
                 )}
+              </button>
+            )}
+
+            {/* Language toggle */}
+            {mounted && (
+              <button
+                onClick={() => setLanguage(language === "en" ? "hi" : "en")}
+                className="inline-flex items-center gap-1 px-2.5 h-8 rounded-md border border-border bg-background hover:bg-muted text-ink-secondary transition-colors font-ui text-xs font-bold"
+                aria-label="Change language"
+              >
+                <Languages className="h-3.5 w-3.5" />
+                <span>{language === "en" ? "EN" : "हिं"}</span>
               </button>
             )}
 
@@ -210,7 +223,7 @@ export function Header() {
                             className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-left font-ui text-sm"
                           >
                             <Shield className="h-3.5 w-3.5 text-brand" />
-                            Admin Panel
+                            {t("Admin Panel")}
                           </button>
                         )}
                         <button
@@ -221,7 +234,7 @@ export function Header() {
                           className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-left font-ui text-sm"
                         >
                           <PenLine className="h-3.5 w-3.5 text-brand" />
-                          Editor Panel
+                          {t("Editor Panel")}
                         </button>
                         <button
                           onClick={async () => {
@@ -233,7 +246,7 @@ export function Header() {
                           className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-left font-ui text-sm text-destructive"
                         >
                           <LogOut className="h-3.5 w-3.5" />
-                          Sign out
+                          {t("Sign out")}
                         </button>
                       </motion.div>
                     </>
@@ -246,7 +259,7 @@ export function Header() {
                 className="hidden md:inline-flex items-center gap-1.5 px-3 h-9 rounded-md border border-border hover:bg-muted transition-colors font-ui text-xs font-semibold"
               >
                 <UserCircle2 className="h-3.5 w-3.5" />
-                Newsroom
+                {t("Newsroom")}
               </button>
             )}
 

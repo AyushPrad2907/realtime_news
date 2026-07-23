@@ -5,9 +5,11 @@ import { ARTICLES_LIST, INDIAN_STATES } from "@/lib/mock-data";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/hooks/use-t";
 
 export function StateNews() {
   const { navigate } = useStore();
+  const t = useT();
   const [activeState, setActiveState] = useState(INDIAN_STATES[0]);
 
   const articles = useMemo(
@@ -19,7 +21,7 @@ export function StateNews() {
   return (
     <section className="mb-12 md:mb-16">
       <div className="flex items-end justify-between mb-5 md:mb-6 border-b border-border pb-3">
-        <h2 className="h-section">State News</h2>
+        <h2 className="h-section">{t("section.stateNews")}</h2>
         <span className="font-ui text-xs text-ink-tertiary">
           {articles.length} {articles.length === 1 ? "story" : "stories"} from {activeState}
         </span>

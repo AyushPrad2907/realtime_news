@@ -5,6 +5,7 @@ import type { Article } from "@/lib/types";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { AdBanner } from "./AdBanner";
 import { useMemo } from "react";
+import { useT } from "@/hooks/use-t";
 
 interface LatestNewsProps {
   articles: Article[];
@@ -12,6 +13,7 @@ interface LatestNewsProps {
 
 export function LatestNews({ articles }: LatestNewsProps) {
   const { navigate } = useStore();
+  const t = useT();
 
   const sorted = useMemo(
     () =>
@@ -26,7 +28,7 @@ export function LatestNews({ articles }: LatestNewsProps) {
     <section className="mb-12 md:mb-16">
       <div className="flex items-end justify-between mb-5 md:mb-6 border-b border-border pb-3">
         <h2 className="h-section flex items-center gap-2">
-          Latest News
+          {t("section.latestNews")}
           <span className="relative flex h-2 w-2">
             <span className="animate-live-pulse absolute inline-flex h-full w-full rounded-full bg-success" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
@@ -36,7 +38,7 @@ export function LatestNews({ articles }: LatestNewsProps) {
           onClick={() => navigate({ type: "section", slug: "national" })}
           className="font-ui text-xs font-semibold text-brand hover:text-brand-dark transition-colors"
         >
-          View all →
+          {t("section.viewAll")}
         </button>
       </div>
 

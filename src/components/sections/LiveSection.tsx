@@ -2,9 +2,11 @@
 
 import { useStore } from "@/lib/store";
 import { Play, Users } from "lucide-react";
+import { useT } from "@/hooks/use-t";
 
 export function LiveSection() {
   const { navigate, isLive } = useStore();
+  const t = useT();
 
   return (
     <section className="mb-12 md:mb-16">
@@ -28,7 +30,7 @@ export function LiveSection() {
                 <span className="animate-live-pulse absolute inline-flex h-full w-full rounded-full bg-white" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
               </span>
-              {isLive ? "Live Now" : "Off Air"}
+              {isLive ? t("live.liveNow") : t("live.offAir")}
             </div>
 
             {/* Play button */}
@@ -48,7 +50,7 @@ export function LiveSection() {
           {/* Info */}
           <div className="p-6 md:p-8 flex flex-col justify-center">
             <p className="font-ui text-[11px] font-bold uppercase tracking-wider text-brand-light mb-2">
-              The National Dispatch Live
+              {t("live.liveStream")}
             </p>
             <h3 className="font-display text-2xl md:text-3xl font-extrabold leading-tight mb-3">
               Parliament Passes Digital Infrastructure Bill — Special Coverage
@@ -64,7 +66,7 @@ export function LiveSection() {
                 className="inline-flex items-center gap-2 px-5 h-11 rounded-md bg-brand hover:bg-brand-light text-white font-ui text-sm font-semibold transition-colors"
               >
                 <Play className="h-4 w-4" fill="currentColor" />
-                Watch Live
+                {t("live.watchLive")}
               </button>
               <div className="font-ui text-xs text-background/70">
                 <p>On air since 8:00 AM</p>

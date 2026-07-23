@@ -519,3 +519,25 @@
     animation: none;
   }
 }
+
+/* Scraped Article Body Styles and Color Normalization overrides */
+.article-body,
+.article-body * {
+  color: inherit !important;
+}
+.article-body img {
+  max-width: 100% !important;
+  height: auto !important;
+  object-fit: cover !important;
+  border-radius: 8px;
+  margin: 1.5rem auto;
+  display: block;
+}
+.article-body table {
+  width: 100% !important;
+  border-collapse: collapse;
+}
+.article-body td {
+  text-align: left !important;
+}
+

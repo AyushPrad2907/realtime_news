@@ -28,12 +28,15 @@ import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 import type { Article, Author } from "@/lib/types";
 
+import { useT } from "@/hooks/use-t";
+
 interface ArticlePageProps {
   slug: string;
 }
 
 export function ArticlePage({ slug }: ArticlePageProps) {
   const { navigate, back, canGoBack, playEpisode, nowPlaying, isPlaying, togglePlay } = useStore();
+  const t = useT();
   const [copied, setCopied] = useState(false);
   const [article, setArticle] = useState<Article | null>(
     () => ARTICLES_LIST.find((a) => a.slug === slug) ?? null
@@ -99,15 +102,15 @@ export function ArticlePage({ slug }: ArticlePageProps) {
   if (!article || !author) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-        <h1 className="font-display text-3xl font-bold mb-3">Article not found</h1>
+        <h1 className="font-display text-3xl font-bold mb-3">{t("article.notFound")}</h1>
         <p className="font-ui text-sm text-ink-secondary mb-6">
-          The article you&rsquo;re looking for may have been moved or removed.
+          {t("article.notFoundDesc")}
         </p>
         <button
           onClick={() => navigate({ type: "home" })}
           className="inline-flex items-center gap-2 px-5 h-11 rounded-md bg-brand hover:bg-brand-dark text-white font-ui text-sm font-semibold transition-colors"
         >
-          Back to homepage
+          {t("article.backToHome")}
         </button>
       </div>
     );
@@ -155,10 +158,74 @@ export function ArticlePage({ slug }: ArticlePageProps) {
   const renderBody = () => {
     // Use dangerouslySetInnerHTML for the rich body content
     return (
-      <div
-        className="article-body"
-        dangerouslySetInnerHTML={{ __html: article.body }}
-      />
+      <>
+        <div
+          className="article-body font-serif text-base md:text-lg leading-relaxed text-foreground select-text selection:bg-brand/20"
+          dangerouslySetInnerHTML={{ __html: article.body }}
+        />
+        <style jsx global>{`
+          .article-body img {
+            max-width: 100% !important;
+            height: auto !important;
+            object-fit: cover !important;
+            border-radius: 8px;
+            margin: 1.5rem auto;
+            display: block;
+          }
+          .article-body,
+          .article-body * {
+            color: inherit !important;
+          }
+          .article-body table {
+            width: 100% !important;
+            border-collapse: collapse;
+          }
+          .article-body td {
+            color: inherit !important;
+            font-family: inherit !important;
+            text-align: left !important;
+          }
+          .article-body p {
+            margin-bottom: 1.5em;
+            text-align: justify;
+            line-height: 1.75;
+            font-family: inherit !important;
+            font-size: inherit !important;
+            color: inherit !important;
+            background-color: transparent !important;
+          }
+          .article-body span {
+            font-family: inherit !important;
+            font-size: inherit !important;
+            color: inherit !important;
+            background-color: transparent !important;
+          }
+          .article-body div {
+            font-family: inherit !important;
+            color: inherit !important;
+          }
+          .article-body div[style*="font-size: 30px"],
+          .article-body div[style*="font-size:30px"] {
+            font-family: var(--font-playfair), serif !important;
+            font-weight: 800 !important;
+            font-size: 1.8rem !important;
+            line-height: 1.3 !important;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            text-align: center !important;
+          }
+          .article-body td[style*="text-align: center"],
+          .article-body td[style*="text-align:center"] {
+            font-family: var(--font-inter), sans-serif !important;
+            font-weight: 600 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--brand) !important;
+            font-size: 0.95rem !important;
+            padding-bottom: 15px;
+          }
+        `}</style>
+      </>
     );
   };
 
@@ -193,7 +260,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
           className="inline-flex items-center gap-1 font-ui text-xs text-ink-secondary hover:text-brand transition-colors mb-6"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Back
+          {t("article.back")}
         </button>
       )}
 
@@ -229,19 +296,19 @@ export function ArticlePage({ slug }: ArticlePageProps) {
               <>
                 <span aria-hidden>·</span>
                 <span className="text-ink-tertiary">
-                  Updated <TimeAgo iso={article.updatedAt ?? article.publishedAt} />
+                  {t("article.updatedLabel")} <TimeAgo iso={article.updatedAt ?? article.publishedAt} />
                 </span>
               </>
             )}
             <span aria-hidden>·</span>
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              {article.readingTime} min read
+              {article.readingTime} {t("article.minRead")}
             </span>
             <span aria-hidden>·</span>
             <span className="flex items-center gap-1">
               <Eye className="h-3 w-3" />
-              {formatViews(article.views)} views
+              {formatViews(article.views)} {t("article.views")}
             </span>
           </div>
 
@@ -281,7 +348,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
               <div className="flex-1 min-w-0">
                 <p className="font-ui text-[11px] font-semibold uppercase tracking-wide text-brand flex items-center gap-1.5">
                   <Headphones className="h-3 w-3" />
-                  Listen to this article
+                  {t("article.listenToArticle")}
                 </p>
                 <p className="font-display text-sm font-bold mt-0.5 line-clamp-1">
                   {article.title}
@@ -297,7 +364,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
           <div className="flex items-center gap-2 mb-8 pb-6 border-b border-border">
             <span className="font-ui text-xs font-semibold uppercase tracking-wider text-ink-tertiary mr-2 flex items-center gap-1.5">
               <Share2 className="h-3.5 w-3.5" />
-              Share
+              {t("article.share")}
             </span>
             {[
               { Icon: Twitter, label: "Twitter", key: "Twitter" },

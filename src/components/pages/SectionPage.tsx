@@ -10,6 +10,8 @@ import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { AlertCircle, Globe, Flag, Headphones } from "lucide-react";
 
+import { useT } from "@/hooks/use-t";
+
 interface SectionPageProps {
   slug: "live" | "breaking" | "national" | "international" | "podcasts";
 }
@@ -28,14 +30,14 @@ export function SectionPage({ slug }: SectionPageProps) {
 
 const META = {
   breaking: {
-    title: "Breaking News",
+    titleKey: "nav.breaking",
     description: "The latest developing stories, as they happen.",
     Icon: AlertCircle,
     color: "var(--breaking)",
     filter: (a: (typeof ARTICLES_LIST)[number]) => a.isBreaking === true,
   },
   national: {
-    title: "National",
+    titleKey: "cat.national",
     description: "Stories shaping the nation — from across the country.",
     Icon: Flag,
     color: "var(--cat-national)",
@@ -43,7 +45,7 @@ const META = {
       a.category === "national" || (a.states && a.states.length > 0),
   },
   international: {
-    title: "International",
+    titleKey: "cat.international",
     description: "Global developments, contextualised.",
     Icon: Globe,
     color: "var(--cat-international)",
@@ -53,6 +55,7 @@ const META = {
 
 function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "international" }) {
   const { navigate } = useStore();
+  const t = useT();
   const [visibleCount, setVisibleCount] = useState(9);
 
   const config = META[slug];
@@ -81,7 +84,7 @@ function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "internatio
             aria-hidden
           />
           <h1 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight">
-            {config.title}
+            {t(config.titleKey as any)}
           </h1>
           {slug === "breaking" && (
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-live text-white font-ui text-xs font-bold uppercase tracking-wide">
@@ -89,15 +92,12 @@ function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "internatio
                 <span className="animate-live-pulse absolute inline-flex h-full w-full rounded-full bg-white" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
               </span>
-              Live
+              {t("nav.live")}
             </span>
           )}
         </div>
         <p className="font-serif text-lg text-ink-secondary max-w-2xl">
           {config.description}
-        </p>
-        <p className="mt-4 font-ui text-xs text-ink-tertiary">
-          {articles.length} {articles.length === 1 ? "story" : "stories"}
         </p>
       </header>
 
@@ -129,7 +129,7 @@ function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "internatio
             onClick={() => setVisibleCount((c) => c + 6)}
             className="inline-flex items-center gap-2 px-6 h-12 rounded-md border border-border hover:bg-muted font-ui text-sm font-semibold"
           >
-            Load more stories
+            {t("section.viewAll")}
           </button>
         </div>
       )}
@@ -144,7 +144,7 @@ function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "internatio
             onClick={() => navigate({ type: "home" })}
             className="mt-4 inline-flex items-center gap-2 px-5 h-11 rounded-md bg-brand hover:bg-brand-dark text-white font-ui text-sm font-semibold"
           >
-            Back to homepage
+            {t("article.backToHome")}
           </button>
         </div>
       )}

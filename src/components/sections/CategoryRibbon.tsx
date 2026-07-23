@@ -5,6 +5,7 @@ import type { Article, CategorySlug } from "@/lib/types";
 import { getCategory } from "@/lib/utils-news";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { ArrowRight } from "lucide-react";
+import { useT } from "@/hooks/use-t";
 
 interface CategoryRibbonProps {
   category: CategorySlug;
@@ -13,9 +14,12 @@ interface CategoryRibbonProps {
 
 export function CategoryRibbon({ category, articles }: CategoryRibbonProps) {
   const { navigate } = useStore();
+  const t = useT();
   const cat = getCategory(category);
 
   if (articles.length === 0) return null;
+
+  const categoryTitle = t(`cat.${category}` as any) || cat.name;
 
   return (
     <section className="mb-12 md:mb-16">
@@ -26,13 +30,13 @@ export function CategoryRibbon({ category, articles }: CategoryRibbonProps) {
             style={{ background: cat.colorVar }}
             aria-hidden
           />
-          <h2 className="h-section">{cat.name}</h2>
+          <h2 className="h-section">{categoryTitle}</h2>
         </div>
         <button
           onClick={() => navigate({ type: "category", slug: category })}
           className="font-ui text-xs font-semibold text-brand hover:text-brand-dark transition-colors flex items-center gap-1"
         >
-          View all <ArrowRight className="h-3 w-3" />
+          {t("section.viewAll")}
         </button>
       </div>
 

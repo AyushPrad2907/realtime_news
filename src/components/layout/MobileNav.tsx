@@ -3,9 +3,11 @@
 import { useStore } from "@/lib/store";
 import { Home, Radio, Search, Headphones, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/hooks/use-t";
 
 export function MobileNav() {
   const { navigate, current, isLive, setMobileMenuOpen } = useStore();
+  const t = useT();
 
   const isActive = (id: string) => {
     if (id === "home") return current.type === "home";
@@ -17,11 +19,11 @@ export function MobileNav() {
   };
 
   const items = [
-    { id: "home", label: "Home", Icon: Home, action: () => navigate({ type: "home" }) },
-    { id: "live", label: "Live", Icon: Radio, action: () => navigate({ type: "section", slug: "live" }), badge: isLive },
-    { id: "search", label: "Search", Icon: Search, action: () => useStore.getState().setSearchOpen(true) },
-    { id: "podcasts", label: "Podcasts", Icon: Headphones, action: () => navigate({ type: "section", slug: "podcasts" }) },
-    { id: "menu", label: "Menu", Icon: Menu, action: () => setMobileMenuOpen(true) },
+    { id: "home", label: t("nav.home"), Icon: Home, action: () => navigate({ type: "home" }) },
+    { id: "live", label: t("nav.live"), Icon: Radio, action: () => navigate({ type: "section", slug: "live" }), badge: isLive },
+    { id: "search", label: t("search.label"), Icon: Search, action: () => useStore.getState().setSearchOpen(true) },
+    { id: "podcasts", label: t("nav.podcasts"), Icon: Headphones, action: () => navigate({ type: "section", slug: "podcasts" }) },
+    { id: "menu", label: t("misc.more"), Icon: Menu, action: () => setMobileMenuOpen(true) },
   ];
 
   return (

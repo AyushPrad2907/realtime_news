@@ -20,6 +20,7 @@ export async function fetchArticles(params: {
   limit?: number;
   sort?: "newest" | "popular";
   date?: string; // YYYY-MM-DD
+  lang?: "en" | "hi";
 } = {}): Promise<Article[]> {
   const q = new URLSearchParams();
   if (params.category) q.set("category", params.category);
@@ -29,6 +30,7 @@ export async function fetchArticles(params: {
   if (params.limit) q.set("limit", String(params.limit));
   if (params.sort) q.set("sort", params.sort);
   if (params.date) q.set("date", params.date);
+  if (params.lang) q.set("lang", params.lang);
   const res = await fetch(`/api/articles?${q.toString()}`, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch articles");
   const data = await res.json();

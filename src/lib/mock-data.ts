@@ -105,515 +105,164 @@ const ARTICLE_BODY_EXAMPLE = `<p>The Parliament on Tuesday cleared the long-deba
 
 const ARTICLES: Article[] = [
   {
-    id: "1",
-    slug: "parliament-clears-digital-public-infrastructure-bill",
-    title: "Parliament Clears Digital Public Infrastructure Bill in Landmark Vote",
-    standfirst:
-      "The legislation grants statutory backing to the country's identity, payments, and data-sharing architecture, creating a new oversight authority and ending eighteen months of cross-committee deliberation.",
+    id: "pib-gov-1",
+    slug: "cabinet-approves-pm-pranam-fertilizer-scheme",
+    title: "Union Cabinet Approves PM-PRANAM Scheme to Promote Alternative Fertilizers",
+    standfirst: "The Union Cabinet has approved the new PM-PRANAM scheme to incentivize states to promote alternative, organic fertilizers and reduce chemical usage.",
     category: "politics",
-    tags: ["Parliament", "Digital India", "Policy", "Governance"],
+    tags: ["Cabinet Decisions", "Agriculture", "Policy", "PM-PRANAM"],
     states: ["Delhi"],
-    authorId: "a1",
-    publishedAt: "2025-07-23T08:30:00Z",
-    updatedAt: "2025-07-23T11:15:00Z",
-    readingTime: 7,
-    views: 48230,
-    heroImage:
-      "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=1600&h=900&fit=crop&q=80",
-    heroCaption:
-      "The Lok Sabha during the final reading of the Digital Public Infrastructure Bill on Tuesday.",
+    authorId: "pib",
+    publishedAt: "2026-07-20T10:30:00Z",
+    readingTime: 3,
+    views: 12000,
+    heroImage: "https://images.unsplash.com/photo-1592417817098-8f3d6eb19675?w=1600&h=900&fit=crop&q=80",
+    heroCaption: "Union Cabinet meeting chaired by the Prime Minister in New Delhi.",
     heroCredit: "Photo: Press Information Bureau",
-    body: ARTICLE_BODY_EXAMPLE,
+    body: `<p>The Cabinet Committee on Economic Affairs (CCEA), chaired by Prime Minister Narendra Modi, has approved the PM Programme for Restoration, Awareness, Generation, Nourishment and Amelioration of Mother Earth (PM-PRANAM). The scheme aims to incentivize States and Union Territories to promote alternative fertilizers and balanced use of chemical fertilizers.</p>
+    <p>Under the scheme, 50% of the fertilizer subsidy savings will be passed on to the respective state governments as a grant to promote organic and bio-fertilizer infrastructure and awareness campaigns at the grassroots level.</p>`,
     isFeatured: true,
     isBreaking: true,
-    hasAudio: true,
-    audioDuration: "11:42",
-    keyPoints: [
-      "Statutory backing granted to identity, payments, and data exchange platforms.",
-      "A new oversight authority, chaired by a judicial officer, will govern the platforms.",
-      "Implementation begins in phases from the next financial year.",
-      "Rules of implementation to be notified within ninety days.",
-    ],
   },
   {
-    id: "2",
-    slug: "rbi-holds-rates-cites-inflation-risk",
-    title: "RBI Holds Repo Rate Steady, Signals Caution on Inflation",
-    standfirst:
-      "The monetary policy committee voted unanimously to keep the policy rate unchanged at 6.25%, citing food inflation and global uncertainty as key risks to the outlook.",
+    id: "pib-gov-2",
+    slug: "gst-revenue-collection-growth-report",
+    title: "GST Revenue Collections Touch ₹1.82 Lakh Crore, Showing 11.5% Annual Growth",
+    standfirst: "India's Goods and Services Tax revenue collection reached a milestone of ₹1.82 lakh crore, driven by strong domestic economic activity and compliance.",
     category: "economy",
-    tags: ["RBI", "Monetary Policy", "Inflation", "Markets"],
-    states: ["Maharashtra"],
-    authorId: "a2",
-    publishedAt: "2025-07-23T06:00:00Z",
-    readingTime: 5,
-    views: 32110,
-    heroImage:
-      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "The Reserve Bank of India headquarters in Mumbai.",
-    heroCredit: "Photo: Bloomberg",
-    body: `<p>The Reserve Bank of India's monetary policy committee voted unanimously on Wednesday to hold the repo rate at 6.25%, marking the third consecutive pause in this cycle and reinforcing the central bank's cautious posture on inflation.</p>
-
-<p>Governor Sanjay Malhotra, in his post-decision remarks, pointed to two factors that weighed on the committee's thinking: the persistent stickiness in food inflation, particularly in vegetables and pulses, and the uncertain global environment shaped by ongoing trade realignments.</p>
-
-<h2>The inflation calculus</h2>
-
-<p>Headline consumer price inflation eased to 4.8% in June, the lowest reading in seven months, but the central bank's own projections suggest the path ahead is unlikely to be linear. The committee revised its forecast for the July-September quarter upward by 20 basis points, citing pressure from cereal prices and an unfavourable base effect.</p>
-
-<blockquote>We are not yet at the point where we can confidently say that the disinflation trajectory is firmly on track to the four per cent target.</blockquote>
-
-<p>The central bank's stance on accommodation was retained, with the governor describing it as a "deliberate choice" that preserves the option to act if conditions warrant.</p>
-
-<h2>Markets react</h2>
-
-<p>The benchmark 10-year government bond yield rose two basis points to 6.94% after the decision, while the Nifty 50 closed 0.3% lower, led by declines in rate-sensitive sectors. The rupee weakened marginally against the dollar, ending the session at 83.42.</p>`,
-    isBreaking: false,
-    hasAudio: false,
-  },
-  {
-    id: "3",
-    slug: "india-launches-indigenous-ai-foundation-model",
-    title: "India Launches First Indigenous AI Foundation Model Trained on 22 Languages",
-    standfirst:
-      "The model, developed by a consortium of public research institutions and private labs, is positioned as a sovereign alternative to foreign systems for government and enterprise use.",
-    category: "technology",
-    tags: ["AI", "Research", "Government", "Languages"],
-    states: ["Karnataka", "Telangana"],
-    authorId: "a3",
-    publishedAt: "2025-07-22T14:20:00Z",
-    readingTime: 6,
-    views: 51890,
-    heroImage:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "A research lab at the Indian Institute of Science, Bengaluru.",
-    heroCredit: "Photo: IISc",
-    body: `<p>A consortium of public research institutions and private laboratories on Tuesday unveiled what it described as India's first fully indigenous foundation model — a 70-billion parameter system trained on twenty-two scheduled languages and positioned as a sovereign alternative to foreign systems for government and enterprise use.</p>
-
-<p>The model, named BharatLM-1, was developed over eighteen months by a team drawn from the Indian Institute of Science, the Indian Institutes of Technology at Madras and Bombay, and a private partner. The Ministry of Electronics and Information Technology provided the compute infrastructure through the national AI mission.</p>
-
-<h2>Why a sovereign model matters</h2>
-
-<p>Officials involved in the project said the case for an indigenous model rested on three considerations: data sovereignty, the inclusion of Indian languages that foreign models handle poorly, and the strategic imperative of not depending on external providers for critical government applications.</p>
-
-<div class="key-points"><div class="key-points-title">Key Points</div><ul><li>BharatLM-1 is a 70-billion parameter foundation model trained on 22 scheduled languages.</li><li>Developed over 18 months by a consortium of public institutions and a private partner.</li><li>The model will be available to government departments and enterprises via API.</li><li>An open-weights version for academic research is planned for release later this year.</li></ul></div>
-
-<h2>Performance and benchmarks</h2>
-
-<p>On standardised benchmarks for Indian languages, the consortium reported that BharatLM-1 outperformed several open-weight foreign models of comparable size, particularly on tasks involving code-mixing and regional dialects. On English-language reasoning tasks, it trailed the leading proprietary systems but was competitive with open-weight peers.</p>
-
-<p>The consortium has released an evaluation paper alongside the model, and an open-weights version for academic research is planned for release later this year.</p>`,
-    isFeatured: false,
-    hasAudio: true,
-    audioDuration: "9:18",
-  },
-  {
-    id: "4",
-    slug: "india-beat-australia-test-series-decider",
-    title: "India Clinch Series Decider Against Australia in Final-Session Thriller",
-    standfirst:
-      "A late-order partnership and a five-wicket haul from the young spinner sealed a famous home series win, with the visitors falling seventeen runs short of a record chase.",
-    category: "sports",
-    tags: ["Cricket", "Test Cricket", "India vs Australia"],
-    states: ["Tamil Nadu"],
-    authorId: "a4",
-    publishedAt: "2025-07-22T18:45:00Z",
-    readingTime: 4,
-    views: 87650,
-    heroImage:
-      "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "The crowd at the MA Chidambaram Stadium erupts as the final wicket falls.",
-    heroCredit: "Photo: Sportzpics",
-    body: `<p>India sealed a memorable home series win against Australia on Tuesday, prevailing by seventeen runs in a decider that swung three times in the final session before a five-wicket haul from the young off-spinner settled the contest in the hosts' favour.</p>
-
-<p>Chasing 287 for a record-breaking series win, the visitors were well placed at 198 for four when the second new ball was taken. From there, the innings unravelled — six wickets falling for 71 runs in a passage of play that will be replayed for years to come.</p>
-
-<h2>The decisive spell</h2>
-
-<p>The turnaround was engineered by the 22-year-old off-spinner, who finished with figures of five for 48 from 24 overs, including a triple-wicket maiden that broke the back of the chase. His control of length and the sharp turn he extracted from a wearing pitch left the lower order with no answers.</p>
-
-<blockquote>The plan was simple — bowl to the field and let the pitch do the rest. I just had to be patient.</blockquote>
-
-<p>The victory gives India their fourth consecutive home series win against Australia and consolidates their position at the top of the World Test Championship table.</p>`,
-  },
-  {
-    id: "5",
-    slug: "asean-summit-maritime-security-accord",
-    title: "ASEAN Summit Ends with Maritime Security Accord, Trade Pledge",
-    standfirst:
-      "Leaders of the ten-member grouping committed to a new framework on maritime conduct and pledged to accelerate negotiations on a long-delayed regional trade update.",
-    category: "international",
-    tags: ["ASEAN", "Diplomacy", "Trade", "Maritime"],
-    authorId: "a5",
-    publishedAt: "2025-07-22T09:10:00Z",
-    readingTime: 6,
-    views: 28450,
-    heroImage:
-      "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "Leaders pose for the traditional family photograph at the ASEAN Summit.",
-    heroCredit: "Photo: ASEAN Secretariat",
-    body: `<p>The ten-member Association of Southeast Asian Nations concluded its annual summit on Tuesday with a new framework agreement on maritime conduct in the South China Sea and a renewed commitment to conclude long-delayed negotiations on a regional trade update.</p>
-
-<p>The maritime framework, three years in the making, establishes confidence-building measures including hotlines between coast guards and a code of conduct for fishing vessels. It stops short of a binding dispute-resolution mechanism — a concession that critics say dilutes its effectiveness but that proponents defend as the best achievable consensus.</p>
-
-<h2>A measured outcome</h2>
-
-<p>Officials involved in the negotiations described the framework as a "floor, not a ceiling" — a baseline of cooperation that reduces the risk of accidental escalation without resolving the underlying territorial disputes. The framework will be reviewed every two years.</p>
-
-<p>On trade, leaders pledged to conclude negotiations on an update to the ASEAN Trade in Goods Agreement by the end of next year, three years behind the original schedule.</p>`,
-  },
-  {
-    id: "6",
-    slug: "monsoon-session-key-bills-list",
-    title: "Monsoon Session: The Five Bills the Government Wants Passed",
-    standfirst:
-      "From the digital infrastructure law to amendments on labour and coastal regulation, the session's legislative agenda is the heaviest in two years.",
-    category: "politics",
-    tags: ["Parliament", "Legislation", "Session Preview"],
+    tags: ["GST", "Revenue Collection", "Finance Ministry", "Economic Growth"],
     states: ["Delhi"],
-    authorId: "a1",
-    publishedAt: "2025-07-21T07:00:00Z",
-    readingTime: 5,
-    views: 19840,
-    heroImage:
-      "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "The Central Hall of Parliament ahead of the monsoon session.",
+    authorId: "pib",
+    publishedAt: "2026-07-19T09:00:00Z",
+    readingTime: 4,
+    views: 15400,
+    heroImage: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1600&h=900&fit=crop&q=80",
+    heroCaption: "Ministry of Finance, New Delhi.",
     heroCredit: "Photo: Press Information Bureau",
-    body: `<p>When Parliament convenes for the monsoon session on Monday, the government will face one of its heaviest legislative agendas in two years — five bills across digital infrastructure, labour, coastal regulation, banking, and data protection.</p>
-
-<p>The standout item is the Digital Public Infrastructure Bill, which grants statutory backing to the country's identity, payments, and data-sharing platforms. The Bill has been in cross-committee consultation for eighteen months and is widely expected to be passed in this session.</p>
-
-<h2>The full agenda</h2>
-
-<p>Beyond the digital infrastructure law, the government has listed four other bills for consideration and passing: amendments to the labour code, a coastal regulation update, a banking law amendment, and a revised data protection framework.</p>
-
-<p>Opposition parties have indicated they will press for discussions on each, suggesting that the session will be a busy one even if the government's numerical majority ensures passage.</p>`,
+    body: `<p>Gross Goods and Services Tax (GST) revenue collection grew 11.5% year-on-year to hit ₹1.82 lakh crore. The robust growth reflects resilient domestic economic activity and improved tax compliance mechanisms implemented by the GST Council.</p>
+    <p>Out of the total gross collection, CGST accounted for ₹34,200 crore, SGST accounted for ₹42,100 crore, and IGST stood at ₹91,300 crore (including collections on import of goods).</p>`,
+    isFeatured: false,
+    isBreaking: false,
   },
   {
-    id: "7",
-    slug: "bengaluru-metro-phase-three-approved",
-    title: "Bengaluru Metro Phase Three Approved, Construction to Begin Next Year",
-    standfirst:
-      "The Union Cabinet has cleared the ₹16,000-crore expansion, adding 58 kilometres of new line and connecting the airport to the city's tech corridor.",
-    category: "national",
-    tags: ["Infrastructure", "Urban", "Bengaluru", "Transport"],
-    states: ["Karnataka"],
-    authorId: "a3",
-    publishedAt: "2025-07-21T13:30:00Z",
-    readingTime: 4,
-    views: 22670,
-    heroImage:
-      "https://images.unsplash.com/photo-1581262177000-8139a463e531?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "An existing metro line in Bengaluru.",
-    heroCredit: "Photo: BMRCL",
-    body: `<p>The Union Cabinet on Monday approved the long-pending Phase Three expansion of the Bengaluru metro, clearing ₹16,000 crore in investment for 58 kilometres of new line that will connect the international airport to the city's technology corridor.</p>
-
-<p>The expansion, expected to be completed in seven years, will add two new corridors and extend two existing lines. It will more than double the network's current length and, by the project's own projections, take 1.2 million daily commuters off the city's congested roads.</p>
-
-<h2>A city held back by traffic</h2>
-
-<p>Bengaluru's traffic has become a chronic constraint on the city's growth, with several independent studies estimating the annual economic cost of congestion at over ₹20,000 crore. The metro expansion is the most significant infrastructure intervention yet attempted to address it.</p>
-
-<p>Construction is scheduled to begin in the second half of next year, with the first sections expected to be operational by 2030.</p>`,
-  },
-  {
-    id: "8",
-    slug: "dengue-vaccine-trial-results-published",
-    title: "Phase Three Trial of Indigenous Dengue Vaccine Shows 85% Efficacy",
-    standfirst:
-      "Results published in a leading medical journal indicate the vaccine is effective against all four serotypes, with no serious adverse events recorded in the trial.",
-    category: "health",
-    tags: ["Health", "Vaccine", "Research", "Dengue"],
-    authorId: "a6",
-    publishedAt: "2025-07-20T16:00:00Z",
-    readingTime: 5,
-    views: 41280,
-    heroImage:
-      "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "A research laboratory working on vector-borne disease vaccines.",
-    heroCredit: "Photo: ICMR",
-    body: `<p>An indigenous tetravalent dengue vaccine developed by an Indian pharmaceutical company in collaboration with the Indian Council of Medical Research has demonstrated 85% efficacy against symptomatic dengue in a phase three trial, with protection observed across all four serotypes of the virus.</p>
-
-<p>The results, published on Friday in The Lancet Infectious Diseases, are based on a trial involving 22,000 participants across ten sites in India. No serious vaccine-related adverse events were recorded during the 24-month follow-up period.</p>
-
-<h2>A disease on the rise</h2>
-
-<p>Dengue has expanded its geographic range in India over the last decade, with cases now reported from every state. An effective vaccine has long been a public health priority, but earlier candidates have shown variable efficacy by serotype and prior exposure.</p>
-
-<div class="key-points"><div class="key-points-title">Key Points</div><ul><li>The vaccine showed 85% efficacy against symptomatic dengue in a 22,000-person trial.</li><li>Protection was observed across all four serotypes of the virus.</li><li>No serious vaccine-related adverse events were recorded.</li><li>The company plans to file for regulatory approval by the end of the year.</li></ul></div>
-
-<p>The company plans to file for regulatory approval with the Central Drugs Standard Control Organisation by the end of the year. If approved, the vaccine would be the first indigenously developed dengue vaccine to reach the market.</p>`,
-    hasAudio: true,
-    audioDuration: "7:32",
-  },
-  {
-    id: "9",
-    slug: "isro-reusable-launch-vehicle-test-success",
-    title: "ISRO's Reusable Launch Vehicle Completes Successful Landing Test",
-    standfirst:
-      "The space agency demonstrated the autonomous landing of its reusable launch vehicle prototype, a critical milestone on the path to lowering the cost of access to space.",
-    category: "science",
-    tags: ["ISRO", "Space", "Technology", "Research"],
-    states: ["Karnataka"],
-    authorId: "a6",
-    publishedAt: "2025-07-20T11:00:00Z",
-    readingTime: 4,
-    views: 65430,
-    heroImage:
-      "https://images.unsplash.com/photo-1517976487492-5750f3195933?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "The reusable launch vehicle prototype on the runway after landing.",
-    heroCredit: "Photo: ISRO",
-    body: `<p>The Indian Space Research Organisation on Sunday successfully demonstrated the autonomous landing of its reusable launch vehicle prototype, a critical milestone on the agency's path to developing a fully reusable rocket that could dramatically lower the cost of access to space.</p>
-
-<p>The prototype, designated RLV-TD, was released from a helicopter at an altitude of 4.5 kilometres and landed autonomously on a runway at the Aeronautical Test Range in Chitradurga. The entire descent, including approach and touchdown, was conducted without human intervention.</p>
-
-<h2>Why reusability matters</h2>
-
-<p>Reusable launch vehicles are widely seen as the most significant lever for reducing the cost of space access. The first stage of a conventional rocket, which accounts for the majority of its cost, is typically discarded after a single use.</p>
-
-<p>ISRO has been working on reusable technology for over a decade, but the landing demonstration had been delayed multiple times by technical issues and weather. With Sunday's success, the agency will now move to the next phase of the programme: an orbital flight test within the next three years.</p>`,
-  },
-  {
-    id: "10",
-    slug: "mumbai-film-festival-lineup-announced",
-    title: "Mumbai Film Festival Announces Competition Lineup, Opens with a Debut Feature",
-    standfirst:
-      "The 25th edition of the festival will screen 180 films across 18 languages, with a focus on first-time filmmakers and a new strand dedicated to climate cinema.",
-    category: "entertainment",
-    tags: ["Film", "Festival", "Mumbai", "Culture"],
-    states: ["Maharashtra"],
-    authorId: "a5",
-    publishedAt: "2025-07-19T17:30:00Z",
+    id: "pib-gov-3",
+    slug: "fit-india-movement-anniversary-celebrated",
+    title: "Fit India Movement Celebrates Anniversary with National Fitness Interactive Campaigns",
+    standfirst: "The Fit India Movement marked its anniversary with nation-wide fitness challenges and virtual interactive sessions with leading sports personalities.",
+    category: "sports",
+    tags: ["Fit India", "Sports Ministry", "Fitness Campaign", "Youth Affairs"],
+    states: ["Delhi"],
+    authorId: "pib",
+    publishedAt: "2026-07-18T14:00:00Z",
     readingTime: 3,
-    views: 16980,
-    heroImage:
-      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "A screening at last year's Mumbai Film Festival.",
-    heroCredit: "Photo: MAMI",
-    body: `<p>The Mumbai Academy of Moving Image on Friday announced the competition lineup for the 25th edition of the Mumbai Film Festival, with 180 films across 18 languages set to screen over eight days beginning October 25.</p>
-
-<p>The festival will open with the world premiere of a debut feature by a young Marathi filmmaker, and will close with the South Asian premiere of an eagerly awaited international film. The international competition section features 14 films, half of them by first-time directors.</p>
-
-<h2>A new climate strand</h2>
-
-<p>This year's edition introduces a new strand dedicated to climate cinema, featuring eight documentaries and fiction films that address the environmental crisis. The strand is curated in partnership with a leading environmental research institute.</p>
-
-<p>Festival organisers said the edition would also expand its industry platform, with a co-production market and a works-in-progress lab aimed at supporting films in post-production.</p>`,
+    views: 9800,
+    heroImage: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1600&h=900&fit=crop&q=80",
+    heroCaption: "Participants performing physical activities during a Fit India event.",
+    heroCredit: "Photo: Press Information Bureau",
+    body: `<p>The Fit India Movement celebrated its anniversary with school challenges and interactive virtual sessions led by the Ministry of Youth Affairs and Sports. Sports icons joined citizens to share fitness tips and routines.</p>
+    <p>Over three lakh schools across the country participated in the week-long celebrations, organizing yoga sessions, athletic meets, and nutrition awareness camps.</p>`,
+    isFeatured: false,
+    isBreaking: false,
   },
   {
-    id: "11",
-    slug: "kerala-floods-rescue-operations-continue",
-    title: "Kerala Floods: Rescue Operations Continue as Rivers Cross Danger Marks",
-    standfirst:
-      "The state government has deployed the National Disaster Response Force across five districts, with over 12,000 people moved to relief camps in the last 48 hours.",
+    id: "pib-gov-4",
+    slug: "president-presents-national-panchayat-awards",
+    title: "President of India Presents National Panchayat Awards to Best Performing Local Bodies",
+    standfirst: "President Droupadi Murmu presented the National Panchayat Awards in New Delhi, urging local bodies to drive sustainable rural development.",
     category: "national",
-    tags: ["Kerala", "Floods", "Disaster", "Weather"],
-    states: ["Kerala"],
-    authorId: "a5",
-    publishedAt: "2025-07-23T05:30:00Z",
-    readingTime: 3,
-    views: 38920,
-    heroImage:
-      "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "Rescue personnel evacuating residents from a flooded neighbourhood.",
-    heroCredit: "Photo: PTI",
-    body: `<p>Rescue operations continued through Wednesday morning across five districts of Kerala as major rivers crossed danger marks following three days of intense rainfall, with the state government deploying the National Disaster Response Force and moving over 12,000 people to relief camps in the last 48 hours.</p>
-
-<p>The India Meteorological Department has issued a red alert for three districts and an orange alert for four others, predicting heavy to very heavy rainfall through Friday. The state's chief minister chaired an emergency review meeting late on Tuesday night.</p>
-
-<h2>The districts affected</h2>
-
-<p>The worst-affected districts are in the northern and central parts of the state, where several rivers have crossed their danger marks. Landslides have been reported from three locations in the high-range Idukki district, blocking key roads.</p>
-
-<p>The state government has announced an immediate relief package and appealed to the central government for additional NDRF deployments.</p>`,
+    tags: ["President of India", "Panchayati Raj", "National Awards", "Rural Development"],
+    states: ["Delhi"],
+    authorId: "pib",
+    publishedAt: "2026-07-17T11:30:00Z",
+    readingTime: 4,
+    views: 11200,
+    heroImage: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=1600&h=900&fit=crop&q=80",
+    heroCaption: "Rashtrapati Bhavan, New Delhi.",
+    heroCredit: "Photo: Press Information Bureau",
+    body: `<p>The President of India, Smt. Droupadi Murmu, presented the National Panchayat Awards in New Delhi. She commended the winning local bodies for their initiatives in sanitation, education, and drinking water availability in rural regions.</p>
+    <p>The President highlighted that Panchayats are the pillars of grassroot democracy and play a vital role in building self-reliant, sustainable rural communities.</p>`,
+    isFeatured: false,
     isBreaking: true,
   },
   {
-    id: "12",
-    slug: "indian-startups-funding-turnaround",
-    title: "Indian Startups See Funding Turnaround as Megarounds Return",
-    standfirst:
-      "Venture funding in the first half of the year rose 22% year-on-year, with eight companies crossing the billion-dollar valuation mark — the highest in two years.",
-    category: "economy",
-    tags: ["Startups", "Funding", "Venture Capital"],
-    states: ["Karnataka", "Maharashtra", "Delhi"],
-    authorId: "a3",
-    publishedAt: "2025-07-18T10:00:00Z",
-    readingTime: 5,
-    views: 24560,
-    heroImage:
-      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "A startup office in Bengaluru's Koramangala neighbourhood.",
-    heroCredit: "Photo: Mint",
-    body: `<p>Indian startups raised $6.8 billion in venture funding in the first half of the year, a 22% increase over the same period last year, with eight companies crossing the billion-dollar valuation mark — the highest number in any six-month period in two years.</p>
-
-<p>The data, compiled by a research firm and reviewed by this publication, suggests that the funding winter that defined 2023 and 2024 may be ending, though the recovery is uneven and concentrated in a small number of sectors.</p>
-
-<h2>Where the money went</h2>
-
-<p>More than half of the funding went to three sectors: artificial intelligence, financial technology, and electric vehicles. The largest single round was a $850 million raise by an AI infrastructure company, the country's largest ever in the sector.</p>
-
-<p>Investors cautioned, however, that the recovery is not broad-based. Early-stage deal volume remains below the peaks of 2021, and several growth-stage companies continue to face valuation pressure.</p>`,
-  },
-  {
-    id: "13",
-    slug: "centre-state-gst-sharing-deal",
-    title: "Centre, States Reach Consensus on GST Compensation Extension",
-    standfirst:
-      "The GST Council approved a six-month extension of the compensation mechanism, ending a standoff that had threatened to disrupt state budgets.",
-    category: "economy",
-    tags: ["GST", "Taxation", "Centre-State", "Governance"],
+    id: "pib-gov-5",
+    slug: "india-un-sustainable-development-framework-signed",
+    title: "India and United Nations Sign Sustainable Development Cooperation Framework 2023-2027",
+    standfirst: "NITI Aayog and the United Nations in India signed the Government of India-UN Sustainable Development Cooperation Framework focusing on rapid economic growth.",
+    category: "international",
+    tags: ["NITI Aayog", "United Nations", "International Cooperation", "Sustainable Development"],
     states: ["Delhi"],
-    authorId: "a2",
-    publishedAt: "2025-07-17T19:00:00Z",
-    readingTime: 4,
-    views: 15340,
-    heroImage:
-      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "The GST Council meeting in progress at Vigyan Bhawan.",
+    authorId: "pib",
+    publishedAt: "2026-07-16T12:00:00Z",
+    readingTime: 5,
+    views: 8700,
+    heroImage: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=1600&h=900&fit=crop&q=80",
+    heroCaption: "Signing ceremony at NITI Aayog, New Delhi.",
     heroCredit: "Photo: Press Information Bureau",
-    body: `<p>The Goods and Services Tax Council on Thursday approved a six-month extension of the compensation mechanism for states, ending a weeks-long standoff that had threatened to disrupt state budgets and testing the federal architecture of the tax regime.</p>
-
-<p>The decision, taken at a meeting of the Council in New Delhi, will extend the compensation window — originally scheduled to end this month — until the end of the financial year. The compensation will be funded through a cess on luxury and sin goods.</p>
-
-<h2>The federal bargain</h2>
-
-<p>The compensation mechanism was a central feature of the original GST bargain, designed to protect states from revenue shortfalls during the transition to the new tax. With revenue growth having normalised, the central government had argued that the mechanism had served its purpose.</p>
-
-<p>Several states, however, had pushed back, pointing to ongoing revenue gaps in specific sectors. The six-month extension is being read as a compromise that allows both sides to claim a win.</p>`,
+    body: `<p>NITI Aayog and the United Nations in India signed the Government of India - United Nations Sustainable Development Cooperation Framework (GoI-UNSDCF) 2023-2027. The framework aligns UN agencies to support India's national development priorities and the Sustainable Development Goals (SDGs).</p>
+    <p>The cooperation focuses on key pillars: Gender Equality, Youth Empowerment, Sustainable Environment, Quality Education, and Health Systems strengthening.</p>`,
+    isFeatured: false,
+    isBreaking: false,
   },
   {
-    id: "14",
-    slug: "telecom-relief-package-approved",
-    title: "Cabinet Approves Telecom Relief Package, Aims to Stabilise Sector",
-    standfirst:
-      "The package includes a moratorium on spectrum dues and a reduction in the bank guarantees required for auctions, providing breathing room for the struggling sector.",
-    category: "economy",
-    tags: ["Telecom", "Policy", "Sector Relief"],
-    authorId: "a2",
-    publishedAt: "2025-07-16T14:00:00Z",
-    readingTime: 4,
-    views: 9870,
-    heroImage:
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "A telecom transmission tower against the evening sky.",
-    heroCredit: "Photo: Bloomberg",
-    body: `<p>The Union Cabinet on Wednesday approved a relief package for the telecom sector, including a moratorium on spectrum dues and a reduction in the bank guarantees required for participation in future auctions, in a move aimed at stabilising a sector that has been under financial stress for several years.</p>
-
-<p>The package, recommended by the sector regulator last year, had been pending with the government for over nine months. Officials familiar with the deliberations said the decision was accelerated by the deteriorating financial position of one of the major operators.</p>
-
-<h2>What the package includes</h2>
-
-<p>The moratorium on spectrum dues will run for four years, with the option for operators to convert the deferred amount into equity at the end of the period. The bank guarantee requirement for auctions will be reduced by 50%, lowering the working capital pressure on operators.</p>
-
-<p>The package is expected to provide immediate relief to the sector, though analysts cautioned that the structural challenges — including the high debt burden and the low tariffs — remain unresolved.</p>`,
-  },
-  {
-    id: "15",
-    slug: "world-athletics-india-medal-tally",
-    title: "India Ends World Athletics with Three Medals, Best-Ever Tally",
-    standfirst:
-      "A historic gold in the javelin and silvers in the long jump and the 4x400 relay marked the country's best performance at the World Athletics Championships.",
-    category: "sports",
-    tags: ["Athletics", "World Championships", "Javelin", "Medal"],
-    authorId: "a4",
-    publishedAt: "2025-07-15T22:00:00Z",
-    readingTime: 3,
-    views: 54210,
-    heroImage:
-      "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "The Indian javelin thrower on the podium after winning gold.",
-    heroCredit: "Photo: AP",
-    body: `<p>India ended its campaign at the World Athletics Championships on Tuesday with three medals — a historic gold in the javelin, a silver in the long jump, and a silver in the 4x400 metre relay — marking the country's best-ever performance at the event.</p>
-
-<p>The javelin gold, won with a throw of 89.45 metres, is the first world championship gold for an Indian in any athletics discipline. The silver in the long jump came with a personal best of 8.32 metres, while the relay team's silver was secured in a national record time of 2 minutes 58.12 seconds.</p>
-
-<h2>A statement of intent</h2>
-
-<p>The performance is being seen as a statement of intent from a country that has historically struggled in track and field. The sports ministry announced a cash award of ₹50 lakh for each gold medallist and ₹25 lakh for each silver medallist.</p>
-
-<p>The athletes will return to a formal reception in the capital on Friday, before resuming training for the Asian Games later this year.</p>`,
-  },
-  {
-    id: "16",
-    slug: "supreme-court-data-protection-ruling",
-    title: "Supreme Court Upholds Right to Be Forgotten in Landmark Ruling",
-    standfirst:
-      "A five-judge bench ruled that individuals can request the removal of search results that are inaccurate or no longer relevant, with safeguards for press freedom.",
-    category: "national",
-    tags: ["Supreme Court", "Privacy", "Data Protection", "Law"],
+    id: "pib-gov-6",
+    slug: "meity-launches-bhashini-translation-platform",
+    title: "Ministry of Electronics & IT Launches Digital India Bhashini Translation Platform",
+    standfirst: "The Ministry of Electronics and IT has launched Bhashini, an AI-powered language translation platform to enable voice-based internet access in regional languages.",
+    category: "technology",
+    tags: ["MeitY", "Digital India", "Bhashini AI", "Language Technology"],
     states: ["Delhi"],
-    authorId: "a1",
-    publishedAt: "2025-07-15T10:30:00Z",
-    readingTime: 6,
-    views: 31420,
-    heroImage:
-      "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "The Supreme Court of India.",
-    heroCredit: "Photo: PTI",
-    body: `<p>The Supreme Court on Tuesday recognised the right to be forgotten as a facet of the right to privacy, ruling that individuals can request the removal of search results that are inaccurate, inadequate, or no longer relevant, while imposing safeguards to protect press freedom and the public interest.</p>
-
-<p>The ruling, delivered by a five-judge constitution bench, frames the right as a qualified one — to be exercised through a structured mechanism that balances individual privacy against the public's right to information.</p>
-
-<h2>A balanced verdict</h2>
-
-<p>The court held that the right cannot be used to remove accurate reporting on matters of public interest, including historical events, public figures acting in their official capacity, and criminal proceedings where the conviction is recorded. It can, however, be invoked to remove information that is factually incorrect, outdated, or where its continued availability causes disproportionate harm.</p>
-
-<blockquote>The right to be forgotten is not a right to rewrite history. It is a right to be free from the indefinite amplification of information that no longer reflects the truth.</blockquote>
-
-<p>The court directed the government to establish a statutory mechanism, within 18 months, through which individuals can make such requests. Until then, the Data Protection Board will adjudicate requests on a case-by-case basis.</p>`,
-  },
-  {
-    id: "17",
-    slug: "bhopal-heritage-conservation-project",
-    title: "Bhopal's Heritage Quarter Gets a Conservation Plan After Two Decades",
-    standfirst:
-      "The state government has approved a ₹240-crore conservation plan for the city's colonial-era quarter, with a focus on adaptive reuse and community participation.",
-    category: "national",
-    tags: ["Heritage", "Conservation", "Bhopal", "Urban"],
-    states: ["Madhya Pradesh"],
-    authorId: "a5",
-    publishedAt: "2025-07-14T12:00:00Z",
+    authorId: "pib",
+    publishedAt: "2026-07-15T15:00:00Z",
     readingTime: 4,
-    views: 7240,
-    heroImage:
-      "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "A heritage building in Bhopal's colonial-era quarter.",
-    heroCredit: "Photo: MP Tourism",
-    body: `<p>The Madhya Pradesh government has approved a ₹240-crore conservation plan for Bhopal's colonial-era heritage quarter, ending two decades of deliberation over the future of a neighbourhood that has steadily deteriorated despite its architectural significance.</p>
-
-<p>The plan, prepared by a conservation architecture firm in consultation with local residents, focuses on adaptive reuse — converting several heritage structures into cultural spaces, libraries, and small museums — while preserving the residential character of the quarter.</p>
-
-<h2>A community-led approach</h2>
-
-<p>Unlike earlier proposals that envisaged large-scale redevelopment, the approved plan emphasises community participation. A residents' committee will have a formal role in the implementation, and a grant programme will support the restoration of privately owned heritage homes.</p>
-
-<p>Work is expected to begin in October and be completed in five phases over seven years.</p>`,
+    views: 14200,
+    heroImage: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&h=900&fit=crop&q=80",
+    heroCaption: "Digital India showcase highlighting translation technologies.",
+    heroCredit: "Photo: Press Information Bureau",
+    body: `<p>The Ministry of Electronics and IT (MeitY) has officially launched 'Bhashini', India's AI-led language translation platform. It aims to break language barriers by providing real-time text-to-speech and translation services in 22 official Indian languages.</p>
+    <p>Bhashini will enable citizens to access public services, education, and banking portals in their mother tongues, boosting digital inclusion in tier-2 and tier-3 regions.</p>`,
+    isFeatured: false,
+    isBreaking: false,
   },
   {
-    id: "18",
-    slug: "ipl-auction-mega-deal-preview",
-    title: "IPL Mega Auction: The Five Players Who Could Break the ₹20-Crore Mark",
-    standfirst:
-      "With the auction pool expanded and several franchises rebuilding, this year's mega auction is set to be the most lucrative in the league's history.",
-    category: "sports",
-    tags: ["IPL", "Cricket", "Auction"],
-    authorId: "a4",
-    publishedAt: "2025-07-13T15:00:00Z",
-    readingTime: 5,
-    views: 92340,
-    heroImage:
-      "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1600&h=900&fit=crop&q=80",
-    heroCaption: "The IPL trophy on display ahead of the auction.",
-    heroCredit: "Photo: Sportzpics",
-    body: `<p>The Indian Premier League's mega auction, scheduled for late next month, is set to be the most lucrative in the league's history, with several franchises in full rebuild mode and at least five players widely expected to cross the ₹20-crore mark.</p>
-
-<p>This year's auction pool has been expanded to 280 players, up from 204 in the last mega auction. The salary cap for franchises has been raised by ₹15 crore, and several franchises have significant purse after releasing high-earning players in the retention window.</p>
-
-<h2>The marquee names</h2>
-
-<p>The five players expected to draw the biggest bids include two all-rounders, two top-order batters, and a fast bowler. Each brings a specific skillset that is in short supply in the auction pool, and several franchises are expected to enter aggressive bidding wars.</p>
-
-<p>The auction will be conducted over two days in Bengaluru, with the marquee set going under the hammer on the morning of the first day.</p>`,
+    id: "pib-gov-7",
+    slug: "isro-successfully-launches-chandrayaan-mission",
+    title: "ISRO Successfully Launches Lunar Exploration Mission from Sriharikota Spaceport",
+    standfirst: "The Indian Space Research Organisation (ISRO) successfully launched the Chandrayaan mission, aiming to land a rover on the lunar South Pole.",
+    category: "science",
+    tags: ["ISRO", "Space Research", "Chandrayaan", "Science & Tech"],
+    states: ["Andhra Pradesh"],
+    authorId: "pib",
+    publishedAt: "2026-07-14T10:45:00Z",
+    readingTime: 4,
+    views: 29800,
+    heroImage: "https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=1600&h=900&fit=crop&q=80",
+    heroCaption: "The GSLV rocket carrying the lunar spacecraft lifting off from Sriharikota.",
+    heroCredit: "Photo: ISRO / PIB",
+    body: `<p>The Indian Space Research Organisation (ISRO) successfully launched its lunar mission from the Satish Dhawan Space Centre in Sriharikota. The spacecraft entered the planned orbit, beginning its journey towards the Moon's unexplored South Pole region.</p>
+    <p>The mission aims to demonstrate safe soft-landing capability and conduct in-situ scientific experiments on the lunar surface using its rover payload.</p>`,
+    isFeatured: false,
+    isBreaking: false,
+  },
+  {
+    id: "pib-gov-8",
+    slug: "ayushman-bharat-hospital-admissions-milestone",
+    title: "Ayushman Bharat PM-JAY Completes Milestone of 5 Crore Free Hospital Admissions",
+    standfirst: "The National Health Authority announced that the Ayushman Bharat PM-JAY scheme has crossed 5 crore hospital admissions, providing cashless healthcare to citizens.",
+    category: "health",
+    tags: ["Health Ministry", "Ayushman Bharat", "Healthcare", "PM-JAY"],
+    states: ["Delhi"],
+    authorId: "pib",
+    publishedAt: "2026-07-13T08:30:00Z",
+    readingTime: 3,
+    views: 18900,
+    heroImage: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=1600&h=900&fit=crop&q=80",
+    heroCaption: "Ayushman Bharat wellness clinic providing patient care services.",
+    heroCredit: "Photo: Press Information Bureau",
+    body: `<p>The National Health Authority (NHA) announced that the Ayushman Bharat Pradhan Mantri Jan Arogya Yojana (AB PM-JAY) has successfully crossed the milestone of 5 crore hospital admissions, providing over ₹61,500 crore worth of free cashless treatments.</p>
+    <p>The scheme targets over 12 crore poor and vulnerable families, offering health insurance coverage of up to ₹5 lakh per family per year for secondary and tertiary care hospitalization.</p>`,
+    isFeatured: false,
+    isBreaking: false,
   },
 ];
 

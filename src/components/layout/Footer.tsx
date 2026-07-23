@@ -6,9 +6,11 @@ import { Twitter, Facebook, Instagram, Youtube, Send, Rss } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { subscribeNewsletter } from "@/lib/api-client";
+import { useT } from "@/hooks/use-t";
 
 export function Footer() {
   const { navigate } = useStore();
+  const t = useT();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -85,7 +87,7 @@ export function Footer() {
                 disabled={submitting}
                 className="h-11 px-5 rounded-md bg-brand hover:bg-brand-light text-white font-ui text-sm font-semibold transition-colors disabled:opacity-60"
               >
-                {submitting ? "…" : "Subscribe"}
+                {submitting ? "…" : t("misc.subscribe")}
               </button>
             </form>
           </div>
@@ -95,14 +97,14 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-10 border-b border-white/10">
           <div>
             <h5 className="font-ui text-[11px] font-bold uppercase tracking-wider text-white/50 mb-3">
-              About
+              {t("misc.more")}
             </h5>
             <ul className="space-y-2">
               {[
-                { label: "About Us", view: { type: "about" as const } },
-                { label: "Contact", view: { type: "contact" as const } },
-                { label: "Advertise", view: { type: "advertise" as const } },
-                { label: "Careers", view: { type: "careers" as const } },
+                { label: t("misc.aboutUs"), view: { type: "about" as const } },
+                { label: t("misc.contact"), view: { type: "contact" as const } },
+                { label: t("misc.advertise"), view: { type: "advertise" as const } },
+                { label: t("misc.careers"), view: { type: "careers" as const } },
               ].map((l) => (
                 <li key={l.label}>
                   <button
@@ -118,15 +120,15 @@ export function Footer() {
 
           <div>
             <h5 className="font-ui text-[11px] font-bold uppercase tracking-wider text-white/50 mb-3">
-              Coverage
+              {t("misc.sections")}
             </h5>
             <ul className="space-y-2">
               {[
-                { label: "Live", view: { type: "section" as const, slug: "live" as const } },
-                { label: "Breaking", view: { type: "section" as const, slug: "breaking" as const } },
-                { label: "National", view: { type: "section" as const, slug: "national" as const } },
-                { label: "International", view: { type: "section" as const, slug: "international" as const } },
-                { label: "Podcasts", view: { type: "section" as const, slug: "podcasts" as const } },
+                { label: t("nav.live"), view: { type: "section" as const, slug: "live" as const } },
+                { label: t("nav.breaking"), view: { type: "section" as const, slug: "breaking" as const } },
+                { label: t("nav.national"), view: { type: "section" as const, slug: "national" as const } },
+                { label: t("nav.international"), view: { type: "section" as const, slug: "international" as const } },
+                { label: t("nav.podcasts"), view: { type: "section" as const, slug: "podcasts" as const } },
               ].map((l) => (
                 <li key={l.label}>
                   <button
