@@ -6,6 +6,7 @@ import { ARTICLES_LIST } from "@/lib/mock-data";
 import { useBreaking } from "@/lib/use-data";
 import { AlertCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LiveClock } from "@/components/LiveClock";
 
 export function BreakingTicker() {
   const [dismissed, setDismissed] = useState(false);
@@ -73,6 +74,11 @@ export function BreakingTicker() {
         >
           <X className="h-3.5 w-3.5" />
         </button>
+
+        {/* Compact live clock — right side of ticker, visible on all screens */}
+        <div className="shrink-0 hidden sm:flex items-center px-3 md:px-4 border-l border-white/10 bg-black/20">
+          <LiveClock compact />
+        </div>
       </div>
     </div>
   );

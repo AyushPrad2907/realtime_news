@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
-import { Search, Menu, Sun, Moon, Radio, LogOut, Shield, PenLine, UserCircle2 } from "lucide-react";
+import { Search, Menu, Sun, Moon, Radio, LogOut, Shield, PenLine, UserCircle2, Calendar as CalendarIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { signOut } from "@/lib/api-client";
+import { LiveClock } from "@/components/LiveClock";
+import { DatePicker } from "@/components/DatePicker";
 
 const PRIMARY_NAV = [
   { label: "Home", view: { type: "home" as const } },
@@ -63,6 +65,18 @@ export function Header() {
               <Search className="h-5 w-5" />
             </button>
 
+            {/* Mobile: calendar icon left */}
+            <button
+              onClick={() => {
+                const today = new Date().toISOString().slice(0, 10);
+                navigate({ type: "date-archive", date: today });
+              }}
+              className="md:hidden p-2 rounded-md hover:bg-muted transition-colors"
+              aria-label="Browse by date"
+            >
+              <CalendarIcon className="h-5 w-5" />
+            </button>
+
             {/* Logo */}
             <button
               onClick={() => navigate({ type: "home" })}
@@ -108,6 +122,11 @@ export function Header() {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-1 md:gap-2 flex-1 md:flex-none justify-end">
+            {/* Live clock — desktop only, hidden on small screens */}
+            <div className="hidden xl:block">
+              <LiveClock />
+            </div>
+
             {/* Live button - desktop */}
             <button
               onClick={() => navigate({ type: "section", slug: "live" })}
@@ -116,6 +135,9 @@ export function Header() {
               <Radio className="h-3.5 w-3.5" />
               {isLive ? "Live Now" : "Live"}
             </button>
+
+            {/* Date picker - desktop */}
+            <DatePicker />
 
             {/* Search button - desktop */}
             <button

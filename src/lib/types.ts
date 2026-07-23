@@ -108,6 +108,7 @@ export type PageView =
   | { type: "contact" }
   | { type: "privacy" }
   | { type: "terms" }
+  | { type: "date-archive"; date: string } // ISO date string YYYY-MM-DD
   // Auth + panels
   | { type: "login" }
   | { type: "editor"; view?: "dashboard" | "new-article" | "edit-article"; articleId?: string }

@@ -28,6 +28,7 @@ import { SectionPage } from "@/components/pages/SectionPage";
 import { LoginPage } from "@/components/pages/LoginPage";
 import { EditorPanel } from "@/components/panels/EditorPanel";
 import { AdminPanel } from "@/components/panels/AdminPanel";
+import { DateArchivePage } from "@/components/pages/DateArchivePage";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
@@ -93,6 +94,8 @@ export default function Home() {
         return <StaticPage type="privacy" />;
       case "terms":
         return <StaticPage type="terms" />;
+      case "date-archive":
+        return <DateArchivePage date={current.date} />;
       default:
         return <HomePage />;
     }
