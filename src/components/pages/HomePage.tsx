@@ -89,45 +89,41 @@ export function HomePage() {
 
       <TopStories articles={topStories} />
 
-      <LazySection>
-        <div className="mb-12 md:mb-16">
-          <AdBanner format="leaderboard" />
-        </div>
-      </LazySection>
+      <div className="mb-12 md:mb-16">
+        <AdBanner format="leaderboard" />
+      </div>
 
-      <LazySection>
-        <div className="grid lg:grid-cols-[1fr_300px] gap-8 lg:gap-12 mb-12 md:mb-16">
-          <div>
-            <LatestNews articles={list} />
-          </div>
-          <aside className="hidden lg:block">
-            <div className="sticky top-32 space-y-6">
-              <AdBanner format="rectangle" />
-              <div>
-                <h3 className="font-display text-base font-bold mb-3 border-b border-border pb-2">
-                  Most Read
-                </h3>
-                <ol className="space-y-3">
-                  {[...list]
-                    .sort((a, b) => b.views - a.views)
-                    .slice(0, 5)
-                    .map((a, i) => (
-                      <li key={a.id} className="flex gap-3">
-                        <span className="font-display text-2xl font-extrabold text-ink-tertiary/40 tabular-nums leading-none">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <p className="font-ui text-sm leading-snug line-clamp-2 flex-1">
-                          {a.title}
-                        </p>
-                      </li>
-                    ))}
-                </ol>
-              </div>
-              <AdBanner format="rectangle" />
-            </div>
-          </aside>
+      <div className="grid lg:grid-cols-[1fr_300px] gap-8 lg:gap-12 mb-12 md:mb-16">
+        <div>
+          <LatestNews articles={list} />
         </div>
-      </LazySection>
+        <aside className="hidden lg:block">
+          <div className="sticky top-32 space-y-6">
+            <AdBanner format="rectangle" />
+            <div>
+              <h3 className="font-display text-base font-bold mb-3 border-b border-border pb-2">
+                Most Read
+              </h3>
+              <ol className="space-y-3">
+                {[...list]
+                  .sort((a, b) => b.views - a.views)
+                  .slice(0, 5)
+                  .map((a, i) => (
+                    <li key={a.id} className="flex gap-3">
+                      <span className="font-display text-2xl font-extrabold text-ink-tertiary/40 tabular-nums leading-none">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <p className="font-ui text-sm leading-snug line-clamp-2 flex-1">
+                        {a.title}
+                      </p>
+                    </li>
+                  ))}
+              </ol>
+            </div>
+            <AdBanner format="rectangle" />
+          </div>
+        </aside>
+      </div>
 
       <LazySection>
         <LiveSection />
