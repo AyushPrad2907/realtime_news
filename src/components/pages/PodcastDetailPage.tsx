@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
-import { formatDate, timeAgo } from "@/lib/utils-news";
+import { formatDate } from "@/lib/utils-news";
+import { TimeAgo } from "@/components/TimeAgo";
 import type { PodcastEpisode, PodcastSeries } from "@/lib/types";
 
 interface PodcastDetailPageProps {
@@ -206,7 +207,7 @@ export function PodcastDetailPage({ slug }: PodcastDetailPageProps) {
                   {episode.duration}
                 </span>
                 <span aria-hidden>·</span>
-                <span>{timeAgo(episode.publishedAt)}</span>
+                <span><TimeAgo iso={episode.publishedAt} /></span>
               </div>
             </div>
           </div>

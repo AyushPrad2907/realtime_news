@@ -5,7 +5,7 @@ import type { PodcastEpisode } from "@/lib/types";
 import { PODCAST_SERIES } from "@/lib/mock-data";
 import { Play, Pause, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { timeAgo } from "@/lib/utils-news";
+import { TimeAgo } from "@/components/TimeAgo";
 
 interface PodcastCardProps {
   episode: PodcastEpisode;
@@ -108,7 +108,7 @@ export function PodcastCard({ episode, variant = "default", className }: Podcast
         <Clock className="h-3 w-3" />
         <span>{episode.duration}</span>
         <span aria-hidden>·</span>
-        <span>{timeAgo(episode.publishedAt)}</span>
+        <span><TimeAgo iso={episode.publishedAt} /></span>
       </div>
     </article>
   );

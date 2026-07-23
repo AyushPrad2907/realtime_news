@@ -2,8 +2,9 @@
 
 import { useStore } from "@/lib/store";
 import type { Article } from "@/lib/types";
-import { getCategory, getAuthor, timeAgo } from "@/lib/utils-news";
+import { getCategory, getAuthor } from "@/lib/utils-news";
 import { Clock, Headphones, ArrowRight } from "lucide-react";
+import { TimeAgo } from "@/components/TimeAgo";
 
 interface HeroStoryProps {
   article: Article;
@@ -63,7 +64,7 @@ export function HeroStory({ article }: HeroStoryProps) {
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 md:mt-5 font-ui text-xs md:text-sm text-white/80">
               <span className="font-medium text-white/95">By {author.name}</span>
               <span aria-hidden>·</span>
-              <span>{timeAgo(article.publishedAt)}</span>
+              <span><TimeAgo iso={article.publishedAt} /></span>
               <span aria-hidden className="hidden md:inline">·</span>
               <span className="hidden md:flex items-center gap-1">
                 <Clock className="h-3 w-3" />

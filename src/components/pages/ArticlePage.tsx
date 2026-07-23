@@ -5,7 +5,8 @@ import { ARTICLES_LIST } from "@/lib/mock-data";
 import { CategoryBadge } from "@/components/cards/CategoryBadge";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { AdBanner } from "@/components/sections/AdBanner";
-import { getAuthor, timeAgo, formatDate, formatViews } from "@/lib/utils-news";
+import { getAuthor, formatDate, formatViews } from "@/lib/utils-news";
+import { TimeAgo } from "@/components/TimeAgo";
 import { fetchArticle } from "@/lib/api-client";
 import {
   Clock,
@@ -228,7 +229,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
               <>
                 <span aria-hidden>·</span>
                 <span className="text-ink-tertiary">
-                  Updated {timeAgo(article.updatedAt)}
+                  Updated <TimeAgo iso={article.updatedAt ?? article.publishedAt} />
                 </span>
               </>
             )}

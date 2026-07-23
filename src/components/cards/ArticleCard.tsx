@@ -2,9 +2,10 @@
 
 import { useStore } from "@/lib/store";
 import type { Article } from "@/lib/types";
-import { getCategory, getAuthor, timeAgo } from "@/lib/utils-news";
+import { getCategory, getAuthor } from "@/lib/utils-news";
 import { Clock, Headphones } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TimeAgo } from "@/components/TimeAgo";
 
 interface ArticleCardProps {
   article: Article;
@@ -34,7 +35,7 @@ export function ArticleCard({
         className="group w-full flex items-center gap-3 md:gap-4 py-3 border-b border-border text-left"
       >
         <div className="shrink-0 font-ui text-xs text-ink-tertiary tabular-nums w-16">
-          {timeAgo(article.publishedAt)}
+          <TimeAgo iso={article.publishedAt} />
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-display text-[15px] md:text-base font-bold leading-snug line-clamp-2 group-hover:text-brand transition-colors">
@@ -82,7 +83,7 @@ export function ArticleCard({
           {article.title}
         </h4>
         <p className="font-ui text-[11px] text-ink-tertiary mt-1.5">
-          {timeAgo(article.publishedAt)}
+          <TimeAgo iso={article.publishedAt} />
         </p>
       </button>
     );
@@ -107,7 +108,7 @@ export function ArticleCard({
               {article.title}
             </h4>
             <p className="font-ui text-[11px] text-ink-tertiary mt-1.5">
-              {timeAgo(article.publishedAt)} · {article.readingTime} min read
+              <TimeAgo iso={article.publishedAt} /> · {article.readingTime} min read
             </p>
           </div>
           {showImage && (
@@ -161,7 +162,7 @@ export function ArticleCard({
       <div className="flex items-center gap-2 mt-3 font-ui text-[11px] text-ink-tertiary">
         <span>{author.name}</span>
         <span aria-hidden>·</span>
-        <span>{timeAgo(article.publishedAt)}</span>
+        <span><TimeAgo iso={article.publishedAt} /></span>
         <span aria-hidden>·</span>
         <span className="flex items-center gap-1">
           <Clock className="h-3 w-3" />

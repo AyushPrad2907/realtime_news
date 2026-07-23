@@ -248,7 +248,7 @@ const ARTICLES: Article[] = [
     readingTime: 6,
     views: 28450,
     heroImage:
-      "https://images.unsplash.com/photo-1582213782179-e0d53f98f2a1?w=1600&h=900&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1600&h=900&fit=crop&q=80",
     heroCaption: "Leaders pose for the traditional family photograph at the ASEAN Summit.",
     heroCredit: "Photo: ASEAN Secretariat",
     body: `<p>The ten-member Association of Southeast Asian Nations concluded its annual summit on Tuesday with a new framework agreement on maritime conduct in the South China Sea and a renewed commitment to conclude long-delayed negotiations on a regional trade update.</p>
@@ -413,7 +413,7 @@ const ARTICLES: Article[] = [
     readingTime: 3,
     views: 38920,
     heroImage:
-      "https://images.unsplash.com/photo-1602491453631-e6a9d226451c?w=1600&h=900&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1600&h=900&fit=crop&q=80",
     heroCaption: "Rescue personnel evacuating residents from a flooded neighbourhood.",
     heroCredit: "Photo: PTI",
     body: `<p>Rescue operations continued through Wednesday morning across five districts of Kerala as major rivers crossed danger marks following three days of intense rainfall, with the state government deploying the National Disaster Response Force and moving over 12,000 people to relief camps in the last 48 hours.</p>
@@ -494,7 +494,7 @@ const ARTICLES: Article[] = [
     readingTime: 4,
     views: 9870,
     heroImage:
-      "https://images.unsplash.com/photo-1593784991095-a5d5e6e1f5f6?w=1600&h=900&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&h=900&fit=crop&q=80",
     heroCaption: "A telecom transmission tower against the evening sky.",
     heroCredit: "Photo: Bloomberg",
     body: `<p>The Union Cabinet on Wednesday approved a relief package for the telecom sector, including a moratorium on spectrum dues and a reduction in the bank guarantees required for participation in future auctions, in a move aimed at stabilising a sector that has been under financial stress for several years.</p>
