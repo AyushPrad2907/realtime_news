@@ -6,15 +6,23 @@ import { useMemo } from "react";
 import { getCategory } from "@/lib/utils-news";
 import { TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
+import type { Article } from "@/lib/types";
 
-export function TrendingNow() {
+interface TrendingNowProps {
+  articles?: Article[];
+}
+
+export function TrendingNow({ articles: articleProp }: TrendingNowProps) {
   const { navigate } = useStore();
+  const list = articleProp ?? ARTICLES_LIST;
 
   // Sort by views (as a proxy for trending)
   const trending = useMemo(
-    () => [...ARTICLES_LIST].sort((a, b) => b.views - a.views).slice(0, 10),
-    []
+    () => [...list].sort((a, b) => b.views - a.views).slice(0, 10),
+    [list]
   );
+
+  if (trending.length === 0) return null;
 
   return (
     <section className="mb-12 md:mb-16">

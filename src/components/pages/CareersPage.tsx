@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useStore } from "@/lib/store";
 import { JOBS } from "@/lib/mock-data";
-import { ArrowRight, MapPin, Briefcase, Users } from "lucide-react";
+import { fetchJobs } from "@/lib/api-client";
+import { ArrowRight, MapPin, Briefcase, Users, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { Job } from "@/lib/types";
 
 const DEPARTMENTS = ["All", "Editorial", "Tech", "Sales", "Operations"] as const;
 const TYPES = ["All", "Full-time", "Part-time", "Contract", "Internship"] as const;
@@ -13,14 +15,26 @@ export function CareersPage() {
   const { navigate } = useStore();
   const [department, setDepartment] = useState<(typeof DEPARTMENTS)[number]>("All");
   const [type, setType] = useState<(typeof TYPES)[number]>("All");
+  const [jobs, setJobs] = useState<Job[]>(JOBS);
+
+  // Fetch from API in background
+  useEffect(() => {
+    const id = setTimeout(() => {
+      fetchJobs().then((data) => {
+        if (data.length > 0) setJobs(data);
+      });
+    }, 0);
+    return () => clearTimeout(id);
+  }, []);
 
   const filtered = useMemo(() => {
-    return JOBS.filter((j) => {
+    return jobs.filter((j) => {
       if (department !== "All" && j.department !== department) return false;
       if (type !== "All" && j.type !== type) return false;
       return true;
     });
-  }, [department, type]);
+  }, [jobs, department, type]);
+
 
   return (
     <div>

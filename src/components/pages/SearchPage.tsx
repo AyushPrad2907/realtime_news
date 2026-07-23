@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useStore } from "@/lib/store";
 import { ARTICLES_LIST, PODCAST_EPISODES, CATEGORIES, TRENDING_TOPICS } from "@/lib/mock-data";
+import { fetchSearch } from "@/lib/api-client";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { PodcastCard } from "@/components/cards/PodcastCard";
-import { Search as SearchIcon, X, TrendingUp, FileText, Headphones } from "lucide-react";
+import { Search as SearchIcon, X, TrendingUp, FileText, Headphones, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { Article, PodcastEpisode } from "@/lib/types";
 
 type FilterType = "all" | "articles" | "podcasts";
 type DateFilter = "anytime" | "today" | "week" | "month";
@@ -21,18 +23,36 @@ export function SearchPage({ query: initialQuery }: SearchPageProps) {
   const [type, setType] = useState<FilterType>("all");
   const [dateFilter, setDateFilter] = useState<DateFilter>("anytime");
   const [sort, setSort] = useState<"relevance" | "newest" | "popular">("relevance");
+  const [apiArticles, setApiArticles] = useState<Article[]>([]);
+  const [apiPodcasts, setApiPodcasts] = useState<PodcastEpisode[]>([]);
+  const [loading, setLoading] = useState(false);
 
+  // Fetch from API when query changes
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setApiArticles([]);
+      setApiPodcasts([]);
+      return;
+    }
+    let cancelled = false;
+    const id = setTimeout(() => {
+      setLoading(true);
+      fetchSearch(query).then((data) => {
+        if (cancelled) return;
+        setApiArticles(data.articles);
+        setApiPodcasts(data.podcasts);
+        setLoading(false);
+      });
+    }, 200); // debounce
+    return () => {
+      cancelled = true;
+      clearTimeout(id);
+    };
+  }, [query]);
+
+  // Client-side date + sort filtering on top of API results
   const matchedArticles = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase();
-    let results = ARTICLES_LIST.filter(
-      (a) =>
-        a.title.toLowerCase().includes(q) ||
-        a.standfirst.toLowerCase().includes(q) ||
-        a.tags.some((t) => t.toLowerCase().includes(q))
-    );
-
-    // Date filter
+    let results = apiArticles;
     const now = Date.now();
     if (dateFilter === "today") {
       results = results.filter(
@@ -48,26 +68,20 @@ export function SearchPage({ query: initialQuery }: SearchPageProps) {
       );
     }
 
-    // Sort
     if (sort === "newest") {
-      results = results.sort(
+      results = [...results].sort(
         (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
       );
     } else if (sort === "popular") {
-      results = results.sort((a, b) => b.views - a.views);
+      results = [...results].sort((a, b) => b.views - a.views);
     }
     return results;
-  }, [query, dateFilter, sort]);
+  }, [apiArticles, dateFilter, sort]);
 
   const matchedPodcasts = useMemo(() => {
-    if (!query.trim() || type === "articles") return [];
-    const q = query.toLowerCase();
-    return PODCAST_EPISODES.filter(
-      (e) =>
-        e.title.toLowerCase().includes(q) ||
-        e.description.toLowerCase().includes(q)
-    );
-  }, [query, type]);
+    if (type === "articles") return [];
+    return apiPodcasts;
+  }, [apiPodcasts, type]);
 
   const matchedCategories = useMemo(() => {
     if (!query.trim()) return [];

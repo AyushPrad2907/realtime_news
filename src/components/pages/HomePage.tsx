@@ -1,6 +1,7 @@
 "use client";
 
 import { ARTICLES_LIST } from "@/lib/mock-data";
+import { useArticles, usePodcasts } from "@/lib/use-data";
 import { HeroStory } from "@/components/sections/HeroStory";
 import { TopStories } from "@/components/sections/TopStories";
 import { LatestNews } from "@/components/sections/LatestNews";
@@ -12,24 +13,43 @@ import { TrendingNow } from "@/components/sections/TrendingNow";
 import { EditorsPicks } from "@/components/sections/EditorsPicks";
 import { Newsletter } from "@/components/sections/Newsletter";
 import { AdBanner } from "@/components/sections/AdBanner";
-import type { CategorySlug } from "@/lib/types";
+import type { Article, CategorySlug, PodcastEpisode } from "@/lib/types";
 
 export function HomePage() {
-  const featured = ARTICLES_LIST.find((a) => a.isFeatured) ?? ARTICLES_LIST[0];
+  // Fetch from real API; mock data is returned instantly as fallback
+  const { data: articles } = useArticles({ limit: 50 });
+  const { data: podcastData } = usePodcasts();
+
+  // Until articles load, use mock data so the page renders instantly
+  const list = articles.length > 0 ? articles : ARTICLES_LIST;
+  const episodes: PodcastEpisode[] = podcastData.episodes;
+
+  const featured = list.find((a) => a.isFeatured) ?? list[0];
 
   // Top stories: take 5 articles, exclude the featured one
-  const topStories = ARTICLES_LIST.filter((a) => a.id !== featured.id).slice(0, 5);
+  const topStories = list.filter((a) => a.id !== featured?.id).slice(0, 5);
 
-  // Editor's picks: a curated selection
-  const editorsPicks = [
-    ARTICLES_LIST.find((a) => a.slug === "supreme-court-data-protection-ruling")!,
-    ARTICLES_LIST.find((a) => a.slug === "isro-reusable-launch-vehicle-test-success")!,
-    ARTICLES_LIST.find((a) => a.slug === "bhopal-heritage-conservation-project")!,
-    ARTICLES_LIST.find((a) => a.slug === "dengue-vaccine-trial-results-published")!,
-  ];
+  // Editor's picks: a curated selection (use mock-defined slugs as a stable curation signal,
+  // then fall back to the next 4 articles by views)
+  const editorsPickSlugs = new Set([
+    "supreme-court-data-protection-ruling",
+    "isro-reusable-launch-vehicle-test-success",
+    "bhopal-heritage-conservation-project",
+    "dengue-vaccine-trial-results-published",
+  ]);
+  const editorsPicks =
+    list.filter((a) => editorsPickSlugs.has(a.slug)).slice(0, 4) ||
+    list.slice(4, 8);
 
-  const byCategory = (slug: CategorySlug) =>
-    ARTICLES_LIST.filter((a) => a.category === slug);
+  const byCategory = (slug: CategorySlug) => list.filter((a) => a.category === slug);
+
+  if (!featured) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-20 text-center">
+        <p className="font-ui text-sm text-ink-secondary">Loading…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-8">
@@ -43,7 +63,7 @@ export function HomePage() {
 
       <div className="grid lg:grid-cols-[1fr_300px] gap-8 lg:gap-12 mb-12 md:mb-16">
         <div>
-          <LatestNews articles={ARTICLES_LIST} />
+          <LatestNews articles={list} />
         </div>
         <aside className="hidden lg:block">
           <div className="sticky top-32 space-y-6">
@@ -53,7 +73,7 @@ export function HomePage() {
                 Most Read
               </h3>
               <ol className="space-y-3">
-                {ARTICLES_LIST.slice()
+                {[...list]
                   .sort((a, b) => b.views - a.views)
                   .slice(0, 5)
                   .map((a, i) => (
@@ -81,14 +101,14 @@ export function HomePage() {
       <CategoryRibbon category="economy" articles={byCategory("economy")} />
       <CategoryRibbon category="sports" articles={byCategory("sports")} />
 
-      <PodcastSection />
+      <PodcastSection episodes={episodes} />
 
       <StateNews />
 
       <CategoryRibbon category="technology" articles={byCategory("technology")} />
       <CategoryRibbon category="science" articles={byCategory("science")} />
 
-      <TrendingNow />
+      <TrendingNow articles={list} />
 
       <Newsletter />
     </div>

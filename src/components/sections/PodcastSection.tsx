@@ -4,10 +4,18 @@ import { useStore } from "@/lib/store";
 import { PODCAST_EPISODES } from "@/lib/mock-data";
 import { PodcastCard } from "@/components/cards/PodcastCard";
 import { ArrowRight, Headphones } from "lucide-react";
+import type { PodcastEpisode } from "@/lib/types";
 
-export function PodcastSection() {
+interface PodcastSectionProps {
+  episodes?: PodcastEpisode[];
+}
+
+export function PodcastSection({ episodes: episodeProp }: PodcastSectionProps) {
   const { navigate } = useStore();
-  const featured = PODCAST_EPISODES.slice(0, 4);
+  const episodes = episodeProp ?? PODCAST_EPISODES;
+  const featured = episodes.slice(0, 4);
+
+  if (featured.length === 0) return null;
 
   return (
     <section className="mb-12 md:mb-16">

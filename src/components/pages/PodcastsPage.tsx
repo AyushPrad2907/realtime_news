@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { PODCAST_EPISODES, PODCAST_SERIES } from "@/lib/mock-data";
+import { usePodcasts } from "@/lib/use-data";
 import { PodcastCard } from "@/components/cards/PodcastCard";
 import { Headphones } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,14 +12,17 @@ type Filter = (typeof FILTERS)[number];
 
 export function PodcastsPage() {
   const [filter, setFilter] = useState<Filter>("All");
+  const { data } = usePodcasts();
+  const series = data.series.length > 0 ? data.series : PODCAST_SERIES;
+  const allEpisodes = data.episodes.length > 0 ? data.episodes : PODCAST_EPISODES;
 
   const filteredEpisodes = useMemo(() => {
-    if (filter === "All") return PODCAST_EPISODES;
-    return PODCAST_EPISODES.filter((ep) => {
-      const series = PODCAST_SERIES.find((s) => s.id === ep.seriesId);
-      return series?.category === filter;
+    if (filter === "All") return allEpisodes;
+    return allEpisodes.filter((ep) => {
+      const s = series.find((x) => x.id === ep.seriesId);
+      return s?.category === filter;
     });
-  }, [filter]);
+  }, [filter, allEpisodes, series]);
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-8">
@@ -40,24 +44,24 @@ export function PodcastsPage() {
       <section className="mb-12">
         <h2 className="h-section mb-5 border-b border-border pb-3">Series</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-          {PODCAST_SERIES.map((series) => (
+          {series.map((s) => (
             <div
-              key={series.id}
+              key={s.id}
               className="group cursor-pointer"
             >
               <div className="overflow-hidden rounded-md aspect-square bg-muted mb-2.5 relative">
                 <img
-                  src={series.coverImage}
+                  src={s.coverImage}
                   alt=""
                   loading="lazy"
                   className="h-full w-full object-cover img-zoom"
                 />
               </div>
               <p className="font-display text-sm font-bold line-clamp-1 group-hover:text-brand transition-colors">
-                {series.name}
+                {s.name}
               </p>
               <p className="font-ui text-[11px] text-ink-tertiary">
-                {series.episodes} episodes
+                {s.episodes} episodes
               </p>
             </div>
           ))}

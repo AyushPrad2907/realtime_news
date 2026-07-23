@@ -2,6 +2,7 @@
 
 import { useStore } from "@/lib/store";
 import { PODCAST_EPISODES, PODCAST_SERIES } from "@/lib/mock-data";
+import { fetchPodcastEpisode } from "@/lib/api-client";
 import { PodcastCard } from "@/components/cards/PodcastCard";
 import {
   Play,
@@ -12,10 +13,12 @@ import {
   Clock,
   Calendar,
   ArrowLeft,
+  Loader2,
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { formatDate, timeAgo } from "@/lib/utils-news";
+import type { PodcastEpisode, PodcastSeries } from "@/lib/types";
 
 interface PodcastDetailPageProps {
   slug: string;
@@ -27,10 +30,48 @@ export function PodcastDetailPage({ slug }: PodcastDetailPageProps) {
   const [currentChapter, setCurrentChapter] = useState<string>("00:00");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const episode = PODCAST_EPISODES.find((e) => e.slug === slug);
-  const series = episode
-    ? PODCAST_SERIES.find((s) => s.id === episode.seriesId)
+  // Start with mock data for instant render, refresh from API in background
+  const mockEpisode = PODCAST_EPISODES.find((e) => e.slug === slug);
+  const mockSeries = mockEpisode
+    ? PODCAST_SERIES.find((s) => s.id === mockEpisode.seriesId) ?? null
     : null;
+
+  const [episode, setEpisode] = useState<PodcastEpisode | null>(mockEpisode ?? null);
+  const [series, setSeries] = useState<PodcastSeries | null>(mockSeries);
+  const [otherEpisodes, setOtherEpisodes] = useState<PodcastEpisode[]>(
+    mockEpisode
+      ? PODCAST_EPISODES.filter((e) => e.seriesId === mockEpisode.seriesId && e.id !== mockEpisode.id).slice(0, 6)
+      : []
+  );
+  const [loading, setLoading] = useState(!mockEpisode);
+
+  useEffect(() => {
+    let cancelled = false;
+    const id = setTimeout(() => {
+      fetchPodcastEpisode(slug).then((data) => {
+        if (cancelled) return;
+        if (data) {
+          setEpisode(data.episode);
+          setSeries({
+            id: data.series.id,
+            name: data.series.name,
+            description: data.series.description,
+            coverImage: data.series.coverImage,
+            category: data.series.category as PodcastSeries["category"],
+            episodes: data.series.episodes,
+          });
+          setOtherEpisodes(data.otherEpisodes);
+        } else {
+          setEpisode(null);
+        }
+        setLoading(false);
+      });
+    }, 0);
+    return () => {
+      cancelled = true;
+      clearTimeout(id);
+    };
+  }, [slug]);
 
   const isCurrent = nowPlaying?.id === episode?.id;
   const showPlay = !isCurrent || !isPlaying;
@@ -56,6 +97,14 @@ export function PodcastDetailPage({ slug }: PodcastDetailPageProps) {
       document.title = "The National Dispatch";
     };
   }, [episode]);
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-20 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-ink-tertiary" />
+      </div>
+    );
+  }
 
   if (!episode || !series) {
     return (
@@ -84,11 +133,6 @@ export function PodcastDetailPage({ slug }: PodcastDetailPageProps) {
     navigator.clipboard?.writeText(window.location.href);
     toast.success("Episode link copied to clipboard");
   };
-
-  // Other episodes in series
-  const otherEpisodes = PODCAST_EPISODES.filter(
-    (e) => e.seriesId === series.id && e.id !== episode.id
-  ).slice(0, 6);
 
   // Format duration as mm:ss from "MM:SS" or "HH:MM:SS"
   const fmtTime = (t: string) => t;

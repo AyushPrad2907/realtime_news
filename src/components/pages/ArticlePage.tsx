@@ -6,6 +6,7 @@ import { CategoryBadge } from "@/components/cards/CategoryBadge";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { AdBanner } from "@/components/sections/AdBanner";
 import { getAuthor, timeAgo, formatDate, formatViews } from "@/lib/utils-news";
+import { fetchArticle } from "@/lib/api-client";
 import {
   Clock,
   Headphones,
@@ -20,9 +21,11 @@ import {
   Pause,
   ChevronRight,
   ArrowLeft,
+  Loader2,
 } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
+import type { Article, Author } from "@/lib/types";
 
 interface ArticlePageProps {
   slug: string;
@@ -31,11 +34,38 @@ interface ArticlePageProps {
 export function ArticlePage({ slug }: ArticlePageProps) {
   const { navigate, back, canGoBack, playEpisode, nowPlaying, isPlaying, togglePlay } = useStore();
   const [copied, setCopied] = useState(false);
+  const [article, setArticle] = useState<Article | null>(
+    () => ARTICLES_LIST.find((a) => a.slug === slug) ?? null
+  );
+  const [author, setAuthor] = useState<Author | null>(() =>
+    article ? getAuthor(article.authorId) : null
+  );
+  const [loading, setLoading] = useState(!article);
 
-  const article = ARTICLES_LIST.find((a) => a.slug === slug);
+  // Fetch fresh data from API (this also increments the view counter server-side)
+  useEffect(() => {
+    let cancelled = false;
+    const id = setTimeout(() => {
+      fetchArticle(slug).then((data) => {
+        if (cancelled) return;
+        if (data) {
+          setArticle(data.article);
+          setAuthor(data.author);
+        } else {
+          setArticle(null);
+        }
+        setLoading(false);
+      });
+    }, 0);
+    return () => {
+      cancelled = true;
+      clearTimeout(id);
+    };
+  }, [slug]);
 
   const relatedArticles = useMemo(() => {
     if (!article) return [];
+    // Prefer mock list for related (we don't want to wait for another API call)
     return ARTICLES_LIST.filter(
       (a) => a.id !== article.id && a.category === article.category
     ).slice(0, 3);
@@ -57,7 +87,15 @@ export function ArticlePage({ slug }: ArticlePageProps) {
     };
   }, [article]);
 
-  if (!article) {
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-20 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-ink-tertiary" />
+      </div>
+    );
+  }
+
+  if (!article || !author) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
         <h1 className="font-display text-3xl font-bold mb-3">Article not found</h1>
@@ -74,7 +112,6 @@ export function ArticlePage({ slug }: ArticlePageProps) {
     );
   }
 
-  const author = getAuthor(article.authorId);
   const isCurrentAudio = nowPlaying?.id === `article-${article.id}`;
   const showArticleAudioPlay = !isCurrentAudio || !isPlaying;
 

@@ -2,36 +2,57 @@
 
 import { useStore } from "@/lib/store";
 import { LIVE_UPDATES, ARTICLES_LIST } from "@/lib/mock-data";
+import { useLive, useArticles } from "@/lib/use-data";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Users, Calendar, Bell, Share2, ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
+import type { LiveUpdate } from "@/lib/types";
 
 export function LivePage() {
-  const { navigate, isLive } = useStore();
-  const [updates, setUpdates] = useState(LIVE_UPDATES);
+  const { navigate } = useStore();
+  const { data: live } = useLive();
+  const { data: articles } = useArticles({ category: "politics", limit: 10 });
+
+  const [updates, setUpdates] = useState<LiveUpdate[]>(LIVE_UPDATES);
   const [newUpdateCount, setNewUpdateCount] = useState(0);
 
-  // Simulate periodic new updates
+  // Sync updates from API when they arrive
+  useEffect(() => {
+    const id = setTimeout(() => {
+      if (live.updates && live.updates.length > 0) {
+        setUpdates(live.updates);
+      }
+    }, 0);
+    return () => clearTimeout(id);
+  }, [live.updates]);
+
+  // Simulate periodic new-update notifications (every 60s)
   useEffect(() => {
     const interval = setInterval(() => {
       setNewUpdateCount((c) => c + 1);
-    }, 25000);
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 
   const showNewUpdates = () => {
     setNewUpdateCount(0);
-    const sample = [
-      { id: `n${Date.now()}`, timestamp: "Just now", text: "The President has received the Bill for assent, the Ministry of Electronics and IT said in a statement.", isNew: true },
-      { id: `n${Date.now() + 1}`, timestamp: "Just now", text: "Industry associations welcomed the passage of the Bill, calling it a \"defining moment\" for digital India.", isNew: true },
+    const sample: LiveUpdate[] = [
+      { id: `n${Date.now()}`, timestamp: "Just now", text: "The President has received the Bill for assent, the Ministry of Electronics and IT said in a statement." },
+      { id: `n${Date.now() + 1}`, timestamp: "Just now", text: "Industry associations welcomed the passage of the Bill, calling it a \"defining moment\" for digital India." },
     ];
     setUpdates((prev) => [...sample, ...prev]);
   };
 
-  const relatedStories = ARTICLES_LIST.filter(
+  const isLive = live.isLive;
+  const programTitle = live.programTitle;
+  const programDesc = live.programDesc;
+  const viewerCount = live.viewerCount;
+
+  const relatedStories = (articles.length > 0 ? articles : ARTICLES_LIST).filter(
     (a) => a.category === "politics" || a.tags.includes("Parliament")
   ).slice(0, 3);
+
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-8">
@@ -88,7 +109,7 @@ export function LivePage() {
             </div>
             <div className="absolute bottom-4 left-4 flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/60 backdrop-blur text-white font-ui text-xs">
               <Users className="h-3 w-3" />
-              <span>4,287 watching</span>
+              <span>{viewerCount.toLocaleString()} watching</span>
             </div>
           </div>
 
@@ -98,12 +119,10 @@ export function LivePage() {
               The National Dispatch Live · Special Coverage
             </p>
             <h2 className="font-display text-2xl md:text-3xl font-extrabold leading-tight mb-2">
-              Parliament Passes Digital Infrastructure Bill — Special Coverage
+              {programTitle}
             </h2>
             <p className="font-serif text-base text-ink-secondary leading-relaxed">
-              Join our anchors and correspondents for live analysis as the Bill
-              moves to the President for assent. With expert guests and on-the-ground
-              reporting from Parliament House.
+              {programDesc}
             </p>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 font-ui text-xs text-ink-tertiary">
               <span>On air since 8:00 AM</span>
