@@ -170,7 +170,7 @@ function FullScreenLoader() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="font-display text-2xl font-extrabold animate-pulse">
-        The<span className="text-brand">National</span>Dispatch
+        News<span className="text-brand">varta</span>
       </div>
     </div>
   );

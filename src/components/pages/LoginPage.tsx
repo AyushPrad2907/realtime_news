@@ -71,7 +71,7 @@ export function LoginPage() {
         <div className="bg-card border border-border rounded-xl p-6 md:p-8 shadow-sm">
           <div className="text-center mb-6">
             <div className="font-display text-2xl font-extrabold mb-1">
-              The<span className="text-brand">National</span>Dispatch
+              News<span className="text-brand">varta</span>
             </div>
             <h1 className="font-display text-xl font-bold mt-4">Sign in to the newsroom</h1>
             <p className="font-ui text-sm text-ink-secondary mt-1">

@@ -26,9 +26,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "The National Dispatch — Trusted Journalism, Every Hour",
+  title: "Newsvarta — Trusted Journalism, Every Hour",
   description:
-    "The National Dispatch delivers authoritative coverage of national and international news, politics, economy, sports, technology, and culture — curated by senior editors for the engaged reader.",
+    "Newsvarta delivers authoritative coverage of national and international news, politics, economy, sports, technology, and culture — curated by senior editors for the engaged reader.",
   keywords: [
     "news",
     "national news",
@@ -40,16 +40,16 @@ export const metadata: Metadata = {
     "podcasts",
     "live news",
   ],
-  authors: [{ name: "The National Dispatch Editorial Team" }],
+  authors: [{ name: "Newsvarta Editorial Team" }],
   openGraph: {
-    title: "The National Dispatch",
+    title: "Newsvarta",
     description: "Trusted journalism, every hour.",
-    siteName: "The National Dispatch",
+    siteName: "Newsvarta",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "The National Dispatch",
+    title: "Newsvarta",
     description: "Trusted journalism, every hour.",
   },
 };

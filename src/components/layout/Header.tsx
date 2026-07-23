@@ -84,7 +84,7 @@ export function Header() {
               aria-label="Go to homepage"
             >
               <span className="font-display text-[15px] min-[375px]:text-[17px] sm:text-xl md:text-2xl font-extrabold tracking-tight">
-                The<span className="text-brand">National</span>Dispatch
+                News<span className="text-brand">varta</span>
               </span>
             </button>
           </div>

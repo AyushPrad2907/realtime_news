@@ -60,7 +60,7 @@ export function MobileMenu() {
             {/* Header */}
             <div className="flex items-center justify-between px-5 h-14 border-b border-border">
               <span className="font-display text-lg font-extrabold">
-                The<span className="text-brand">National</span>Dispatch
+                News<span className="text-brand">varta</span>
               </span>
               <button
                 onClick={() => setMobileMenuOpen(false)}

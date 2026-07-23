@@ -33,7 +33,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pb-10 border-b border-white/10">
           <div className="md:col-span-1">
             <div className="font-display text-2xl font-extrabold">
-              The<span className="text-brand-light">National</span>Dispatch
+              News<span className="text-brand-light">varta</span>
             </div>
             <p className="mt-3 font-ui text-sm text-white/70 leading-relaxed max-w-xs">
               Trusted journalism, every hour. Independent reporting on the stories that shape the nation — and the world beyond it.
@@ -184,7 +184,7 @@ export function Footer() {
         {/* Bottom row */}
         <div className="pt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <p className="font-ui text-xs text-white/60">
-            © {new Date().getFullYear()} The National Dispatch. All rights reserved.
+            © {new Date().getFullYear()} Newsvarta. All rights reserved.
           </p>
           <p className="font-ui text-xs text-white/60">
             A demo news portal interface — built for illustrative purposes.

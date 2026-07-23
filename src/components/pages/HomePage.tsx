@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { ARTICLES_LIST } from "@/lib/mock-data";
 import { useArticles, usePodcasts } from "@/lib/use-data";
 import { HeroStory } from "@/components/sections/HeroStory";
@@ -14,6 +15,37 @@ import { EditorsPicks } from "@/components/sections/EditorsPicks";
 import { Newsletter } from "@/components/sections/Newsletter";
 import { AdBanner } from "@/components/sections/AdBanner";
 import type { Article, CategorySlug, PodcastEpisode } from "@/lib/types";
+
+function LazySection({ children }: { children: React.ReactNode }) {
+  const [shouldRender, setShouldRender] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldRender(true);
+          observer.disconnect();
+        }
+      },
+      {
+        rootMargin: "300px 0px", // Load 300px before scrolling into view for a smooth transition
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="min-h-[100px]">
+      {shouldRender ? children : <div className="h-24 animate-pulse bg-muted/20 rounded-lg" />}
+    </div>
+  );
+}
 
 export function HomePage() {
   // Fetch from real API; mock data is returned instantly as fallback
@@ -57,60 +89,86 @@ export function HomePage() {
 
       <TopStories articles={topStories} />
 
-      <div className="mb-12 md:mb-16">
-        <AdBanner format="leaderboard" />
-      </div>
-
-      <div className="grid lg:grid-cols-[1fr_300px] gap-8 lg:gap-12 mb-12 md:mb-16">
-        <div>
-          <LatestNews articles={list} />
+      <LazySection>
+        <div className="mb-12 md:mb-16">
+          <AdBanner format="leaderboard" />
         </div>
-        <aside className="hidden lg:block">
-          <div className="sticky top-32 space-y-6">
-            <AdBanner format="rectangle" />
-            <div>
-              <h3 className="font-display text-base font-bold mb-3 border-b border-border pb-2">
-                Most Read
-              </h3>
-              <ol className="space-y-3">
-                {[...list]
-                  .sort((a, b) => b.views - a.views)
-                  .slice(0, 5)
-                  .map((a, i) => (
-                    <li key={a.id} className="flex gap-3">
-                      <span className="font-display text-2xl font-extrabold text-ink-tertiary/40 tabular-nums leading-none">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <p className="font-ui text-sm leading-snug line-clamp-2 flex-1">
-                        {a.title}
-                      </p>
-                    </li>
-                  ))}
-              </ol>
-            </div>
-            <AdBanner format="rectangle" />
+      </LazySection>
+
+      <LazySection>
+        <div className="grid lg:grid-cols-[1fr_300px] gap-8 lg:gap-12 mb-12 md:mb-16">
+          <div>
+            <LatestNews articles={list} />
           </div>
-        </aside>
-      </div>
+          <aside className="hidden lg:block">
+            <div className="sticky top-32 space-y-6">
+              <AdBanner format="rectangle" />
+              <div>
+                <h3 className="font-display text-base font-bold mb-3 border-b border-border pb-2">
+                  Most Read
+                </h3>
+                <ol className="space-y-3">
+                  {[...list]
+                    .sort((a, b) => b.views - a.views)
+                    .slice(0, 5)
+                    .map((a, i) => (
+                      <li key={a.id} className="flex gap-3">
+                        <span className="font-display text-2xl font-extrabold text-ink-tertiary/40 tabular-nums leading-none">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <p className="font-ui text-sm leading-snug line-clamp-2 flex-1">
+                          {a.title}
+                        </p>
+                      </li>
+                    ))}
+                </ol>
+              </div>
+              <AdBanner format="rectangle" />
+            </div>
+          </aside>
+        </div>
+      </LazySection>
 
-      <LiveSection />
+      <LazySection>
+        <LiveSection />
+      </LazySection>
 
-      <EditorsPicks articles={editorsPicks} />
+      <LazySection>
+        <EditorsPicks articles={editorsPicks} />
+      </LazySection>
 
-      <CategoryRibbon category="politics" articles={byCategory("politics")} />
-      <CategoryRibbon category="economy" articles={byCategory("economy")} />
-      <CategoryRibbon category="sports" articles={byCategory("sports")} />
+      <LazySection>
+        <CategoryRibbon category="politics" articles={byCategory("politics")} />
+      </LazySection>
+      <LazySection>
+        <CategoryRibbon category="economy" articles={byCategory("economy")} />
+      </LazySection>
+      <LazySection>
+        <CategoryRibbon category="sports" articles={byCategory("sports")} />
+      </LazySection>
 
-      <PodcastSection episodes={episodes} />
+      <LazySection>
+        <PodcastSection episodes={episodes} />
+      </LazySection>
 
-      <StateNews />
+      <LazySection>
+        <StateNews />
+      </LazySection>
 
-      <CategoryRibbon category="technology" articles={byCategory("technology")} />
-      <CategoryRibbon category="science" articles={byCategory("science")} />
+      <LazySection>
+        <CategoryRibbon category="technology" articles={byCategory("technology")} />
+      </LazySection>
+      <LazySection>
+        <CategoryRibbon category="science" articles={byCategory("science")} />
+      </LazySection>
 
-      <TrendingNow articles={list} />
+      <LazySection>
+        <TrendingNow articles={list} />
+      </LazySection>
 
-      <Newsletter />
+      <LazySection>
+        <Newsletter />
+      </LazySection>
     </div>
   );
 }
