@@ -111,4 +111,4 @@ export type PageView =
   // Auth + panels
   | { type: "login" }
   | { type: "editor"; view?: "dashboard" | "new-article" | "edit-article"; articleId?: string }
-  | { type: "admin"; view?: "dashboard" | "articles" | "editors" | "ads" | "live" | "careers" | "layout" | "analytics" };
+  | { type: "admin"; view?: "dashboard" | "articles" | "editors" | "ads" | "live" | "careers" | "layout" | "analytics" | "messages" | "breaking" | "live-updates" | "subscribers" };

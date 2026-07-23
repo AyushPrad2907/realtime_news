@@ -2,16 +2,26 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { subscribeNewsletter } from "@/lib/api-client";
+import { Loader2 } from "lucide-react";
 
 export function Newsletter() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes("@")) return;
-    setSubmitted(true);
-    toast.success("You're in! Check your inbox.");
+    setSubmitting(true);
+    const ok = await subscribeNewsletter(email);
+    setSubmitting(false);
+    if (ok) {
+      setSubmitted(true);
+      toast.success("You're in! Check your inbox.");
+    } else {
+      toast.error("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -51,9 +61,17 @@ export function Newsletter() {
             />
             <button
               type="submit"
-              className="h-12 px-6 rounded-md bg-brand hover:bg-brand-light text-white font-ui text-sm font-semibold transition-colors"
+              disabled={submitting}
+              className="h-12 px-6 rounded-md bg-brand hover:bg-brand-light text-white font-ui text-sm font-semibold transition-colors disabled:opacity-60 inline-flex items-center justify-center gap-2"
             >
-              Subscribe
+              {submitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Subscribing…
+                </>
+              ) : (
+                "Subscribe"
+              )}
             </button>
           </form>
         )}

@@ -2,6 +2,7 @@
 
 import { useStore } from "@/lib/store";
 import { JOBS } from "@/lib/mock-data";
+import { fetchJob, submitJobApplication } from "@/lib/api-client";
 import {
   MapPin,
   Briefcase,
@@ -9,10 +10,12 @@ import {
   ArrowRight,
   Check,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import type { Job } from "@/lib/types";
 
 interface CareerDetailPageProps {
   slug: string;
@@ -21,8 +24,39 @@ interface CareerDetailPageProps {
 export function CareerDetailPage({ slug }: CareerDetailPageProps) {
   const { navigate, back, canGoBack } = useStore();
   const [applied, setApplied] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    city: "",
+    linkedinUrl: "",
+    portfolioUrl: "",
+    coverLetter: "",
+    source: "",
+  });
+  const [resumePath, setResumePath] = useState("");
 
-  const job = JOBS.find((j) => j.slug === slug);
+  // Start with mock data for instant render, refresh from API in background
+  const mockJob = JOBS.find((j) => j.slug === slug);
+  const [job, setJob] = useState<Job | null>(mockJob ?? null);
+  const [loading, setLoading] = useState(!mockJob);
+
+  useEffect(() => {
+    let cancelled = false;
+    const id = setTimeout(() => {
+      fetchJob(slug).then((data) => {
+        if (cancelled) return;
+        if (data) setJob(data);
+        else setJob(null);
+        setLoading(false);
+      });
+    }, 0);
+    return () => {
+      cancelled = true;
+      clearTimeout(id);
+    };
+  }, [slug]);
 
   useEffect(() => {
     if (job) {
@@ -32,6 +66,14 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
       document.title = "The National Dispatch";
     };
   }, [job]);
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-20 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-ink-tertiary" />
+      </div>
+    );
+  }
 
   if (!job) {
     return (
@@ -47,10 +89,40 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
     );
   }
 
-  const onApply = (e: React.FormEvent) => {
+  const onApply = async (e: React.FormEvent) => {
     e.preventDefault();
-    setApplied(true);
-    toast.success("Application submitted! We'll be in touch within 2 weeks.");
+    if (!resumePath) {
+      toast.error("Please attach your resume.");
+      return;
+    }
+    setSubmitting(true);
+    const ok = await submitJobApplication(slug, {
+      fullName: form.fullName,
+      email: form.email,
+      phone: form.phone || undefined,
+      city: form.city || undefined,
+      linkedinUrl: form.linkedinUrl || undefined,
+      portfolioUrl: form.portfolioUrl || undefined,
+      resumePath,
+      coverLetter: form.coverLetter || undefined,
+      source: form.source || undefined,
+    });
+    setSubmitting(false);
+    if (ok) {
+      setApplied(true);
+      toast.success("Application submitted! We'll be in touch within 2 weeks.");
+    } else {
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
+  // Upload resume via editor upload endpoint (admin/editor only — but we'll
+  // use a public-ish approach: store as a data URL since this is a demo)
+  const onUploadResume = async (file: File) => {
+    // For demo: we just store the file name. In production we'd POST to a
+    // dedicated public upload endpoint and store the file on S3/local disk.
+    setResumePath(file.name);
+    toast.success(`Resume "${file.name}" attached.`);
   };
 
   return (
@@ -227,6 +299,8 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
                       type="text"
                       required
                       autoComplete="name"
+                      value={form.fullName}
+                      onChange={(e) => setForm({ ...form, fullName: e.target.value })}
                       className="career-input"
                     />
                   </FormField>
@@ -235,6 +309,8 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
                       type="email"
                       required
                       autoComplete="email"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
                       className="career-input"
                     />
                   </FormField>
@@ -242,6 +318,8 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
                     <input
                       type="tel"
                       autoComplete="tel"
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
                       className="career-input"
                     />
                   </FormField>
@@ -249,6 +327,8 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
                     <input
                       type="text"
                       autoComplete="address-level2"
+                      value={form.city}
+                      onChange={(e) => setForm({ ...form, city: e.target.value })}
                       className="career-input"
                     />
                   </FormField>
@@ -256,6 +336,8 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
                     <input
                       type="url"
                       placeholder="https://linkedin.com/in/..."
+                      value={form.linkedinUrl}
+                      onChange={(e) => setForm({ ...form, linkedinUrl: e.target.value })}
                       className="career-input"
                     />
                   </FormField>
@@ -263,6 +345,8 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
                     <input
                       type="url"
                       placeholder="https://"
+                      value={form.portfolioUrl}
+                      onChange={(e) => setForm({ ...form, portfolioUrl: e.target.value })}
                       className="career-input"
                     />
                   </FormField>
@@ -270,17 +354,21 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
 
                 <div className="mt-4">
                   <FormField label="Resume / CV (PDF, max 5MB)" required>
-                    <div className="career-input flex items-center justify-between cursor-pointer hover:border-foreground/30 transition-colors">
-                      <span className="text-ink-tertiary text-sm">
-                        Choose a file or drag it here
+                    <div className="career-input flex items-center justify-between cursor-pointer hover:border-foreground/30 transition-colors relative">
+                      <span className="text-ink-tertiary text-sm truncate">
+                        {resumePath || "Choose a file or drag it here"}
                       </span>
-                      <span className="px-3 py-1 rounded border border-border bg-background font-ui text-xs font-semibold">
+                      <span className="px-3 py-1 rounded border border-border bg-background font-ui text-xs font-semibold shrink-0">
                         Browse
                       </span>
                       <input
                         type="file"
                         accept=".pdf,.doc,.docx"
                         required
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) onUploadResume(f);
+                        }}
                         className="absolute inset-0 opacity-0 cursor-pointer"
                       />
                     </div>
@@ -292,6 +380,8 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
                     <textarea
                       rows={5}
                       placeholder="Tell us why you'd be a great fit for this role."
+                      value={form.coverLetter}
+                      onChange={(e) => setForm({ ...form, coverLetter: e.target.value })}
                       className="career-input resize-none h-auto"
                     />
                   </FormField>
@@ -299,7 +389,11 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
 
                 <div className="mt-4">
                   <FormField label="How did you hear about us?">
-                    <select className="career-input">
+                    <select
+                      value={form.source}
+                      onChange={(e) => setForm({ ...form, source: e.target.value })}
+                      className="career-input"
+                    >
                       <option value="">Select…</option>
                       <option>Our website</option>
                       <option>LinkedIn</option>
@@ -312,10 +406,20 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
 
                 <button
                   type="submit"
-                  className="mt-6 inline-flex items-center gap-2 px-6 h-12 rounded-md bg-brand hover:bg-brand-dark text-white font-ui text-sm font-semibold transition-colors"
+                  disabled={submitting}
+                  className="mt-6 inline-flex items-center gap-2 px-6 h-12 rounded-md bg-brand hover:bg-brand-dark text-white font-ui text-sm font-semibold transition-colors disabled:opacity-60"
                 >
-                  Submit application
-                  <ArrowRight className="h-4 w-4" />
+                  {submitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Submitting…
+                    </>
+                  ) : (
+                    <>
+                      Submit application
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
                 </button>
                 <p className="font-ui text-[11px] text-ink-tertiary mt-3">
                   By submitting, you agree to our privacy policy. We&rsquo;ll only

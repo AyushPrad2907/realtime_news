@@ -14,6 +14,14 @@ import {
   Shield,
   Menu,
   X,
+  Megaphone,
+  Radio,
+  Briefcase,
+  Mail,
+  AlertCircle,
+  Users,
+  TrendingUp,
+  Layout as LayoutIcon,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -230,9 +238,13 @@ export const ADMIN_NAV = [
   { id: "dashboard", label: "Dashboard", Icon: LayoutDashboard },
   { id: "articles", label: "Articles", Icon: ListChecks },
   { id: "editors", label: "Editors", Icon: PenLine },
-  { id: "ads", label: "Advertisements", Icon: LayoutDashboard },
-  { id: "live", label: "Live", Icon: LayoutDashboard },
-  { id: "careers", label: "Careers", Icon: LayoutDashboard },
-  { id: "layout", label: "Homepage Layout", Icon: LayoutDashboard },
-  { id: "analytics", label: "Analytics", Icon: LayoutDashboard },
+  { id: "ads", label: "Advertisements", Icon: Megaphone },
+  { id: "live", label: "Live", Icon: Radio },
+  { id: "live-updates", label: "Live Updates", Icon: AlertCircle },
+  { id: "breaking", label: "Breaking News", Icon: AlertCircle },
+  { id: "careers", label: "Careers", Icon: Briefcase },
+  { id: "layout", label: "Homepage Layout", Icon: LayoutIcon },
+  { id: "messages", label: "Messages", Icon: Mail },
+  { id: "subscribers", label: "Subscribers", Icon: Users },
+  { id: "analytics", label: "Analytics", Icon: TrendingUp },
 ];

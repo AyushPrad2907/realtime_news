@@ -1,17 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, Check } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { submitContact } from "@/lib/api-client";
 
 export function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    toast.success("Message sent! We'll respond within 2 business days.");
+    setSubmitting(true);
+    const ok = await submitContact(form);
+    setSubmitting(false);
+    if (ok) {
+      setSubmitted(true);
+      toast.success("Message sent! We'll respond within 2 business days.");
+    } else {
+      toast.error("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -128,16 +143,35 @@ export function ContactPage() {
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <ContactField label="Full name" required>
-                  <input type="text" required autoComplete="name" className="contact-input" />
+                  <input
+                    type="text"
+                    required
+                    autoComplete="name"
+                    value={form.fullName}
+                    onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                    className="contact-input"
+                  />
                 </ContactField>
                 <ContactField label="Email address" required>
-                  <input type="email" required autoComplete="email" className="contact-input" />
+                  <input
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="contact-input"
+                  />
                 </ContactField>
               </div>
 
               <div className="mt-4">
                 <ContactField label="Subject" required>
-                  <select required className="contact-input">
+                  <select
+                    required
+                    value={form.subject}
+                    onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                    className="contact-input"
+                  >
                     <option value="">Select a subject…</option>
                     <option>Story tip</option>
                     <option>Correction</option>
@@ -155,6 +189,8 @@ export function ContactPage() {
                     required
                     rows={6}
                     placeholder="Tell us what's on your mind."
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
                     className="contact-input resize-none h-auto"
                   />
                 </ContactField>
@@ -162,10 +198,15 @@ export function ContactPage() {
 
               <button
                 type="submit"
-                className="mt-6 inline-flex items-center gap-2 px-6 h-12 rounded-md bg-brand hover:bg-brand-dark text-white font-ui text-sm font-semibold transition-colors"
+                disabled={submitting}
+                className="mt-6 inline-flex items-center gap-2 px-6 h-12 rounded-md bg-brand hover:bg-brand-dark text-white font-ui text-sm font-semibold transition-colors disabled:opacity-60"
               >
-                <Send className="h-4 w-4" />
-                Send message
+                {submitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+                {submitting ? "Sending…" : "Send message"}
               </button>
               <p className="font-ui text-[11px] text-ink-tertiary mt-3">
                 By submitting, you agree to our privacy policy. We&rsquo;ll only

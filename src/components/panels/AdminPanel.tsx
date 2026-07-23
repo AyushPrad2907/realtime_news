@@ -21,6 +21,24 @@ import {
   adminUpdateCareer,
   adminDeleteCareer,
   adminFetchAnalytics,
+  adminFetchMessages,
+  adminUpdateMessageStatus,
+  adminDeleteMessage,
+  adminFetchInquiries,
+  adminUpdateInquiryStatus,
+  adminDeleteInquiry,
+  adminFetchApplications,
+  adminDeleteApplication,
+  adminFetchSubscribers,
+  adminDeleteSubscriber,
+  adminFetchBreaking,
+  adminCreateBreaking,
+  adminUpdateBreaking,
+  adminDeleteBreaking,
+  adminFetchLiveUpdates,
+  adminCreateLiveUpdate,
+  adminUpdateLiveUpdate,
+  adminDeleteLiveUpdate,
 } from "@/lib/api-client";
 import { PanelShell, ADMIN_NAV } from "./PanelShell";
 import { CATEGORIES } from "@/lib/mock-data";
@@ -42,6 +60,9 @@ import {
   TrendingUp,
   AlertCircle,
   X,
+  Mail,
+  Inbox,
+  Send,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -53,9 +74,13 @@ type AdminView =
   | "editors"
   | "ads"
   | "live"
+  | "live-updates"
+  | "breaking"
   | "careers"
   | "layout"
-  | "analytics";
+  | "analytics"
+  | "messages"
+  | "subscribers";
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
   DRAFT: { label: "Draft", color: "text-ink-tertiary bg-muted" },
@@ -86,8 +111,12 @@ export function AdminPanel({ view }: { view?: AdminView }) {
       {activeView === "editors" && <AdminEditors />}
       {activeView === "ads" && <AdminAds />}
       {activeView === "live" && <AdminLive />}
+      {activeView === "live-updates" && <AdminLiveUpdates />}
+      {activeView === "breaking" && <AdminBreaking />}
       {activeView === "careers" && <AdminCareers />}
       {activeView === "layout" && <AdminLayout />}
+      {activeView === "messages" && <AdminMessages />}
+      {activeView === "subscribers" && <AdminSubscribers />}
       {activeView === "analytics" && <AdminAnalytics />}
     </PanelShell>
   );
@@ -177,11 +206,25 @@ function AdminDashboard() {
               <Megaphone className="h-4 w-4 text-ink-tertiary" />
             </button>
             <button
+              onClick={() => navigate({ type: "admin", view: "messages" })}
+              className="w-full flex items-center justify-between p-3 rounded-md hover:bg-muted transition-colors text-left"
+            >
+              <span className="font-ui text-sm">View inbox (messages, inquiries, applications)</span>
+              <Mail className="h-4 w-4 text-ink-tertiary" />
+            </button>
+            <button
               onClick={() => navigate({ type: "admin", view: "live" })}
               className="w-full flex items-center justify-between p-3 rounded-md hover:bg-muted transition-colors text-left"
             >
               <span className="font-ui text-sm">Manage live broadcast</span>
               <Radio className="h-4 w-4 text-ink-tertiary" />
+            </button>
+            <button
+              onClick={() => navigate({ type: "admin", view: "breaking" })}
+              className="w-full flex items-center justify-between p-3 rounded-md hover:bg-muted transition-colors text-left"
+            >
+              <span className="font-ui text-sm">Edit breaking news ticker</span>
+              <AlertCircle className="h-4 w-4 text-ink-tertiary" />
             </button>
             <button
               onClick={() => navigate({ type: "admin", view: "analytics" })}
@@ -1550,6 +1593,628 @@ function AdminAnalytics() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── Messages inbox (Contact + Advertise + Applications, in tabs) ──────────
+
+function AdminMessages() {
+  const [tab, setTab] = useState<"contact" | "advertise" | "applications">("contact");
+  return (
+    <div className="max-w-5xl mx-auto space-y-4">
+      <div>
+        <h2 className="font-display text-xl font-bold">Inbox</h2>
+        <p className="font-ui text-xs text-ink-tertiary mt-0.5">
+          Contact messages, advertising inquiries, and job applications.
+        </p>
+      </div>
+      <div className="flex items-center gap-1 p-0.5 rounded-md bg-muted w-fit">
+        {([
+          { key: "contact", label: "Contact" },
+          { key: "advertise", label: "Advertise" },
+          { key: "applications", label: "Applications" },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`px-3 py-1.5 rounded font-ui text-xs font-medium transition-colors ${
+              tab === t.key
+                ? "bg-background text-foreground shadow-sm"
+                : "text-ink-secondary hover:text-foreground"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      {tab === "contact" && <ContactMessagesTab />}
+      {tab === "advertise" && <AdvertiseInquiriesTab />}
+      {tab === "applications" && <ApplicationsTab />}
+    </div>
+  );
+}
+
+function ContactMessagesTab() {
+  const [messages, setMessages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<string>("NEW");
+
+  const load = async () => {
+    setLoading(true);
+    const data = await adminFetchMessages(filter === "ALL" ? undefined : filter);
+    setMessages(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const id = setTimeout(() => load(), 0);
+    return () => clearTimeout(id);
+  }, [filter]);
+
+  const onAction = async (id: string, status: string) => {
+    await adminUpdateMessageStatus(id, status);
+    load();
+  };
+  const onDelete = async (id: string) => {
+    if (!confirm("Delete this message?")) return;
+    await adminDeleteMessage(id);
+    toast.success("Deleted.");
+    load();
+  };
+
+  if (loading) return <LoaderSpinner />;
+
+  return (
+    <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="flex items-center gap-1 p-2 border-b border-border">
+        {["NEW", "READ", "REPLIED", "ARCHIVED", "ALL"].map((s) => (
+          <button
+            key={s}
+            onClick={() => setFilter(s)}
+            className={`px-2.5 py-1 rounded text-[11px] font-medium ${
+              filter === s ? "bg-foreground text-background" : "text-ink-secondary hover:bg-muted"
+            }`}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+      {messages.length === 0 ? (
+        <EmptyState Icon={Mail} label="No messages" />
+      ) : (
+        messages.map((m, i) => (
+          <div key={m.id} className={`p-4 ${i > 0 ? "border-t border-border" : ""}`}>
+            <div className="flex items-start gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <p className="font-ui text-sm font-semibold">{m.fullName}</p>
+                  <span className="font-ui text-[10px] text-ink-tertiary">{m.email}</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-muted text-ink-secondary">
+                    {m.subject}
+                  </span>
+                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${
+                    m.status === "NEW" ? "bg-brand/15 text-brand"
+                    : m.status === "REPLIED" ? "bg-success/10 text-success"
+                    : "bg-muted text-ink-tertiary"
+                  }`}>{m.status}</span>
+                </div>
+                <p className="font-serif text-sm text-ink leading-relaxed">{m.message}</p>
+                <p className="font-ui text-[10px] text-ink-tertiary mt-2">
+                  {new Date(m.createdAt).toLocaleString()}
+                </p>
+              </div>
+              <div className="flex flex-col gap-1 shrink-0">
+                {m.status === "NEW" && (
+                  <button
+                    onClick={() => onAction(m.id, "READ")}
+                    className="px-2 py-1 rounded text-[11px] hover:bg-muted"
+                    title="Mark as read"
+                  >Read</button>
+                )}
+                {m.status !== "REPLIED" && (
+                  <button
+                    onClick={() => onAction(m.id, "REPLIED")}
+                    className="px-2 py-1 rounded text-[11px] hover:bg-muted text-success"
+                    title="Mark as replied"
+                  >Replied</button>
+                )}
+                <a
+                  href={`mailto:${m.email}?subject=Re: ${encodeURIComponent(m.subject)}`}
+                  className="px-2 py-1 rounded text-[11px] hover:bg-muted inline-flex items-center gap-1"
+                  title="Reply via email"
+                >
+                  <Send className="h-3 w-3" /> Reply
+                </a>
+                <button
+                  onClick={() => onDelete(m.id)}
+                  className="px-2 py-1 rounded text-[11px] hover:bg-destructive/10 text-destructive"
+                >Delete</button>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+function AdvertiseInquiriesTab() {
+  const [inquiries, setInquiries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    setLoading(true);
+    const data = await adminFetchInquiries();
+    setInquiries(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const id = setTimeout(() => load(), 0);
+    return () => clearTimeout(id);
+  }, []);
+
+  const onUpdate = async (id: string, status: string) => {
+    await adminUpdateInquiryStatus(id, status);
+    load();
+  };
+  const onDelete = async (id: string) => {
+    if (!confirm("Delete this inquiry?")) return;
+    await adminDeleteInquiry(id);
+    toast.success("Deleted.");
+    load();
+  };
+
+  if (loading) return <LoaderSpinner />;
+
+  return (
+    <div className="bg-card border border-border rounded-lg overflow-hidden">
+      {inquiries.length === 0 ? (
+        <EmptyState Icon={Megaphone} label="No advertising inquiries" />
+      ) : (
+        inquiries.map((inq, i) => (
+          <div key={inq.id} className={`p-4 ${i > 0 ? "border-t border-border" : ""}`}>
+            <div className="flex items-start gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <p className="font-ui text-sm font-semibold">{inq.fullName}</p>
+                  <span className="font-ui text-[10px] text-ink-tertiary">{inq.email}</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-brand/10 text-brand">
+                    {inq.company}
+                  </span>
+                  {inq.budget && (
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-muted text-ink-secondary">
+                      {inq.budget}
+                    </span>
+                  )}
+                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${
+                    inq.status === "NEW" ? "bg-brand/15 text-brand"
+                    : inq.status === "WON" ? "bg-success/10 text-success"
+                    : inq.status === "LOST" ? "bg-destructive/10 text-destructive"
+                    : "bg-muted text-ink-tertiary"
+                  }`}>{inq.status}</span>
+                </div>
+                {inq.formats && inq.formats.length > 0 && (
+                  <p className="font-ui text-[11px] text-ink-secondary mb-1">
+                    <span className="text-ink-tertiary">Formats:</span> {inq.formats.join(", ")}
+                  </p>
+                )}
+                {inq.message && (
+                  <p className="font-serif text-sm text-ink leading-relaxed">{inq.message}</p>
+                )}
+                <p className="font-ui text-[10px] text-ink-tertiary mt-2">
+                  {new Date(inq.createdAt).toLocaleString()}
+                  {inq.phone && ` · ${inq.phone}`}
+                  {inq.websiteUrl && ` · ${inq.websiteUrl}`}
+                </p>
+              </div>
+              <div className="flex flex-col gap-1 shrink-0">
+                <select
+                  value={inq.status}
+                  onChange={(e) => onUpdate(inq.id, e.target.value)}
+                  className="px-2 py-1 rounded text-[11px] border border-border bg-background"
+                >
+                  <option value="NEW">New</option>
+                  <option value="CONTACTED">Contacted</option>
+                  <option value="WON">Won</option>
+                  <option value="LOST">Lost</option>
+                </select>
+                <a
+                  href={`mailto:${inq.email}`}
+                  className="px-2 py-1 rounded text-[11px] hover:bg-muted inline-flex items-center gap-1"
+                >
+                  <Send className="h-3 w-3" /> Reply
+                </a>
+                <button
+                  onClick={() => onDelete(inq.id)}
+                  className="px-2 py-1 rounded text-[11px] hover:bg-destructive/10 text-destructive"
+                >Delete</button>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+function ApplicationsTab() {
+  const [apps, setApps] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    setLoading(true);
+    const data = await adminFetchApplications();
+    setApps(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const id = setTimeout(() => load(), 0);
+    return () => clearTimeout(id);
+  }, []);
+
+  const onDelete = async (id: string) => {
+    if (!confirm("Delete this application?")) return;
+    await adminDeleteApplication(id);
+    toast.success("Deleted.");
+    load();
+  };
+
+  if (loading) return <LoaderSpinner />;
+
+  return (
+    <div className="bg-card border border-border rounded-lg overflow-hidden">
+      {apps.length === 0 ? (
+        <EmptyState Icon={Briefcase} label="No job applications" />
+      ) : (
+        apps.map((a, i) => (
+          <div key={a.id} className={`p-4 ${i > 0 ? "border-t border-border" : ""}`}>
+            <div className="flex items-start gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <p className="font-ui text-sm font-semibold">{a.fullName}</p>
+                  <span className="font-ui text-[10px] text-ink-tertiary">{a.email}</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-muted text-ink-secondary">
+                    {a.job?.title ?? "Unknown position"}
+                  </span>
+                </div>
+                {a.phone && <p className="font-ui text-[11px] text-ink-secondary">📞 {a.phone}</p>}
+                {a.city && <p className="font-ui text-[11px] text-ink-secondary">📍 {a.city}</p>}
+                {a.linkedinUrl && (
+                  <p className="font-ui text-[11px] text-ink-secondary">
+                    <a href={a.linkedinUrl} target="_blank" rel="noreferrer" className="text-brand hover:underline">LinkedIn ↗</a>
+                  </p>
+                )}
+                {a.portfolioUrl && (
+                  <p className="font-ui text-[11px] text-ink-secondary">
+                    <a href={a.portfolioUrl} target="_blank" rel="noreferrer" className="text-brand hover:underline">Portfolio ↗</a>
+                  </p>
+                )}
+                {a.coverLetter && (
+                  <p className="font-serif text-sm text-ink leading-relaxed mt-1">{a.coverLetter}</p>
+                )}
+                <p className="font-ui text-[10px] text-ink-tertiary mt-2">
+                  Applied {new Date(a.createdAt).toLocaleString()}
+                  {a.source && ` · via ${a.source}`}
+                  {a.resumePath && ` · resume: ${a.resumePath}`}
+                </p>
+              </div>
+              <div className="flex flex-col gap-1 shrink-0">
+                <a
+                  href={`mailto:${a.email}`}
+                  className="px-2 py-1 rounded text-[11px] hover:bg-muted inline-flex items-center gap-1"
+                >
+                  <Send className="h-3 w-3" /> Reply
+                </a>
+                <button
+                  onClick={() => onDelete(a.id)}
+                  className="px-2 py-1 rounded text-[11px] hover:bg-destructive/10 text-destructive"
+                >Delete</button>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+// ─── Breaking news editor ─────────────────────────────────────────────────
+
+function AdminBreaking() {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newText, setNewText] = useState("");
+
+  const load = async () => {
+    setLoading(true);
+    const data = await adminFetchBreaking();
+    setItems(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const id = setTimeout(() => load(), 0);
+    return () => clearTimeout(id);
+  }, []);
+
+  const onAdd = async () => {
+    if (!newText.trim()) return;
+    await adminCreateBreaking(newText.trim());
+    setNewText("");
+    toast.success("Headline added.");
+    load();
+  };
+
+  const onToggle = async (id: string, isActive: boolean) => {
+    await adminUpdateBreaking(id, { isActive: !isActive });
+    load();
+  };
+
+  const onDelete = async (id: string) => {
+    if (!confirm("Delete this headline?")) return;
+    await adminDeleteBreaking(id);
+    toast.success("Deleted.");
+    load();
+  };
+
+  return (
+    <div className="max-w-3xl mx-auto space-y-4">
+      <div>
+        <h2 className="font-display text-xl font-bold">Breaking news ticker</h2>
+        <p className="font-ui text-xs text-ink-tertiary mt-0.5">
+          Manage the headlines that scroll across the top of every page.
+        </p>
+      </div>
+
+      <div className="p-4 rounded-lg border border-border bg-card flex gap-2">
+        <input
+          type="text"
+          value={newText}
+          onChange={(e) => setNewText(e.target.value)}
+          placeholder="Add a breaking headline…"
+          className="flex-1 h-10 px-3 rounded-md border border-border bg-background font-ui text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+          onKeyDown={(e) => { if (e.key === "Enter") onAdd(); }}
+        />
+        <button
+          onClick={onAdd}
+          className="inline-flex items-center gap-1.5 px-4 h-10 rounded-md bg-brand hover:bg-brand-dark text-white font-ui text-sm font-semibold"
+        >
+          <Plus className="h-4 w-4" /> Add
+        </button>
+      </div>
+
+      {loading ? (
+        <LoaderSpinner />
+      ) : items.length === 0 ? (
+        <EmptyState Icon={AlertCircle} label="No breaking headlines" />
+      ) : (
+        <div className="bg-card border border-border rounded-lg overflow-hidden">
+          {items.map((b, i) => (
+            <div key={b.id} className={`p-3 flex items-center gap-3 ${i > 0 ? "border-t border-border" : ""}`}>
+              <span className="font-ui text-[11px] text-ink-tertiary tabular-nums w-6">{i + 1}.</span>
+              <p className="font-ui text-sm flex-1">{b.text}</p>
+              <button
+                onClick={() => onToggle(b.id, b.isActive)}
+                className={`px-2 py-1 rounded text-[10px] font-semibold uppercase ${
+                  b.isActive ? "bg-success/10 text-success" : "bg-muted text-ink-tertiary"
+                }`}
+              >
+                {b.isActive ? "Active" : "Hidden"}
+              </button>
+              <button
+                onClick={() => onDelete(b.id)}
+                className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
+                aria-label="Delete"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Live updates timeline editor ─────────────────────────────────────────
+
+function AdminLiveUpdates() {
+  const [updates, setUpdates] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newText, setNewText] = useState("");
+
+  const load = async () => {
+    setLoading(true);
+    const data = await adminFetchLiveUpdates();
+    setUpdates(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const id = setTimeout(() => load(), 0);
+    return () => clearTimeout(id);
+  }, []);
+
+  const onAdd = async () => {
+    if (!newText.trim()) return;
+    await adminCreateLiveUpdate(newText.trim());
+    setNewText("");
+    toast.success("Update added.");
+    load();
+  };
+
+  const onDelete = async (id: string) => {
+    if (!confirm("Delete this update?")) return;
+    await adminDeleteLiveUpdate(id);
+    toast.success("Deleted.");
+    load();
+  };
+
+  return (
+    <div className="max-w-3xl mx-auto space-y-4">
+      <div>
+        <h2 className="font-display text-xl font-bold">Live updates timeline</h2>
+        <p className="font-ui text-xs text-ink-tertiary mt-0.5">
+          Add real-time updates to the live broadcast page. Newest entries appear at the top.
+        </p>
+      </div>
+
+      <div className="p-4 rounded-lg border border-border bg-card flex gap-2">
+        <input
+          type="text"
+          value={newText}
+          onChange={(e) => setNewText(e.target.value)}
+          placeholder="Add a live update…"
+          className="flex-1 h-10 px-3 rounded-md border border-border bg-background font-ui text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+          onKeyDown={(e) => { if (e.key === "Enter") onAdd(); }}
+        />
+        <button
+          onClick={onAdd}
+          className="inline-flex items-center gap-1.5 px-4 h-10 rounded-md bg-brand hover:bg-brand-dark text-white font-ui text-sm font-semibold"
+        >
+          <Plus className="h-4 w-4" /> Post
+        </button>
+      </div>
+
+      {loading ? (
+        <LoaderSpinner />
+      ) : updates.length === 0 ? (
+        <EmptyState Icon={AlertCircle} label="No live updates yet" />
+      ) : (
+        <div className="bg-card border border-border rounded-lg overflow-hidden">
+          {updates.map((u, i) => (
+            <div key={u.id} className={`p-3 flex items-start gap-3 ${i > 0 ? "border-t border-border" : ""}`}>
+              <div className="shrink-0 text-right w-24">
+                <p className="font-ui text-[11px] font-bold text-brand tabular-nums">{u.timestamp}</p>
+                <p className="font-ui text-[10px] text-ink-tertiary">
+                  {new Date(u.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              <p className="font-serif text-sm text-ink flex-1">{u.text}</p>
+              <button
+                onClick={() => onDelete(u.id)}
+                className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
+                aria-label="Delete"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Newsletter subscribers ───────────────────────────────────────────────
+
+function AdminSubscribers() {
+  const [subs, setSubs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    setLoading(true);
+    const data = await adminFetchSubscribers();
+    setSubs(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const id = setTimeout(() => load(), 0);
+    return () => clearTimeout(id);
+  }, []);
+
+  const onDelete = async (id: string) => {
+    if (!confirm("Remove this subscriber?")) return;
+    await adminDeleteSubscriber(id);
+    toast.success("Removed.");
+    load();
+  };
+
+  const onExport = () => {
+    const csv = "email,status,subscribed_at\n" + subs.map((s) => `${s.email},${s.status},${s.createdAt}`).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `subscribers-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-4">
+      <div className="flex items-end justify-between">
+        <div>
+          <h2 className="font-display text-xl font-bold">Newsletter subscribers</h2>
+          <p className="font-ui text-xs text-ink-tertiary mt-0.5">
+            {subs.length} subscriber{subs.length !== 1 ? "s" : ""} total.
+          </p>
+        </div>
+        {subs.length > 0 && (
+          <button
+            onClick={onExport}
+            className="inline-flex items-center gap-1.5 px-3 h-9 rounded-md border border-border hover:bg-muted font-ui text-xs font-semibold"
+          >
+            Export CSV
+          </button>
+        )}
+      </div>
+      {loading ? (
+        <LoaderSpinner />
+      ) : subs.length === 0 ? (
+        <EmptyState Icon={Users} label="No subscribers yet" />
+      ) : (
+        <div className="bg-card border border-border rounded-lg overflow-hidden">
+          <div className="grid grid-cols-[1fr_auto_auto] gap-3 p-3 border-b border-border bg-muted/50 font-ui text-[11px] font-semibold uppercase tracking-wider text-ink-tertiary">
+            <span>Email</span>
+            <span className="w-20">Status</span>
+            <span className="w-24 text-right">Subscribed</span>
+          </div>
+          {subs.map((s, i) => (
+            <div key={s.id} className={`grid grid-cols-[1fr_auto_auto] gap-3 p-3 items-center ${i > 0 ? "border-t border-border" : ""}`}>
+              <span className="font-ui text-sm truncate">{s.email}</span>
+              <span className={`w-20 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase text-center ${
+                s.status === "ACTIVE" ? "bg-success/10 text-success" : "bg-muted text-ink-tertiary"
+              }`}>{s.status}</span>
+              <div className="w-24 flex items-center justify-end gap-1">
+                <span className="font-ui text-[10px] text-ink-tertiary">
+                  {new Date(s.createdAt).toLocaleDateString()}
+                </span>
+                <button
+                  onClick={() => onDelete(s.id)}
+                  className="p-1 rounded hover:bg-destructive/10 text-destructive"
+                  aria-label="Remove"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────
+
+function LoaderSpinner() {
+  return (
+    <div className="py-12 flex items-center justify-center">
+      <Loader2 className="h-6 w-6 animate-spin text-ink-tertiary" />
+    </div>
+  );
+}
+
+function EmptyState({ Icon, label }: { Icon: typeof Mail; label: string }) {
+  return (
+    <div className="py-12 text-center">
+      <Icon className="h-10 w-10 text-ink-tertiary mx-auto mb-3" />
+      <p className="font-display text-lg font-bold">{label}</p>
     </div>
   );
 }

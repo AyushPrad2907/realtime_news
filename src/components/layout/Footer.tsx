@@ -5,17 +5,25 @@ import { CATEGORIES } from "@/lib/mock-data";
 import { Twitter, Facebook, Instagram, Youtube, Send, Rss } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import { subscribeNewsletter } from "@/lib/api-client";
 
 export function Footer() {
   const { navigate } = useStore();
   const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const onSubscribe = (e: React.FormEvent) => {
+  const onSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    toast.success("You're in! Check your inbox.");
-    setEmail("");
+    setSubmitting(true);
+    const ok = await subscribeNewsletter(email);
+    setSubmitting(false);
+    if (ok) {
+      toast.success("You're in! Check your inbox.");
+      setEmail("");
+    } else {
+      toast.error("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -74,9 +82,10 @@ export function Footer() {
               />
               <button
                 type="submit"
-                className="h-11 px-5 rounded-md bg-brand hover:bg-brand-light text-white font-ui text-sm font-semibold transition-colors"
+                disabled={submitting}
+                className="h-11 px-5 rounded-md bg-brand hover:bg-brand-light text-white font-ui text-sm font-semibold transition-colors disabled:opacity-60"
               >
-                Subscribe
+                {submitting ? "…" : "Subscribe"}
               </button>
             </form>
           </div>

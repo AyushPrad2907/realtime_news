@@ -25,19 +25,56 @@ import {
 } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { submitAdvertiseInquiry } from "@/lib/api-client";
+import { Loader2 } from "lucide-react";
 
 const STAT_ICONS = [Users, Eye, TrendingUp, Clock];
 
 export function AdvertisePage() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    company: "",
+    websiteUrl: "",
+    budget: "",
+    startDate: "",
+    message: "",
+  });
+  const [selectedFormats, setSelectedFormats] = useState<string[]>([]);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    toast.success("Inquiry received! We'll be in touch within 1 business day.");
-    setTimeout(() => {
-      document.getElementById("inquiry-form")?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
+    setSubmitting(true);
+    const ok = await submitAdvertiseInquiry({
+      fullName: form.fullName,
+      email: form.email,
+      phone: form.phone || undefined,
+      company: form.company,
+      websiteUrl: form.websiteUrl || undefined,
+      formats: selectedFormats,
+      budget: form.budget || undefined,
+      startDate: form.startDate || undefined,
+      message: form.message || undefined,
+    });
+    setSubmitting(false);
+    if (ok) {
+      setSubmitted(true);
+      toast.success("Inquiry received! We'll be in touch within 1 business day.");
+      setTimeout(() => {
+        document.getElementById("inquiry-form")?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else {
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
+  const toggleFormat = (name: string) => {
+    setSelectedFormats((prev) =>
+      prev.includes(name) ? prev.filter((f) => f !== name) : [...prev, name]
+    );
   };
 
   return (
@@ -279,6 +316,8 @@ export function AdvertisePage() {
                     type="text"
                     required
                     autoComplete="name"
+                    value={form.fullName}
+                    onChange={(e) => setForm({ ...form, fullName: e.target.value })}
                     className="form-input"
                   />
                 </Field>
@@ -287,6 +326,8 @@ export function AdvertisePage() {
                     type="email"
                     required
                     autoComplete="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
                     className="form-input"
                   />
                 </Field>
@@ -294,6 +335,8 @@ export function AdvertisePage() {
                   <input
                     type="tel"
                     autoComplete="tel"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     className="form-input"
                   />
                 </Field>
@@ -302,6 +345,8 @@ export function AdvertisePage() {
                     type="text"
                     required
                     autoComplete="organization"
+                    value={form.company}
+                    onChange={(e) => setForm({ ...form, company: e.target.value })}
                     className="form-input"
                   />
                 </Field>
@@ -309,11 +354,17 @@ export function AdvertisePage() {
                   <input
                     type="url"
                     placeholder="https://"
+                    value={form.websiteUrl}
+                    onChange={(e) => setForm({ ...form, websiteUrl: e.target.value })}
                     className="form-input"
                   />
                 </Field>
                 <Field label="Monthly budget">
-                  <select className="form-input">
+                  <select
+                    value={form.budget}
+                    onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                    className="form-input"
+                  >
                     <option value="">Select range</option>
                     <option>Under ₹1 lakh</option>
                     <option>₹1 – 5 lakh</option>
@@ -334,6 +385,8 @@ export function AdvertisePage() {
                       >
                         <input
                           type="checkbox"
+                          checked={selectedFormats.includes(f.name)}
+                          onChange={() => toggleFormat(f.name)}
                           className="h-3 w-3 accent-brand"
                         />
                         {f.name}
@@ -345,7 +398,12 @@ export function AdvertisePage() {
 
               <div className="mt-4">
                 <Field label="Campaign start date">
-                  <input type="date" className="form-input" />
+                  <input
+                    type="date"
+                    value={form.startDate}
+                    onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+                    className="form-input"
+                  />
                 </Field>
               </div>
 
@@ -354,6 +412,8 @@ export function AdvertisePage() {
                   <textarea
                     rows={4}
                     placeholder="Tell us about your campaign objectives, target audience, and timeline."
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
                     className="form-input resize-none"
                   />
                 </Field>
@@ -361,10 +421,20 @@ export function AdvertisePage() {
 
               <button
                 type="submit"
-                className="mt-6 w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 h-12 rounded-md bg-brand hover:bg-brand-light text-white font-ui text-sm font-semibold transition-colors"
+                disabled={submitting}
+                className="mt-6 w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 h-12 rounded-md bg-brand hover:bg-brand-light text-white font-ui text-sm font-semibold transition-colors disabled:opacity-60"
               >
-                Submit inquiry
-                <ArrowRight className="h-4 w-4" />
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Submitting…
+                  </>
+                ) : (
+                  <>
+                    Submit inquiry
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
               </button>
               <p className="font-ui text-[11px] text-background/50 mt-3">
                 By submitting, you agree to our privacy policy. We&rsquo;ll only

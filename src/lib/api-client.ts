@@ -451,3 +451,137 @@ export async function adminUpdateLayout(data: { featuredId?: string; orderedIds?
   });
   return res.ok;
 }
+
+// ── Admin: Messages, Inquiries, Applications, Subscribers, Breaking, Live Updates ──
+
+export async function adminFetchMessages(status?: string) {
+  const q = new URLSearchParams();
+  if (status) q.set("status", status);
+  const res = await fetch(`/api/admin/messages?${q.toString()}`, { cache: "no-store" });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.messages as Array<any>;
+}
+
+export async function adminUpdateMessageStatus(id: string, status: string) {
+  const res = await fetch(`/api/admin/messages`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, status }),
+  });
+  return res.ok;
+}
+
+export async function adminDeleteMessage(id: string): Promise<boolean> {
+  const res = await fetch(`/api/admin/messages?id=${id}`, { method: "DELETE" });
+  return res.ok;
+}
+
+export async function adminFetchInquiries(status?: string) {
+  const q = new URLSearchParams();
+  if (status) q.set("status", status);
+  const res = await fetch(`/api/admin/inquiries?${q.toString()}`, { cache: "no-store" });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.inquiries as Array<any>;
+}
+
+export async function adminUpdateInquiryStatus(id: string, status: string) {
+  const res = await fetch(`/api/admin/inquiries`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, status }),
+  });
+  return res.ok;
+}
+
+export async function adminDeleteInquiry(id: string): Promise<boolean> {
+  const res = await fetch(`/api/admin/inquiries?id=${id}`, { method: "DELETE" });
+  return res.ok;
+}
+
+export async function adminFetchApplications(jobId?: string) {
+  const q = new URLSearchParams();
+  if (jobId) q.set("jobId", jobId);
+  const res = await fetch(`/api/admin/applications?${q.toString()}`, { cache: "no-store" });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.applications as Array<any>;
+}
+
+export async function adminDeleteApplication(id: string): Promise<boolean> {
+  const res = await fetch(`/api/admin/applications?id=${id}`, { method: "DELETE" });
+  return res.ok;
+}
+
+export async function adminFetchSubscribers() {
+  const res = await fetch(`/api/admin/subscribers`, { cache: "no-store" });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.subscribers as Array<any>;
+}
+
+export async function adminDeleteSubscriber(id: string): Promise<boolean> {
+  const res = await fetch(`/api/admin/subscribers?id=${id}`, { method: "DELETE" });
+  return res.ok;
+}
+
+export async function adminFetchBreaking() {
+  const res = await fetch(`/api/admin/breaking`, { cache: "no-store" });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items as Array<any>;
+}
+
+export async function adminCreateBreaking(text: string, isActive = true) {
+  const res = await fetch(`/api/admin/breaking`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text, isActive }),
+  });
+  return res.ok;
+}
+
+export async function adminUpdateBreaking(id: string, data: { text?: string; isActive?: boolean; order?: number }) {
+  const res = await fetch(`/api/admin/breaking`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, ...data }),
+  });
+  return res.ok;
+}
+
+export async function adminDeleteBreaking(id: string): Promise<boolean> {
+  const res = await fetch(`/api/admin/breaking/${id}`, { method: "DELETE" });
+  return res.ok;
+}
+
+export async function adminFetchLiveUpdates() {
+  const res = await fetch(`/api/admin/live-updates`, { cache: "no-store" });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.updates as Array<any>;
+}
+
+export async function adminCreateLiveUpdate(text: string, timestamp?: string) {
+  const res = await fetch(`/api/admin/live-updates`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text, timestamp }),
+  });
+  return res.ok;
+}
+
+export async function adminUpdateLiveUpdate(id: string, data: { text?: string; timestamp?: string }) {
+  const res = await fetch(`/api/admin/live-updates`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, ...data }),
+  });
+  return res.ok;
+}
+
+export async function adminDeleteLiveUpdate(id: string): Promise<boolean> {
+  const res = await fetch(`/api/admin/live-updates/${id}`, { method: "DELETE" });
+  return res.ok;
+}

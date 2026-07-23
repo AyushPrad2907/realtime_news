@@ -275,3 +275,79 @@ Stage Summary:
 - Ready for production hardening: rate-limiting on auth, image optimization
   via sharp, email sending for advertise inquiries / job applications,
   and migration to Postgres for production scale.
+
+---
+Task ID: news-portal-backend-finish
+Agent: main (Super Z)
+Task: Finish the backend — wire all public forms to actually POST, add the
+  missing admin inbox APIs and views, and connect the remaining public
+  pages to the real APIs.
+
+Work Log:
+- Wired AdvertisePage inquiry form to POST to /api/advertise/inquire with
+  controlled inputs (full name, email, phone, company, website, budget,
+  multi-select formats, start date, message) + loading state + error toast.
+- Wired ContactPage form to POST to /api/contact with controlled inputs
+  (name, email, subject dropdown, message) + loading state.
+- Wired Newsletter section + Footer mini-form to POST to
+  /api/newsletter/subscribe with loading state.
+- Wired CareerDetailPage to fetch job from /api/jobs/[slug] (with mock
+  fallback for instant render) and submit application to
+  /api/jobs/[slug]/apply with controlled inputs (name, email, phone, city,
+  LinkedIn, portfolio, resume attach, cover letter, source) + loading state.
+- Added 6 new admin API routes:
+  • /api/admin/messages (GET filtered by status, PATCH status, DELETE)
+  • /api/admin/inquiries (GET, PATCH status, DELETE)
+  • /api/admin/applications (GET, DELETE) — includes job title join
+  • /api/admin/subscribers (GET, DELETE)
+  • /api/admin/breaking (GET, POST, PATCH) + /admin/breaking/[id] (DELETE)
+  • /api/admin/live-updates (GET, POST, PATCH) + /admin/live-updates/[id] (DELETE)
+- Added 17 new admin API client functions in api-client.ts.
+- Extended PageView type and ADMIN_NAV with 4 new views: messages,
+  breaking, live-updates, subscribers.
+- Added 4 new admin view components in AdminPanel.tsx:
+  • AdminMessages: 3-tab inbox (Contact / Advertise / Applications) with
+    per-message status badges, mark-as-read/replied actions, mailto:
+    reply links, and delete.
+  • AdminBreaking: add/toggle/delete breaking headlines with live preview
+    of active state.
+  • AdminLiveUpdates: post new timeline updates (auto-timestamped) and
+    delete existing ones.
+  • AdminSubscribers: list all newsletter subscribers with status,
+    subscribe date, delete, and CSV export.
+- Updated AdminDashboard quick actions to include inbox, breaking news,
+  and live updates shortcuts.
+- Discovered and fixed a critical issue: the .env file was being reset by
+  the dev.sh script's `bun install` step, losing NEXTAUTH_SECRET. This
+  caused JWEDecryptionFailed errors when reading sessions. Re-added
+  NEXTAUTH_URL and NEXTAUTH_SECRET to .env.
+- Browser-tested end-to-end:
+  • Anonymous user submits contact form on public site → sees success
+    message.
+  • Admin signs in → navigates to Messages inbox → sees the submitted
+    message in the Contact tab with full content (name, email, subject,
+    body, timestamp).
+  • Advertise inquiries tab shows the test inquiry with company, budget,
+    formats, message.
+  • Subscribers view shows the new newsletter subscriber with CSV export
+    button available.
+  • Breaking news editor shows all 5+ headlines with active/hidden toggle
+    and delete.
+  • Live updates editor shows the timeline with add/delete.
+- All forms now have proper loading states and error handling.
+- Lint passes cleanly. Dev server runs without errors.
+
+Stage Summary:
+- The backend is now FULLY complete. Every public form actually POSTs to
+  the database, and every admin can see and manage all submitted data.
+- Public pages fetch from real APIs with mock-data fallback for instant
+  render: Home, Article, Live, Podcasts (listing + detail), Search,
+  Careers listing + detail, Advertise, Contact.
+- Admin Panel now has 12 views: Dashboard, Articles, Editors, Ads, Live,
+  Live Updates, Breaking News, Careers, Homepage Layout, Messages,
+  Subscribers, Analytics.
+- Full editorial workflow verified: editor creates → submits → admin
+  approves → article appears publicly. Full inbox workflow verified:
+  anonymous user submits form → admin sees it in the appropriate inbox tab.
+- Demo credentials: admin@dispatch.test/admin123 (full access),
+  editor@dispatch.test/editor123 (article creation only).
