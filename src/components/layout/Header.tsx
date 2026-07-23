@@ -55,11 +55,11 @@ export function Header() {
       <div className="mx-auto max-w-[1280px] px-4 md:px-8">
         <div className="flex h-14 md:h-16 items-center justify-between gap-4">
           {/* Left: Mobile menu icon (mobile only) */}
-          <div className="flex items-center gap-3 md:gap-6 flex-1 md:flex-none">
+          <div className="flex items-center gap-1.5 sm:gap-3 md:gap-6 flex-1 md:flex-none">
             {/* Mobile: search icon left */}
             <button
               onClick={() => setSearchOpen(true)}
-              className="md:hidden -ml-1 p-2 rounded-md hover:bg-muted transition-colors"
+              className="md:hidden -ml-1 p-1.5 sm:p-2 rounded-md hover:bg-muted transition-colors"
               aria-label="Open search"
             >
               <Search className="h-5 w-5" />
@@ -71,7 +71,7 @@ export function Header() {
                 const today = new Date().toISOString().slice(0, 10);
                 navigate({ type: "date-archive", date: today });
               }}
-              className="md:hidden p-2 rounded-md hover:bg-muted transition-colors"
+              className="md:hidden p-1.5 sm:p-2 rounded-md hover:bg-muted transition-colors"
               aria-label="Browse by date"
             >
               <CalendarIcon className="h-5 w-5" />
@@ -83,7 +83,7 @@ export function Header() {
               className="flex items-center gap-2 group"
               aria-label="Go to homepage"
             >
-              <span className="font-display text-xl md:text-2xl font-extrabold tracking-tight">
+              <span className="font-display text-[15px] min-[375px]:text-[17px] sm:text-xl md:text-2xl font-extrabold tracking-tight">
                 The<span className="text-brand">National</span>Dispatch
               </span>
             </button>
@@ -121,7 +121,7 @@ export function Header() {
           </nav>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-1 md:gap-2 flex-1 md:flex-none justify-end">
+          <div className="flex items-center gap-0.5 sm:gap-1 md:gap-2 flex-1 md:flex-none justify-end">
             {/* Live clock — desktop only, hidden on small screens */}
             <div className="hidden xl:block">
               <LiveClock />
@@ -251,7 +251,7 @@ export function Header() {
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-2 rounded-md hover:bg-muted transition-colors"
+              className="md:hidden p-1.5 sm:p-2 rounded-md hover:bg-muted transition-colors"
               aria-label="Open menu"
             >
               <Menu className="h-5 w-5" />
