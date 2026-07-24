@@ -61,7 +61,7 @@ export function MobileMenu() {
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 h-14 border-b border-border">
-              <span className="font-display text-lg font-extrabold">
+              <span className="font-display text-lg font-extrabold notranslate">
                 News<span className="text-brand">varta</span>
               </span>
               <button

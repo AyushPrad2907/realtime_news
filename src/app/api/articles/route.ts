@@ -380,8 +380,36 @@ export async function GET(req: NextRequest) {
   // Slice to the requested limit
   const result = combined.slice(0, limit);
 
+  // Pre-translate titles and standfirsts to Hindi server-side if lang is "hi"
+  if (lang === "hi") {
+    await Promise.all(
+      result.map(async (article) => {
+        article.title = await translateText(article.title, "hi");
+        article.standfirst = await translateText(article.standfirst, "hi");
+      })
+    );
+  }
+
   return NextResponse.json({
     articles: result,
     count: result.length,
   });
+}
+
+async function translateText(text: string, targetLang: string): Promise<string> {
+  if (!text || targetLang === "en") return text;
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0" }
+    });
+    if (!res.ok) return text;
+    const data = await res.json();
+    if (data && data[0]) {
+      return data[0].map((x: any) => x[0]).join("");
+    }
+  } catch (e) {
+    console.error("Translation helper error:", e);
+  }
+  return text;
 }

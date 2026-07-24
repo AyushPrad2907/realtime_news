@@ -38,7 +38,7 @@ export function Footer() {
         {/* Top: brand + newsletter mini */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pb-10 border-b border-white/10">
           <div className="md:col-span-1">
-            <div className="font-display text-2xl font-extrabold">
+            <div className="font-display text-2xl font-extrabold notranslate">
               News<span className="text-brand-light">varta</span>
             </div>
             <p className="mt-3 font-ui text-sm text-white/70 leading-relaxed max-w-xs">

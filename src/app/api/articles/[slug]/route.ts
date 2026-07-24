@@ -45,6 +45,20 @@ export async function GET(
 ) {
   const { slug } = await params;
 
+  // Extract language from query params or googtrans cookie header, default to 'hi'
+  const { searchParams } = new URL(_req.url);
+  let lang = searchParams.get("lang");
+  if (!lang) {
+    const cookieHeader = _req.headers.get("cookie") || "";
+    const match = cookieHeader.match(/googtrans=([^;]+)/);
+    if (match) {
+      const val = decodeURIComponent(match[1]);
+      if (val.endsWith("/hi")) lang = "hi";
+      else if (val.endsWith("/en")) lang = "en";
+    }
+  }
+  if (!lang) lang = "hi"; // Default to Hindi
+
   // Intercept PIB releases dynamically
   if (slug.startsWith("pib-")) {
     const prid = slug.replace("pib-", "");
@@ -85,7 +99,7 @@ export async function GET(
         .replace(/<\/font>/gi, "") // Strip font closing tags
         .replace(/style=["'][^"']*(?:color|background)[^"']*["']/gi, ""); // Strip style attributes setting color/bg
 
-      // Generate a mock title from the extracted content if needed, but the client already passed one or we can parse it from headings
+      // Generate a mock title from the extracted content if needed
       const h2Match = bodyContent.match(/<h2[^>]*id="Titleh2"[^>]*>([\s\S]*?)<\/h2>/i);
       const title = h2Match ? h2Match[1].replace(/<[^>]*>/g, "").trim() : "Government Release";
 
@@ -111,6 +125,13 @@ export async function GET(
         hasAudio: false,
         keyPoints: [],
       };
+
+      // Translate dynamically if target is Hindi
+      if (lang === "hi") {
+        mockArticle.title = await translateText(mockArticle.title, "hi");
+        mockArticle.standfirst = await translateText(mockArticle.standfirst, "hi");
+        mockArticle.body = await translateText(mockArticle.body, "hi");
+      }
 
       return NextResponse.json({
         article: mockArticle,
@@ -145,8 +166,17 @@ export async function GET(
       .update({ where: { id: article.id }, data: { views: { increment: 1 } } })
       .catch(() => {});
 
+    const serialized = serializeArticle(article);
+
+    // Translate dynamically if target is Hindi
+    if (lang === "hi") {
+      serialized.title = await translateText(serialized.title, "hi");
+      serialized.standfirst = await translateText(serialized.standfirst, "hi");
+      serialized.body = await translateText(serialized.body, "hi");
+    }
+
     return NextResponse.json({
-      article: serializeArticle(article),
+      article: serialized,
       author: {
         id: article.author.id,
         name: article.author.name,
@@ -161,6 +191,14 @@ export async function GET(
     if (!mockArticle) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+
+    // Translate dynamically if target is Hindi
+    if (lang === "hi") {
+      mockArticle.title = await translateText(mockArticle.title, "hi");
+      mockArticle.standfirst = await translateText(mockArticle.standfirst, "hi");
+      mockArticle.body = await translateText(mockArticle.body, "hi");
+    }
+
     return NextResponse.json({
       article: mockArticle,
       author: {
@@ -172,4 +210,22 @@ export async function GET(
       },
     });
   }
+}
+
+async function translateText(text: string, targetLang: string): Promise<string> {
+  if (!text || targetLang === "en") return text;
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0" }
+    });
+    if (!res.ok) return text;
+    const data = await res.json();
+    if (data && data[0]) {
+      return data[0].map((x: any) => x[0]).join("");
+    }
+  } catch (e) {
+    console.error("Translation helper error:", e);
+  }
+  return text;
 }
