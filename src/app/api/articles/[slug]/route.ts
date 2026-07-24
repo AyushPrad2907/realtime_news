@@ -142,6 +142,10 @@ export async function GET(
           avatar: "https://ui-avatars.com/api/?name=PIB",
           role: "Government Spokesperson",
         },
+      }, {
+        headers: {
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=150",
+        }
       });
     } catch (err: any) {
       return NextResponse.json(
@@ -184,6 +188,10 @@ export async function GET(
         avatar: article.author.avatar ?? "",
         role: article.author.jobTitle ?? "Correspondent",
       },
+    }, {
+      headers: {
+        "Cache-Control": "public, s-maxage=120, stale-while-revalidate=60",
+      }
     });
   } catch (dbError) {
     console.error("Prisma database connection failed in details endpoint. Falling back to mock data:", dbError);

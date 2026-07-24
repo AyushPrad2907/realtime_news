@@ -238,63 +238,65 @@ async function fetchLiveFallbackFeeds(
     }
   }
 
-  for (const feed of feedsToFetch) {
-    try {
-      const res = await fetch(feed.url, {
-        headers: { "User-Agent": "Mozilla/5.0" },
-        next: { revalidate: 300 }
-      });
-      if (!res.ok) continue;
-      const xml = await res.text();
-      const cleanEntities = xml
-        .replace(/&zwj;/gi, "\u200d")
-        .replace(/&ndash;/gi, "–")
-        .replace(/&mdash;/gi, "—")
-        .replace(/&nbsp;/gi, " ")
-        .replace(/&rsquo;/gi, "’")
-        .replace(/&lsquo;/gi, "‘")
-        .replace(/&rdquo;/gi, "”")
-        .replace(/&ldquo;/gi, "“");
-      const cleanXml = cleanEntities.replace(/&(?!(amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);)/g, "&amp;");
-      const parsed = await parser.parseString(cleanXml);
-
-      parsed.items.forEach((item, index) => {
-        const pridMatch = item.link?.match(/PRID=(\d+)/);
-        const feedSlugName = feed.name.toLowerCase().replace(/[^a-z0-9]/g, "-");
-        const prid = pridMatch ? pridMatch[1] : `${feedSlugName}-${index}`;
-        const slug = feed.source === "pib" ? `pib-${prid}` : `hindustan-${index}-${Date.now()}`;
-        const itemCategory = feed.defaultCategory || getCategoryFromTitle(item.title || "");
-        const pubDate = item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString();
-
-        articles.push({
-          id: slug,
-          slug,
-          title: item.title || "",
-          standfirst: item.contentSnippet || item.description || (isHindi ? "विज्ञप्ति।" : "Official Release."),
-          body: item.content || item.contentSnippet || "",
-          category: itemCategory,
-          tags: feed.source === "pib" ? ["PIB"] : ["Hindustan"],
-          states: state ? [state] : [],
-          authorId: feed.source === "pib" ? "pib-scraper" : "hindustan-scraper",
-          publishedAt: pubDate,
-          views: 100 + index * 5,
-          heroImage: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800",
-          heroCaption: feed.name,
-          heroCredit: feed.source === "pib" ? "PIB" : "Hindustan",
-          isFeatured: index === 0 && !category,
-          isBreaking: index < 2,
-          hasAudio: false,
-          author: {
-            id: feed.source === "pib" ? "pib-scraper" : "hindustan-scraper",
-            name: feed.source === "pib" ? "पत्र सूचना कार्यालय (PIB)" : "लाइव हिन्दुस्तान",
-            avatar: "https://ui-avatars.com/api/?name=" + (feed.source === "pib" ? "PIB" : "LH")
-          }
+  await Promise.all(
+    feedsToFetch.map(async (feed) => {
+      try {
+        const res = await fetch(feed.url, {
+          headers: { "User-Agent": "Mozilla/5.0" },
+          next: { revalidate: 300 }
         });
-      });
-    } catch (e) {
-      console.error("Failed to parse feed in fallback", feed.name, e);
-    }
-  }
+        if (!res.ok) return;
+        const xml = await res.text();
+        const cleanEntities = xml
+          .replace(/&zwj;/gi, "\u200d")
+          .replace(/&ndash;/gi, "–")
+          .replace(/&mdash;/gi, "—")
+          .replace(/&nbsp;/gi, " ")
+          .replace(/&rsquo;/gi, "’")
+          .replace(/&lsquo;/gi, "‘")
+          .replace(/&rdquo;/gi, "”")
+          .replace(/&ldquo;/gi, "“");
+        const cleanXml = cleanEntities.replace(/&(?!(amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);)/g, "&amp;");
+        const parsed = await parser.parseString(cleanXml);
+
+        parsed.items.forEach((item, index) => {
+          const pridMatch = item.link?.match(/PRID=(\d+)/);
+          const feedSlugName = feed.name.toLowerCase().replace(/[^a-z0-9]/g, "-");
+          const prid = pridMatch ? pridMatch[1] : `${feedSlugName}-${index}`;
+          const slug = feed.source === "pib" ? `pib-${prid}` : `hindustan-${index}-${Date.now()}`;
+          const itemCategory = feed.defaultCategory || getCategoryFromTitle(item.title || "");
+          const pubDate = item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString();
+
+          articles.push({
+            id: slug,
+            slug,
+            title: item.title || "",
+            standfirst: item.contentSnippet || item.description || (isHindi ? "विज्ञप्ति।" : "Official Release."),
+            body: item.content || item.contentSnippet || "",
+            category: itemCategory,
+            tags: feed.source === "pib" ? ["PIB"] : ["Hindustan"],
+            states: state ? [state] : [],
+            authorId: feed.source === "pib" ? "pib-scraper" : "hindustan-scraper",
+            publishedAt: pubDate,
+            views: 100 + index * 5,
+            heroImage: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800",
+            heroCaption: feed.name,
+            heroCredit: feed.source === "pib" ? "PIB" : "Hindustan",
+            isFeatured: index === 0 && !category,
+            isBreaking: index < 2,
+            hasAudio: false,
+            author: {
+              id: feed.source === "pib" ? "pib-scraper" : "hindustan-scraper",
+              name: feed.source === "pib" ? "पत्र सूचना कार्यालय (PIB)" : "लाइव हिन्दुस्तान",
+              avatar: "https://ui-avatars.com/api/?name=" + (feed.source === "pib" ? "PIB" : "LH")
+            }
+          });
+        });
+      } catch (e) {
+        console.error("Failed to parse feed in fallback", feed.name, e);
+      }
+    })
+  );
 
   // Filter combined articles
   let filtered = articles;
@@ -393,6 +395,10 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     articles: result,
     count: result.length,
+  }, {
+    headers: {
+      "Cache-Control": "public, s-maxage=60, stale-while-revalidate=30",
+    }
   });
 }
 
