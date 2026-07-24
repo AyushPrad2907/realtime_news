@@ -37,9 +37,15 @@ const proc = Bun.spawn(["bun", "x", "next", "dev", "-p", "3000"], {
   }
 })();
 
+const scraperProc = Bun.spawn(["bun", "run", "scripts/scraper.ts", "--daemon"], {
+  stdout: "inherit",
+  stderr: "inherit",
+});
+
 // Handle process exit
 (async () => {
   const exitCode = await proc.exited;
+  scraperProc.kill();
   logWriter.end();
   process.exit(exitCode);
 })();
@@ -47,12 +53,14 @@ const proc = Bun.spawn(["bun", "x", "next", "dev", "-p", "3000"], {
 // Clean termination signals
 process.on("SIGINT", () => {
   proc.kill();
+  scraperProc.kill();
   logWriter.end();
   process.exit(0);
 });
 
 process.on("SIGTERM", () => {
   proc.kill();
+  scraperProc.kill();
   logWriter.end();
   process.exit(0);
 });

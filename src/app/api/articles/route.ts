@@ -162,6 +162,149 @@ async function fetchPibArticles(lang: string = "en"): Promise<any[]> {
   }
 }
 
+async function fetchLiveFallbackFeeds(
+  lang: string,
+  category?: string | null,
+  state?: string | null,
+  breaking?: boolean,
+  featured?: boolean,
+  date?: string | null
+): Promise<any[]> {
+  const isHindi = lang === "hi";
+  const parser = new Parser();
+  const articles: any[] = [];
+
+  // Determine which feeds to fetch
+  const feedsToFetch: { name: string; url: string; source: "pib" | "hindustan"; defaultCategory?: string }[] = [];
+
+  // PIB national
+  feedsToFetch.push({
+    name: "PIB National",
+    url: `https://pib.gov.in/RssMain.aspx?ModId=6&Lang=${isHindi ? "2" : "1"}`,
+    source: "pib"
+  });
+
+  // State PIB feeds if state matches
+  if (state === "Delhi") {
+    feedsToFetch.push({
+      name: "PIB Delhi",
+      url: `https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&Regid=3`,
+      source: "pib"
+    });
+  } else if (state === "Bihar") {
+    feedsToFetch.push({
+      name: "PIB Bihar",
+      url: `https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&Regid=13`,
+      source: "pib"
+    });
+  } else if (state === "Punjab") {
+    feedsToFetch.push({
+      name: "PIB Punjab",
+      url: `https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&Regid=20`,
+      source: "pib"
+    });
+  }
+
+  // Live Hindustan (always include if no state is specified, as they don't map to these 3 states easily)
+  if (!state) {
+    if (category === "sports") {
+      feedsToFetch.push({
+        name: "Hindustan Sports",
+        url: "https://feed.livehindustan.com/rss/sports",
+        source: "hindustan",
+        defaultCategory: "sports"
+      });
+    } else if (category === "economy") {
+      feedsToFetch.push({
+        name: "Hindustan Business",
+        url: "https://feed.livehindustan.com/rss/business",
+        source: "hindustan",
+        defaultCategory: "economy"
+      });
+    } else if (category === "technology" || category === "science") {
+      feedsToFetch.push({
+        name: "Hindustan SciTech",
+        url: "https://feed.livehindustan.com/rss/science-technology",
+        source: "hindustan",
+        defaultCategory: "technology"
+      });
+    } else {
+      feedsToFetch.push({
+        name: "Hindustan National",
+        url: "https://feed.livehindustan.com/rss/national",
+        source: "hindustan",
+        defaultCategory: "national"
+      });
+    }
+  }
+
+  for (const feed of feedsToFetch) {
+    try {
+      const res = await fetch(feed.url, {
+        headers: { "User-Agent": "Mozilla/5.0" },
+        next: { revalidate: 300 }
+      });
+      if (!res.ok) continue;
+      const xml = await res.text();
+      const cleanEntities = xml
+        .replace(/&zwj;/gi, "\u200d")
+        .replace(/&ndash;/gi, "–")
+        .replace(/&mdash;/gi, "—")
+        .replace(/&nbsp;/gi, " ")
+        .replace(/&rsquo;/gi, "’")
+        .replace(/&lsquo;/gi, "‘")
+        .replace(/&rdquo;/gi, "”")
+        .replace(/&ldquo;/gi, "“");
+      const cleanXml = cleanEntities.replace(/&(?!(amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);)/g, "&amp;");
+      const parsed = await parser.parseString(cleanXml);
+
+      parsed.items.forEach((item, index) => {
+        const pridMatch = item.link?.match(/PRID=(\d+)/);
+        const prid = pridMatch ? pridMatch[1] : String(index);
+        const slug = feed.source === "pib" ? `pib-${prid}` : `hindustan-${index}-${Date.now()}`;
+        const itemCategory = feed.defaultCategory || getCategoryFromTitle(item.title || "");
+        const pubDate = item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString();
+
+        articles.push({
+          id: slug,
+          slug,
+          title: item.title || "",
+          standfirst: item.contentSnippet || item.description || (isHindi ? "विज्ञप्ति।" : "Official Release."),
+          body: item.content || item.contentSnippet || "",
+          category: itemCategory,
+          tags: feed.source === "pib" ? ["PIB"] : ["Hindustan"],
+          states: state ? [state] : [],
+          authorId: feed.source === "pib" ? "pib-scraper" : "hindustan-scraper",
+          publishedAt: pubDate,
+          views: 100 + index * 5,
+          heroImage: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800",
+          heroCaption: feed.name,
+          heroCredit: feed.source === "pib" ? "PIB" : "Hindustan",
+          isFeatured: index === 0 && !category,
+          isBreaking: index < 2,
+          hasAudio: false,
+          author: {
+            id: feed.source === "pib" ? "pib-scraper" : "hindustan-scraper",
+            name: feed.source === "pib" ? "पत्र सूचना कार्यालय (PIB)" : "लाइव हिन्दुस्तान",
+            avatar: "https://ui-avatars.com/api/?name=" + (feed.source === "pib" ? "PIB" : "LH")
+          }
+        });
+      });
+    } catch (e) {
+      console.error("Failed to parse feed in fallback", feed.name, e);
+    }
+  }
+
+  // Filter combined articles
+  let filtered = articles;
+  if (category) filtered = filtered.filter(a => a.category === category);
+  if (breaking) filtered = filtered.filter(a => a.isBreaking);
+  if (featured) filtered = filtered.filter(a => a.isFeatured);
+  if (date) filtered = filtered.filter(a => a.publishedAt.startsWith(date));
+
+  return filtered;
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const parsedLimit = parseInt(searchParams.get("limit") ?? "20", 10);
@@ -172,6 +315,7 @@ export async function GET(req: NextRequest) {
   const featured = searchParams.get("featured") === "true";
   const sort = searchParams.get("sort") ?? "newest";
   const date = searchParams.get("date"); // YYYY-MM-DD
+  const lang = searchParams.get("lang") ?? "en";
 
   // 1. Fetch DB Articles
   const where: any = { status: "PUBLISHED" };
@@ -203,38 +347,18 @@ export async function GET(req: NextRequest) {
       include: { author: true, category: true },
     });
     serializedDb = dbArticles.map(serializeArticle);
+    
+    // If DB is empty, fetch live fallback feeds
+    if (serializedDb.length === 0) {
+      serializedDb = await fetchLiveFallbackFeeds(lang, category, state, breaking, featured, date);
+    }
   } catch (dbError) {
-    console.error("Prisma database connection failed. Falling back to mock articles for DB data:", dbError);
-    // If DB fails, filter the ARTICLES_LIST using the same request parameters so the app works database-free!
-    const mockFiltered = ARTICLES_LIST.filter((a) => {
-      if (category && a.category !== category) return false;
-      if (breaking && !a.isBreaking) return false;
-      if (featured && !a.isFeatured) return false;
-      if (date && !a.publishedAt.startsWith(date)) return false;
-      return true;
-    });
-    serializedDb = mockFiltered;
+    console.error("Prisma database connection failed. Falling back to live RSS feeds:", dbError);
+    serializedDb = await fetchLiveFallbackFeeds(lang, category, state, breaking, featured, date);
   }
 
-  // 2. Fetch & Filter PIB Articles
-  const lang = searchParams.get("lang") ?? "en";
-  let pibArticles = await fetchPibArticles(lang);
-  
-  if (category) {
-    pibArticles = pibArticles.filter((a) => a.category === category);
-  }
-  if (breaking) {
-    pibArticles = pibArticles.filter((a) => a.isBreaking);
-  }
-  if (featured) {
-    pibArticles = pibArticles.filter((a) => a.isFeatured);
-  }
-  if (date) {
-    pibArticles = pibArticles.filter((a) => a.publishedAt.startsWith(date));
-  }
-
-  // 3. Combine and Sort
-  let combined = [...serializedDb, ...pibArticles];
+  // Combine and Sort
+  let combined = [...serializedDb];
 
   if (sort === "popular") {
     combined.sort((a, b) => b.views - a.views);
@@ -244,7 +368,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // 4. Slice to the requested limit
+  // Slice to the requested limit
   const result = combined.slice(0, limit);
 
   return NextResponse.json({
