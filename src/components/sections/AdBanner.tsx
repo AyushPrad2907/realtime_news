@@ -40,7 +40,7 @@ const CAMPAIGNS: AdCampaign[] = [
     id: "implexcart",
     name: "ImplexCart Flash Sale",
     company: "ImplexCart",
-    url: "https://www.nwtinfotech.online/", // fallback or user-intended link
+    url: "https://www.implexcart.online/",
     theme: "ecommerce",
     headline: "Super Flash Sale Live",
     subline: "Incredible discounts on best selling electronics & fashion",
