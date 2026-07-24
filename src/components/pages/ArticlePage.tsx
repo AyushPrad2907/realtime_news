@@ -8,6 +8,7 @@ import { AdBanner } from "@/components/sections/AdBanner";
 import { getAuthor, formatDate, formatViews } from "@/lib/utils-news";
 import { TimeAgo } from "@/components/TimeAgo";
 import { fetchArticle } from "@/lib/api-client";
+import { cn } from "@/lib/utils";
 import {
   Clock,
   Headphones,
@@ -296,7 +297,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
   };
 
   return (
-    <article className="mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-6">
+    <article className={cn("mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-6", language === "hi" && "notranslate")}>
       {/* Breadcrumb */}
       <nav
         aria-label="Breadcrumb"

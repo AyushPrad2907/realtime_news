@@ -19,34 +19,7 @@ import { AdBanner } from "@/components/sections/AdBanner";
 import type { Article, CategorySlug, PodcastEpisode } from "@/lib/types";
 
 function LazySection({ children }: { children: React.ReactNode }) {
-  const [shouldRender, setShouldRender] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShouldRender(true);
-          observer.disconnect();
-        }
-      },
-      {
-        rootMargin: "300px 0px", // Load 300px before scrolling into view for a smooth transition
-      }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div ref={ref} className="min-h-[100px]">
-      {shouldRender ? children : <div className="h-24 animate-pulse bg-muted/20 rounded-lg" />}
-    </div>
-  );
+  return <>{children}</>;
 }
 
 export function HomePage() {
