@@ -109,7 +109,7 @@ async function fetchPibArticles(lang: string = "en"): Promise<any[]> {
     // Resolve real images in parallel for the items
     return await Promise.all(items.map(async (item, index) => {
       const pridMatch = item.link?.match(/PRID=(\d+)/);
-      const prid = pridMatch ? pridMatch[1] : String(index);
+      const prid = pridMatch ? pridMatch[1] : `national-${index}`;
       const slug = `pib-${prid}`;
       
       const title = item.title || "";
@@ -260,7 +260,8 @@ async function fetchLiveFallbackFeeds(
 
       parsed.items.forEach((item, index) => {
         const pridMatch = item.link?.match(/PRID=(\d+)/);
-        const prid = pridMatch ? pridMatch[1] : String(index);
+        const feedSlugName = feed.name.toLowerCase().replace(/[^a-z0-9]/g, "-");
+        const prid = pridMatch ? pridMatch[1] : `${feedSlugName}-${index}`;
         const slug = feed.source === "pib" ? `pib-${prid}` : `hindustan-${index}-${Date.now()}`;
         const itemCategory = feed.defaultCategory || getCategoryFromTitle(item.title || "");
         const pubDate = item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString();
@@ -359,6 +360,14 @@ export async function GET(req: NextRequest) {
 
   // Combine and Sort
   let combined = [...serializedDb];
+
+  // Deduplicate by slug
+  const seenSlugs = new Set<string>();
+  combined = combined.filter((article) => {
+    if (seenSlugs.has(article.slug)) return false;
+    seenSlugs.add(article.slug);
+    return true;
+  });
 
   if (sort === "popular") {
     combined.sort((a, b) => b.views - a.views);
