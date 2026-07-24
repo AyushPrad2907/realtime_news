@@ -59,7 +59,7 @@ export function CategoryBar() {
 
         <div
           ref={scrollRef}
-          className="flex items-center gap-1 overflow-x-auto no-scrollbar px-4 md:px-10 py-2.5"
+          className="flex items-center gap-1 overflow-x-auto no-scrollbar px-4 md:px-10 py-2.5 notranslate"
         >
           {CATEGORIES.map((cat) => {
             const active =
