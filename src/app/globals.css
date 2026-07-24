@@ -522,10 +522,13 @@
 
 /* Scraped Article Body Styles and Color Normalization overrides */
 .article-body,
-.article-body * {
+.article-body *,
+.styled-article-body,
+.styled-article-body * {
   color: inherit !important;
 }
-.article-body img {
+.article-body img,
+.styled-article-body img {
   max-width: 100% !important;
   height: auto !important;
   object-fit: cover !important;
