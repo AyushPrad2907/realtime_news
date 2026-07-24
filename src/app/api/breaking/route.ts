@@ -14,7 +14,6 @@ export async function GET() {
   } catch (err) {
     console.error("Prisma database connection failed in breaking news API. Falling back to mock:", err);
     // Return active mock breaking news
-    const mockTexts = BREAKING_NEWS.filter((b) => b.isActive).map((b) => b.text);
-    return NextResponse.json({ items: mockTexts });
+    return NextResponse.json({ items: BREAKING_NEWS });
   }
 }

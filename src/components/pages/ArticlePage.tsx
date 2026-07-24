@@ -29,6 +29,8 @@ import { toast } from "sonner";
 import type { Article, Author } from "@/lib/types";
 
 import { useT } from "@/hooks/use-t";
+import { useHydrated } from "@/hooks/use-hydrated";
+import type { TranslationKey } from "@/lib/i18n";
 
 interface ArticlePageProps {
   slug: string;
@@ -37,6 +39,7 @@ interface ArticlePageProps {
 export function ArticlePage({ slug }: ArticlePageProps) {
   const { navigate, back, canGoBack, playEpisode, nowPlaying, isPlaying, togglePlay } = useStore();
   const t = useT();
+  const mounted = useHydrated();
   const [copied, setCopied] = useState(false);
   const [article, setArticle] = useState<Article | null>(
     () => ARTICLES_LIST.find((a) => a.slug === slug) ?? null
@@ -124,7 +127,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
       const url = window.location.href;
       navigator.clipboard?.writeText(url);
       setCopied(true);
-      toast.success("Link copied to clipboard");
+      toast.success(t("misc.linkCopied"));
       setTimeout(() => setCopied(false), 2000);
     } else {
       toast.message(`Sharing to ${platform}…`, {
@@ -240,14 +243,14 @@ export function ArticlePage({ slug }: ArticlePageProps) {
           onClick={() => navigate({ type: "home" })}
           className="hover:text-brand transition-colors"
         >
-          Home
+          {mounted ? t("nav.home") : "Home"}
         </button>
         <ChevronRight className="h-3 w-3" />
         <button
           onClick={() => navigate({ type: "category", slug: article.category })}
           className="hover:text-brand transition-colors"
         >
-          {article.category.charAt(0).toUpperCase() + article.category.slice(1)}
+          {mounted ? t(`cat.${article.category}` as TranslationKey) : article.category.charAt(0).toUpperCase() + article.category.slice(1)}
         </button>
         <ChevronRight className="h-3 w-3" />
         <span className="text-ink-secondary line-clamp-1">{article.title}</span>
@@ -354,7 +357,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
                   {article.title}
                 </p>
                 <p className="font-ui text-[11px] text-ink-tertiary">
-                  Narrated · {article.audioDuration}
+                  {mounted ? t("misc.narrated") : "Narrated · "}{article.audioDuration}
                 </p>
               </div>
             </div>
@@ -397,7 +400,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
           {/* Tags */}
           <div className="mt-8 pt-6 border-t border-border">
             <p className="font-ui text-[11px] font-bold uppercase tracking-wider text-ink-tertiary mb-3">
-              Topics
+              {mounted ? t("misc.topics") : "Topics"}
             </p>
             <div className="flex flex-wrap gap-2">
               {article.tags.map((tag) => (
@@ -439,7 +442,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
           {relatedArticles.length > 0 && (
             <div className="mt-12">
               <h3 className="h-section mb-5 border-b border-border pb-3">
-                You may also like
+                {mounted ? t("misc.youMayAlsoLike") : "You may also like"}
               </h3>
               <div className="grid md:grid-cols-3 gap-6">
                 {relatedArticles.map((a) => (
@@ -456,7 +459,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
               className="mt-12 w-full text-left p-5 md:p-7 rounded-lg border border-border hover:border-foreground/30 hover:bg-surface-alt transition-colors group"
             >
               <p className="font-ui text-[11px] font-bold uppercase tracking-wider text-brand mb-2">
-                Next Story
+                {mounted ? t("misc.nextStory") : "Next Story"}
               </p>
               <h4 className="font-display text-xl md:text-2xl font-bold leading-tight line-clamp-2 group-hover:text-brand transition-colors">
                 {nextArticle.title}
@@ -465,7 +468,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
                 {nextArticle.standfirst}
               </p>
               <span className="inline-flex items-center gap-1.5 mt-4 font-ui text-sm font-semibold text-brand">
-                Continue reading
+                {mounted ? t("misc.continueReading") : "Continue reading"}
                 <ChevronRight className="h-4 w-4" />
               </span>
             </button>
@@ -479,7 +482,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
 
             <div>
               <h3 className="font-display text-base font-bold mb-3 border-b border-border pb-2">
-                Most Read
+                {mounted ? t("misc.mostRead") : "Most Read"}
               </h3>
               <ol className="space-y-4">
                 {ARTICLES_LIST.slice()

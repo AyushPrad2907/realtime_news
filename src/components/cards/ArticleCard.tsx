@@ -7,6 +7,7 @@ import { Clock, Headphones } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TimeAgo } from "@/components/TimeAgo";
 import { useT } from "@/hooks/use-t";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 interface ArticleCardProps {
   article: Article;
@@ -25,11 +26,14 @@ export function ArticleCard({
 }: ArticleCardProps) {
   const { navigate } = useStore();
   const t = useT();
+  const mounted = useHydrated();
   const cat = getCategory(article.category);
   const author = getAuthor(article.authorId);
   const categoryTitle = t(`cat.${article.category}` as any) || cat.name;
 
   const go = () => navigate({ type: "article", slug: article.slug });
+
+  if (!mounted) return null;
 
   if (variant === "list") {
     return (
@@ -176,7 +180,7 @@ export function ArticleCard({
             <span aria-hidden>·</span>
             <span className="flex items-center gap-1">
               <Headphones className="h-3 w-3" />
-              Audio
+              {t("misc.audio")}
             </span>
           </>
         )}

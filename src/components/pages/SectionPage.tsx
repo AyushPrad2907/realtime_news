@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 import { AlertCircle, Globe, Flag, Headphones } from "lucide-react";
 
 import { useT } from "@/hooks/use-t";
+import { useHydrated } from "@/hooks/use-hydrated";
+import type { TranslationKey } from "@/lib/i18n";
 
 interface SectionPageProps {
   slug: "live" | "breaking" | "national" | "international" | "podcasts";
@@ -31,14 +33,14 @@ export function SectionPage({ slug }: SectionPageProps) {
 const META = {
   breaking: {
     titleKey: "nav.breaking",
-    description: "The latest developing stories, as they happen.",
+    descriptionKey: "sec.breakingDesc",
     Icon: AlertCircle,
     color: "var(--breaking)",
     filter: (a: (typeof ARTICLES_LIST)[number]) => a.isBreaking === true,
   },
   national: {
     titleKey: "cat.national",
-    description: "Stories shaping the nation — from across the country.",
+    descriptionKey: "sec.nationalDesc",
     Icon: Flag,
     color: "var(--cat-national)",
     filter: (a: (typeof ARTICLES_LIST)[number]) =>
@@ -46,7 +48,7 @@ const META = {
   },
   international: {
     titleKey: "cat.international",
-    description: "Global developments, contextualised.",
+    descriptionKey: "sec.internationalDesc",
     Icon: Globe,
     color: "var(--cat-international)",
     filter: (a: (typeof ARTICLES_LIST)[number]) => a.category === "international",
@@ -56,6 +58,7 @@ const META = {
 function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "international" }) {
   const { navigate } = useStore();
   const t = useT();
+  const mounted = useHydrated();
   const [visibleCount, setVisibleCount] = useState(9);
 
   const config = META[slug];
@@ -97,7 +100,7 @@ function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "internatio
           )}
         </div>
         <p className="font-serif text-lg text-ink-secondary max-w-2xl">
-          {config.description}
+          {mounted ? t(config.descriptionKey as TranslationKey) : t(config.descriptionKey as TranslationKey)}
         </p>
       </header>
 
@@ -129,7 +132,7 @@ function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "internatio
             onClick={() => setVisibleCount((c) => c + 6)}
             className="inline-flex items-center gap-2 px-6 h-12 rounded-md border border-border hover:bg-muted font-ui text-sm font-semibold"
           >
-            {t("section.viewAll")}
+            {mounted ? t("section.viewAll") : "View all →"}
           </button>
         </div>
       )}
@@ -138,13 +141,13 @@ function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "internatio
         <div className="py-16 text-center">
           <Icon className="h-12 w-12 text-ink-tertiary mx-auto mb-4" />
           <p className="font-ui text-sm text-ink-secondary">
-            No stories in this section right now. Check back soon.
+            {mounted ? t("misc.noStoriesSoon") : "No stories in this section right now. Check back soon."}
           </p>
           <button
             onClick={() => navigate({ type: "home" })}
             className="mt-4 inline-flex items-center gap-2 px-5 h-11 rounded-md bg-brand hover:bg-brand-dark text-white font-ui text-sm font-semibold"
           >
-            {t("article.backToHome")}
+            {mounted ? t("article.backToHome") : "Back to homepage"}
           </button>
         </div>
       )}
@@ -153,6 +156,8 @@ function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "internatio
 }
 
 function PodcastsSection() {
+  const t = useT();
+  const mounted = useHydrated();
   const [filter, setFilter] = useState<"All" | "News" | "Analysis" | "Interviews" | "Special Series">("All");
 
   const filtered = useMemo(() => {
@@ -169,18 +174,17 @@ function PodcastsSection() {
         <div className="flex items-center gap-3 mb-3">
           <Headphones className="h-8 w-8 text-brand" />
           <h1 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight">
-            Podcasts
+            {mounted ? t("nav.podcasts") : "Podcasts"}
           </h1>
         </div>
         <p className="font-serif text-lg text-ink-secondary max-w-2xl">
-          Long-form conversations, daily briefings, and on-the-ground reporting —
-          from the editors and correspondents of The National Dispatch.
+          {mounted ? t("misc.podcastDesc") : "Long-form conversations, daily briefings, and on-the-ground reporting — from the editors and correspondents of Newsvarta."}
         </p>
       </header>
 
       {/* Featured series */}
       <section className="mb-12">
-        <h2 className="font-display text-2xl font-bold mb-5">Series</h2>
+        <h2 className="font-display text-2xl font-bold mb-5">{mounted ? t("misc.series") : "Series"}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
           {PODCAST_SERIES.map((series) => (
             <div key={series.id} className="group cursor-pointer">
@@ -196,7 +200,7 @@ function PodcastsSection() {
                 {series.name}
               </p>
               <p className="font-ui text-[11px] text-ink-tertiary">
-                {series.episodes} episodes
+                {series.episodes} {mounted ? t("misc.episodes") : "episodes"}
               </p>
             </div>
           ))}
@@ -216,14 +220,16 @@ function PodcastsSection() {
                 : "bg-muted text-ink-secondary hover:bg-muted/70"
             )}
           >
-            {f}
+            {mounted ? t((f === "All" ? "misc.all" : f === "News" ? "misc.news" : f === "Analysis" ? "misc.analysis" : f === "Interviews" ? "misc.interviews" : "misc.specialSeries") as TranslationKey) : f}
           </button>
         ))}
       </div>
 
       <section className="mb-12">
         <h2 className="font-display text-2xl font-bold mb-5">
-          {filter === "All" ? "Latest Episodes" : `${filter} Episodes`}
+          {filter === "All" 
+            ? (mounted ? t("misc.latestEpisodes") : "Latest Episodes") 
+            : `${mounted ? t((filter === "News" ? "misc.news" : filter === "Analysis" ? "misc.analysis" : filter === "Interviews" ? "misc.interviews" : "misc.specialSeries") as TranslationKey) : filter} ${mounted ? t("misc.episodes") : "Episodes"}`}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
           {filtered.map((ep) => (

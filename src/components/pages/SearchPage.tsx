@@ -7,6 +7,8 @@ import { fetchSearch } from "@/lib/api-client";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { PodcastCard } from "@/components/cards/PodcastCard";
 import { Search as SearchIcon, X, TrendingUp, FileText, Headphones, Loader2 } from "lucide-react";
+import { t } from "@/lib/i18n";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import type { Article, PodcastEpisode } from "@/lib/types";
 
@@ -18,7 +20,8 @@ interface SearchPageProps {
 }
 
 export function SearchPage({ query: initialQuery }: SearchPageProps) {
-  const { navigate } = useStore();
+  const mounted = useHydrated();
+  const { navigate, language } = useStore();
   const [query, setQuery] = useState(initialQuery);
   const [type, setType] = useState<FilterType>("all");
   const [dateFilter, setDateFilter] = useState<DateFilter>("anytime");
@@ -106,7 +109,7 @@ export function SearchPage({ query: initialQuery }: SearchPageProps) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search articles, podcasts, topics..."
+            placeholder={mounted ? t(language, "misc.searchPlaceholder") : "Search articles, podcasts, topics..."}
             autoFocus
             className="flex-1 bg-transparent outline-none font-ui text-base placeholder:text-ink-tertiary"
           />
@@ -128,14 +131,13 @@ export function SearchPage({ query: initialQuery }: SearchPageProps) {
         {query.trim() === "" ? (
           <div className="py-8">
             <h1 className="font-display text-2xl md:text-3xl font-bold mb-4">
-              Search The National Dispatch
+              {mounted ? t(language, "search.label") : "Search"} The National Dispatch
             </h1>
             <p className="font-serif text-base text-ink-secondary mb-6 max-w-xl">
-              Find articles, podcasts, and topics across our archive. Use the
-              filters below to refine by date, type, or category.
+              {mounted ? t(language, "misc.searchDesc") : "Find articles, podcasts, and topics across our archive. Use the filters below to refine by date, type, or category."}
             </p>
             <p className="font-ui text-[11px] font-bold uppercase tracking-wider text-ink-tertiary mb-3 flex items-center gap-1.5">
-              <TrendingUp className="h-3.5 w-3.5" /> Trending searches
+              <TrendingUp className="h-3.5 w-3.5" /> {mounted ? t(language, "misc.trendingSearches") : "Trending searches"}
             </p>
             <div className="flex flex-wrap gap-2">
               {TRENDING_TOPICS.map((t) => (
@@ -166,7 +168,7 @@ export function SearchPage({ query: initialQuery }: SearchPageProps) {
                     className="px-3 py-1 rounded-full font-ui text-xs font-medium text-white"
                     style={{ background: c.colorVar }}
                   >
-                    Browse {c.name} →
+                    {mounted ? (language === "hi" ? `${c.name} देखें →` : `Browse ${c.name} →`) : `Browse ${c.name} →`}
                   </button>
                 ))}
               </div>
@@ -227,7 +229,7 @@ export function SearchPage({ query: initialQuery }: SearchPageProps) {
 
             {/* Sort */}
             <div className="ml-auto flex items-center gap-2">
-              <span className="font-ui text-xs text-ink-tertiary">Sort:</span>
+              <span className="font-ui text-xs text-ink-tertiary">{mounted ? t(language, "misc.sort") : "Sort:"}</span>
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as typeof sort)}
@@ -282,7 +284,7 @@ export function SearchPage({ query: initialQuery }: SearchPageProps) {
       {query.trim() !== "" && totalResults === 0 && (
         <div className="py-16 text-center max-w-md mx-auto">
           <SearchIcon className="h-12 w-12 text-ink-tertiary mx-auto mb-4" />
-          <h2 className="font-display text-2xl font-bold mb-2">No results found</h2>
+          <h2 className="font-display text-2xl font-bold mb-2">{mounted ? t(language, "search.noResults") : "No results found"}</h2>
           <p className="font-ui text-sm text-ink-secondary mb-6">
             We couldn&rsquo;t find anything matching &ldquo;{query}&rdquo;. Try a
             different term, or check out our trending topics below.
@@ -302,7 +304,7 @@ export function SearchPage({ query: initialQuery }: SearchPageProps) {
             onClick={() => navigate({ type: "home" })}
             className="mt-6 inline-flex items-center gap-2 px-5 h-11 rounded-md bg-brand hover:bg-brand-dark text-white font-ui text-sm font-semibold"
           >
-            Browse homepage
+            {mounted ? t(language, "misc.browseHomepage") : "Browse homepage"}
           </button>
         </div>
       )}

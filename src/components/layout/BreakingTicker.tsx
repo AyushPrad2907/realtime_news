@@ -7,12 +7,16 @@ import { useBreaking } from "@/lib/use-data";
 import { AlertCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LiveClock } from "@/components/LiveClock";
+import { useT } from "@/hooks/use-t";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export function BreakingTicker() {
   const [dismissed, setDismissed] = useState(false);
   const [paused, setPaused] = useState(false);
   const { navigate } = useStore();
   const { data: headlines } = useBreaking();
+  const t = useT();
+  const mounted = useHydrated();
 
   if (dismissed || headlines.length === 0) return null;
 
@@ -37,13 +41,13 @@ export function BreakingTicker() {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       role="region"
-      aria-label="Breaking news"
+      aria-label={mounted ? t("aria.breakingNews") : "Breaking news"}
     >
       <div className="mx-auto max-w-[1280px] flex items-stretch">
         <div className="shrink-0 flex items-center gap-2 px-3 md:px-5 py-2 bg-black/30 border-r border-white/10">
           <AlertCircle className="h-3.5 w-3.5 text-red-300" />
           <span className="font-ui text-[11px] md:text-xs font-bold uppercase tracking-wider">
-            Breaking
+            {mounted ? t("nav.breaking") : "Breaking"}
           </span>
         </div>
 
@@ -70,7 +74,7 @@ export function BreakingTicker() {
         <button
           onClick={() => setDismissed(true)}
           className="shrink-0 px-3 md:px-4 flex items-center text-white/70 hover:text-white transition-colors"
-          aria-label="Dismiss breaking news ticker"
+          aria-label={mounted ? t("aria.dismissTicker") : "Dismiss breaking news ticker"}
         >
           <X className="h-3.5 w-3.5" />
         </button>

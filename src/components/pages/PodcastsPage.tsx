@@ -5,12 +5,17 @@ import { PODCAST_EPISODES, PODCAST_SERIES } from "@/lib/mock-data";
 import { usePodcasts } from "@/lib/use-data";
 import { PodcastCard } from "@/components/cards/PodcastCard";
 import { Headphones } from "lucide-react";
+import { t } from "@/lib/i18n";
+import { useHydrated } from "@/hooks/use-hydrated";
+import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const FILTERS = ["All", "News", "Analysis", "Interviews", "Special Series"] as const;
 type Filter = (typeof FILTERS)[number];
 
 export function PodcastsPage() {
+  const mounted = useHydrated();
+  const { language } = useStore();
   const [filter, setFilter] = useState<Filter>("All");
   const { data } = usePodcasts();
   const series = data.series.length > 0 ? data.series : PODCAST_SERIES;
@@ -31,18 +36,17 @@ export function PodcastsPage() {
         <div className="flex items-center gap-3 mb-2">
           <Headphones className="h-8 w-8 text-brand" />
           <h1 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight">
-            Podcasts
+            {mounted ? t(language, "nav.podcasts") : "Podcasts"}
           </h1>
         </div>
         <p className="font-serif text-lg text-ink-secondary max-w-2xl">
-          Long-form conversations, daily briefings, and on-the-ground reporting —
-          from the editors and correspondents of The National Dispatch.
+          {mounted ? t(language, "misc.podcastDesc") : "Long-form conversations, daily briefings, and on-the-ground reporting — from the editors and correspondents of The National Dispatch."}
         </p>
       </div>
 
       {/* Featured series — show all series as cards */}
       <section className="mb-12">
-        <h2 className="h-section mb-5 border-b border-border pb-3">Series</h2>
+        <h2 className="h-section mb-5 border-b border-border pb-3">{mounted ? t(language, "misc.series") : "Series"}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
           {series.map((s) => (
             <div
@@ -61,7 +65,7 @@ export function PodcastsPage() {
                 {s.name}
               </p>
               <p className="font-ui text-[11px] text-ink-tertiary">
-                {s.episodes} episodes
+                {s.episodes} {mounted ? t(language, "misc.episodes") : "episodes"}
               </p>
             </div>
           ))}
@@ -89,7 +93,7 @@ export function PodcastsPage() {
       {/* Episodes grid */}
       <section className="mb-12">
         <h2 className="h-section mb-5 border-b border-border pb-3">
-          {filter === "All" ? "Latest Episodes" : `${filter} Episodes`}
+          {filter === "All" ? (mounted ? t(language, "misc.latestEpisodes") : "Latest Episodes") : `${filter} Episodes`}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
           {filteredEpisodes.map((ep) => (

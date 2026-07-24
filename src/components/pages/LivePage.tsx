@@ -6,11 +6,14 @@ import { useLive, useArticles } from "@/lib/use-data";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Users, Calendar, Bell, Share2, ChevronRight } from "lucide-react";
+import { t } from "@/lib/i18n";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { useState, useEffect } from "react";
 import type { LiveUpdate } from "@/lib/types";
 
 export function LivePage() {
-  const { navigate } = useStore();
+  const mounted = useHydrated();
+  const { navigate, language } = useStore();
   const { data: live } = useLive();
   const { data: articles } = useArticles({ category: "politics", limit: 10 });
 
@@ -59,25 +62,25 @@ export function LivePage() {
       {/* Header */}
       <div className="mb-6 md:mb-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="font-display text-3xl md:text-4xl font-extrabold">Live News</h1>
+          <h1 className="font-display text-3xl md:text-4xl font-extrabold">{mounted ? t(language, "misc.liveNews") : "Live News"}</h1>
           {isLive && (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-live text-white font-ui text-xs font-bold uppercase tracking-wide">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="animate-live-pulse absolute inline-flex h-full w-full rounded-full bg-white" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
               </span>
-              On Air
+              {mounted ? t(language, "misc.onAir") : "On Air"}
             </span>
           )}
         </div>
         <div className="hidden md:flex items-center gap-2">
           <button className="inline-flex items-center gap-1.5 px-3 h-9 rounded-md border border-border hover:bg-muted font-ui text-xs font-semibold transition-colors">
             <Bell className="h-3.5 w-3.5" />
-            Notify me
+            {mounted ? t(language, "misc.notifyMe") : "Notify me"}
           </button>
           <button className="inline-flex items-center gap-1.5 px-3 h-9 rounded-md border border-border hover:bg-muted font-ui text-xs font-semibold transition-colors">
             <Share2 className="h-3.5 w-3.5" />
-            Share
+            {mounted ? t(language, "misc.share") : "Share"}
           </button>
         </div>
       </div>
@@ -109,7 +112,7 @@ export function LivePage() {
             </div>
             <div className="absolute bottom-4 left-4 flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/60 backdrop-blur text-white font-ui text-xs">
               <Users className="h-3 w-3" />
-              <span>{viewerCount.toLocaleString()} watching</span>
+              <span>{viewerCount.toLocaleString()}{mounted ? t(language, "misc.watching") : " watching"}</span>
             </div>
           </div>
 
@@ -139,12 +142,14 @@ export function LivePage() {
               updates={updates}
               newUpdateCount={newUpdateCount}
               onShowNew={showNewUpdates}
+              language={language}
+              mounted={mounted}
             />
           </div>
 
           {/* Related stories */}
           <div className="mt-10">
-            <h3 className="h-section mb-5 border-b border-border pb-3">Related Stories</h3>
+            <h3 className="h-section mb-5 border-b border-border pb-3">{mounted ? t(language, "section.relatedStories") : "Related Stories"}</h3>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedStories.map((a) => (
                 <ArticleCard key={a.id} article={a} />
@@ -156,7 +161,7 @@ export function LivePage() {
           <div className="mt-10">
             <h3 className="h-section mb-5 border-b border-border pb-3 flex items-center gap-2">
               <Calendar className="h-5 w-5 text-brand" />
-              Upcoming Broadcasts
+              {mounted ? t(language, "misc.upcomingBroadcasts") : "Upcoming Broadcasts"}
             </h3>
             <div className="divide-y divide-border border border-border rounded-lg overflow-hidden">
               {[
@@ -186,7 +191,7 @@ export function LivePage() {
                   </div>
                   <button className="shrink-0 px-3 h-8 rounded-md border border-border hover:bg-muted font-ui text-xs font-semibold transition-colors flex items-center gap-1">
                     <Bell className="h-3 w-3" />
-                    Remind
+                    {mounted ? t(language, "misc.remind") : "Remind"}
                   </button>
                 </div>
               ))}
@@ -201,6 +206,8 @@ export function LivePage() {
               updates={updates}
               newUpdateCount={newUpdateCount}
               onShowNew={showNewUpdates}
+              language={language}
+              mounted={mounted}
             />
           </div>
         </aside>
@@ -210,6 +217,8 @@ export function LivePage() {
 }
 
 function LiveUpdatesTimeline({
+  language,
+  mounted,
   updates,
   newUpdateCount,
   onShowNew,
@@ -217,12 +226,14 @@ function LiveUpdatesTimeline({
   updates: typeof LIVE_UPDATES;
   newUpdateCount: number;
   onShowNew: () => void;
+  language: any;
+  mounted: boolean;
 }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-display text-lg font-bold flex items-center gap-2">
-          Live Updates
+          {mounted ? t(language, "misc.liveUpdates") : "Live Updates"}
           <span className="relative flex h-2 w-2">
             <span className="animate-live-pulse absolute inline-flex h-full w-full rounded-full bg-live" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-live" />

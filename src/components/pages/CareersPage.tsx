@@ -5,6 +5,8 @@ import { useStore } from "@/lib/store";
 import { JOBS } from "@/lib/mock-data";
 import { fetchJobs } from "@/lib/api-client";
 import { ArrowRight, MapPin, Briefcase, Users, Loader2 } from "lucide-react";
+import { t } from "@/lib/i18n";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 import type { Job } from "@/lib/types";
 
@@ -12,7 +14,8 @@ const DEPARTMENTS = ["All", "Editorial", "Tech", "Sales", "Operations"] as const
 const TYPES = ["All", "Full-time", "Part-time", "Contract", "Internship"] as const;
 
 export function CareersPage() {
-  const { navigate } = useStore();
+  const mounted = useHydrated();
+  const { navigate, language } = useStore();
   const [department, setDepartment] = useState<(typeof DEPARTMENTS)[number]>("All");
   const [type, setType] = useState<(typeof TYPES)[number]>("All");
   const [jobs, setJobs] = useState<Job[]>(JOBS);
@@ -51,21 +54,18 @@ export function CareersPage() {
         />
         <div className="relative mx-auto max-w-[1280px] px-4 md:px-8 py-16 md:py-24">
           <p className="font-ui text-[11px] font-bold uppercase tracking-[0.2em] text-brand-light mb-4">
-            Careers
+            {mounted ? t(language, "misc.careers") : "Careers"}
           </p>
           <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight max-w-3xl leading-[1.05]">
-            Join our team.
+            {mounted ? t(language, "misc.joinOurTeam") : "Join our team."}
           </h1>
           <p className="font-serif text-lg md:text-xl text-background/75 mt-5 max-w-2xl">
-            We&rsquo;re building the country&rsquo;s most trusted newsroom — one
-            story at a time. If you believe in serious journalism, in
-            independence, and in the work of getting it right, we&rsquo;d love
-            to hear from you.
+            {mounted ? t(language, "misc.careersIntro") : "We’re building the country’s most trusted newsroom — one story at a time. If you believe in serious journalism, in independence, and in the work of getting it right, we’d love to hear from you."}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 font-ui text-sm text-background/80">
             <span className="flex items-center gap-1.5">
               <Users className="h-4 w-4" />
-              {JOBS.length} open positions
+              {JOBS.length}{mounted ? t(language, "misc.openPositions") : " open positions"}
             </span>
             <span className="flex items-center gap-1.5">
               <Briefcase className="h-4 w-4" />
@@ -157,7 +157,7 @@ export function CareersPage() {
             {filtered.length === 0 ? (
               <div className="py-12 text-center">
                 <p className="font-ui text-sm text-ink-secondary">
-                  No positions match these filters right now.
+                  {mounted ? t(language, "misc.noPositions") : "No positions match these filters right now."}
                 </p>
                 <button
                   onClick={() => {
@@ -166,7 +166,7 @@ export function CareersPage() {
                   }}
                   className="mt-3 px-4 h-10 rounded-md border border-border hover:bg-muted font-ui text-xs font-semibold"
                 >
-                  Clear filters
+                  {mounted ? t(language, "misc.clearFilters") : "Clear filters"}
                 </button>
               </div>
             ) : (

@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import type { PageView, PodcastEpisode } from "./types";
 import { fetchSession } from "./api-client";
 
@@ -52,64 +53,75 @@ interface NavState {
   refreshSession: () => Promise<void>;
 }
 
-export const useStore = create<NavState>((set, get) => ({
-  current: { type: "home" },
-  language: "hi",
-  setLanguage: (lang) => set({ language: lang }),
-  history: [],
-  navigate: (view) => {
-    const { current, history } = get();
-    set({
-      current: view,
-      history: [...history, current].slice(-50),
+export const useStore = create<NavState>()(
+  persist(
+    (set, get) => ({
+      current: { type: "home" },
+      language: "hi",
+      setLanguage: (lang) => set({ language: lang }),
+      history: [],
+      navigate: (view) => {
+        const { current, history } = get();
+        set({
+          current: view,
+          history: [...history, current].slice(-50),
+          mobileMenuOpen: false,
+          searchOpen: false,
+        });
+        if (typeof window !== "undefined") {
+          window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+        }
+      },
+      back: () => {
+        const { history } = get();
+        if (history.length === 0) return;
+        const prev = history[history.length - 1];
+        set({
+          current: prev,
+          history: history.slice(0, -1),
+          mobileMenuOpen: false,
+          searchOpen: false,
+        });
+        if (typeof window !== "undefined") {
+          window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+        }
+      },
+      canGoBack: () => get().history.length > 0,
+
       mobileMenuOpen: false,
+      setMobileMenuOpen: (open) => set({ mobileMenuOpen: open }),
+
       searchOpen: false,
-    });
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+      setSearchOpen: (open) => set({ searchOpen: open }),
+
+      isLive: true,
+
+      nowPlaying: null,
+      isPlaying: false,
+      playEpisode: (episode) => set({ nowPlaying: episode, isPlaying: true }),
+      togglePlay: () => set((s) => ({ isPlaying: !s.isPlaying })),
+      stopPlayback: () => set({ nowPlaying: null, isPlaying: false }),
+
+      readingProgress: 0,
+      setReadingProgress: (p) => set({ readingProgress: p }),
+
+      user: null,
+      sessionLoading: true,
+      setSession: (user) => set({ user, sessionLoading: false }),
+      refreshSession: async () => {
+        set({ sessionLoading: true });
+        try {
+          const { user } = await fetchSession();
+          set({ user, sessionLoading: false });
+        } catch {
+          set({ user: null, sessionLoading: false });
+        }
+      },
+    }),
+    {
+      name: "newsvarta-store",
+      partialize: (state) => ({ language: state.language }),
+      version: 1,
     }
-  },
-  back: () => {
-    const { history } = get();
-    if (history.length === 0) return;
-    const prev = history[history.length - 1];
-    set({
-      current: prev,
-      history: history.slice(0, -1),
-    });
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-    }
-  },
-  canGoBack: () => get().history.length > 0,
-
-  mobileMenuOpen: false,
-  setMobileMenuOpen: (open) => set({ mobileMenuOpen: open }),
-
-  searchOpen: false,
-  setSearchOpen: (open) => set({ searchOpen: open }),
-
-  isLive: true,
-
-  nowPlaying: null,
-  isPlaying: false,
-  playEpisode: (episode) => set({ nowPlaying: episode, isPlaying: true }),
-  togglePlay: () => set((s) => ({ isPlaying: !s.isPlaying })),
-  stopPlayback: () => set({ nowPlaying: null, isPlaying: false }),
-
-  readingProgress: 0,
-  setReadingProgress: (p) => set({ readingProgress: p }),
-
-  user: null,
-  sessionLoading: true,
-  setSession: (user) => set({ user, sessionLoading: false }),
-  refreshSession: async () => {
-    set({ sessionLoading: true });
-    try {
-      const { user } = await fetchSession();
-      set({ user, sessionLoading: false });
-    } catch {
-      set({ user: null, sessionLoading: false });
-    }
-  },
-}));
+  )
+);

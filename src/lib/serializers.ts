@@ -21,7 +21,7 @@ export function serializeArticle(
     body: a.body,
     category: a.categorySlug as Article["category"],
     tags: safeParse(a.tags, []),
-    states: a.stateTags ? safeParse<string[]>(a.stateTags, undefined) : undefined,
+    states: a.stateTags ? safeParse<string[]>(a.stateTags, []) : undefined,
     authorId: a.authorId,
     publishedAt: a.publishedAt?.toISOString() ?? a.createdAt.toISOString(),
     updatedAt: a.updatedAt?.toISOString() ?? undefined,

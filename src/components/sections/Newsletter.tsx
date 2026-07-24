@@ -4,11 +4,17 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { subscribeNewsletter } from "@/lib/api-client";
 import { Loader2 } from "lucide-react";
+import { useT } from "@/hooks/use-t";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export function Newsletter() {
+  const t = useT();
+  const mounted = useHydrated();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  if (!mounted) return null;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,9 +24,9 @@ export function Newsletter() {
     setSubmitting(false);
     if (ok) {
       setSubmitted(true);
-      toast.success("You're in! Check your inbox.");
+      toast.success(t("misc.subscribeSuccess"));
     } else {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("misc.subscribeError"));
     }
   };
 
@@ -28,21 +34,19 @@ export function Newsletter() {
     <section className="mb-12 md:mb-16">
       <div className="bg-foreground text-background rounded-xl p-6 md:p-12 text-center">
         <h2 className="font-display text-2xl md:text-4xl font-extrabold tracking-tight">
-          Never Miss a Story.
+          {t("misc.newsletterTitle")}
         </h2>
         <p className="font-serif text-base md:text-lg text-background/75 mt-3 max-w-xl mx-auto">
-          The morning briefing, delivered to your inbox every weekday at 7 AM.
-          The day&rsquo;s top stories, contextualised by our editors — in twenty
-          minutes or less.
+          {t("misc.newsletterDesc")}
         </p>
 
         {submitted ? (
           <div className="mt-6 max-w-md mx-auto">
             <p className="font-display text-xl font-bold text-background">
-              You&rsquo;re in! Check your inbox.
+              {t("misc.subscribeSuccess")}
             </p>
             <p className="font-ui text-sm text-background/70 mt-2">
-              We&rsquo;ve sent a confirmation link to <strong>{email}</strong>.
+              {t("misc.confirmationSent")} <strong>{email}</strong>.
             </p>
           </div>
         ) : (
@@ -55,7 +59,7 @@ export function Newsletter() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder={t("misc.emailPlaceholder")}
               aria-label="Email address"
               className="flex-1 h-12 px-4 rounded-md bg-white/10 border border-white/15 text-background placeholder:text-background/50 focus:outline-none focus:ring-2 focus:ring-brand-light font-ui text-sm"
             />
@@ -67,17 +71,17 @@ export function Newsletter() {
               {submitting ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Subscribing…
+                  {t("misc.subscribing")}
                 </>
               ) : (
-                "Subscribe"
+                t("misc.subscribe")
               )}
             </button>
           </form>
         )}
 
         <p className="font-ui text-[11px] text-background/50 mt-4">
-          Free, no spam, unsubscribe anytime.
+          {t("misc.noSpam")}
         </p>
       </div>
     </section>

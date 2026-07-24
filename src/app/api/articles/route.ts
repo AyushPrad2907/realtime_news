@@ -61,6 +61,12 @@ async function getPibArticleImage(prid: string): Promise<string> {
         if (imgUrl.startsWith("/")) imgUrl = imgUrl.substring(1);
         imgUrl = `https://static.pib.gov.in/${imgUrl}`;
       }
+      if (imageCache.size >= 500) {
+        const firstKey = imageCache.keys().next().value;
+        if (firstKey !== undefined) {
+          imageCache.delete(firstKey);
+        }
+      }
       imageCache.set(prid, imgUrl);
       return imgUrl;
     }
@@ -158,7 +164,8 @@ async function fetchPibArticles(lang: string = "en"): Promise<any[]> {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const limit = Math.min(parseInt(searchParams.get("limit") ?? "20", 10), 100);
+  const parsedLimit = parseInt(searchParams.get("limit") ?? "20", 10);
+  const limit = Math.min(isNaN(parsedLimit) ? 20 : parsedLimit, 100);
   const category = searchParams.get("category");
   const state = searchParams.get("state");
   const breaking = searchParams.get("breaking") === "true";
@@ -175,8 +182,8 @@ export async function GET(req: NextRequest) {
     where.stateTags = { contains: `"${state}"` };
   }
   if (date) {
-    const start = new Date(date + "T00:00:00.000Z");
-    const end = new Date(date + "T23:59:59.999Z");
+    const start = new Date(date + "T00:00:00.000+05:30");
+    const end = new Date(date + "T23:59:59.999+05:30");
     where.publishedAt = { gte: start, lte: end };
   }
 

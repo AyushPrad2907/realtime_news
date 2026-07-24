@@ -5,8 +5,13 @@ import { Mail, Phone, MapPin, Send, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { submitContact } from "@/lib/api-client";
+import { t } from "@/lib/i18n";
+import { useHydrated } from "@/hooks/use-hydrated";
+import { useStore } from "@/lib/store";
 
 export function ContactPage() {
+  const { language } = useStore();
+  const mounted = useHydrated();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
@@ -23,7 +28,7 @@ export function ContactPage() {
     setSubmitting(false);
     if (ok) {
       setSubmitted(true);
-      toast.success("Message sent! We'll respond within 2 business days.");
+      toast.success(t(language, "misc.messageSent"));
     } else {
       toast.error("Something went wrong. Please try again.");
     }
@@ -34,15 +39,13 @@ export function ContactPage() {
       {/* Header */}
       <div className="mb-10 max-w-3xl">
         <p className="font-ui text-[11px] font-bold uppercase tracking-[0.2em] text-brand mb-3">
-          Contact Us
+          {mounted && language === "hi" ? "संपर्क करें" : "Contact Us"}
         </p>
         <h1 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight leading-tight mb-4">
-          Get in touch with our team.
+          {mounted && language === "hi" ? "हमारी टीम से संपर्क करें।" : "Get in touch with our team."}
         </h1>
         <p className="font-serif text-lg text-ink-secondary leading-relaxed">
-          Have a tip, a correction, or a question? We&rsquo;d love to hear from
-          you. Choose the right contact below, or send us a message and
-          we&rsquo;ll route it to the right desk.
+          {mounted && language === "hi" ? "क्या आपके पास कोई सुझाव, सुधार या प्रश्न है? हमें आपसे सुनना अच्छा लगेगा। नीचे सही संपर्क चुनें, या हमें संदेश भेजें।" : "Have a tip, a correction, or a question? We'd love to hear from you. Choose the right contact below, or send us a message and we'll route it to the right desk."}
         </p>
       </div>
 
@@ -115,7 +118,7 @@ export function ContactPage() {
                 <Check className="h-7 w-7" />
               </div>
               <h3 className="font-display text-2xl font-bold mb-2">
-                Message sent.
+                {mounted && language === "hi" ? "संदेश भेजा गया।" : "Message sent."}
               </h3>
               <p className="font-serif text-base text-ink-secondary max-w-md mx-auto">
                 Thank you for reaching out. We&rsquo;ll respond within two
@@ -126,7 +129,7 @@ export function ContactPage() {
                 onClick={() => setSubmitted(false)}
                 className="mt-6 px-5 h-11 rounded-md border border-border hover:bg-muted font-ui text-sm font-semibold"
               >
-                Send another message
+                {mounted && language === "hi" ? "एक और संदेश भेजें" : "Send another message"}
               </button>
             </motion.div>
           ) : (
@@ -135,14 +138,14 @@ export function ContactPage() {
               className="p-6 md:p-8 rounded-lg border border-border bg-surface-alt"
             >
               <h2 className="font-display text-xl font-bold mb-1">
-                Send us a message
+                {mounted && language === "hi" ? "हमें एक संदेश भेजें" : "Send us a message"}
               </h2>
               <p className="font-ui text-sm text-ink-secondary mb-6">
-                We&rsquo;ll route your message to the right team.
+                {mounted && language === "hi" ? "हम आपका संदेश सही टीम तक पहुंचाएंगे।" : "We'll route your message to the right team."}
               </p>
 
               <div className="grid sm:grid-cols-2 gap-4">
-                <ContactField label="Full name" required>
+                <ContactField label={mounted && language === "hi" ? "पूरा नाम" : "Full name"} required>
                   <input
                     type="text"
                     required
@@ -152,7 +155,7 @@ export function ContactPage() {
                     className="contact-input"
                   />
                 </ContactField>
-                <ContactField label="Email address" required>
+                <ContactField label={mounted && language === "hi" ? "ईमेल पता" : "Email address"} required>
                   <input
                     type="email"
                     required
@@ -165,7 +168,7 @@ export function ContactPage() {
               </div>
 
               <div className="mt-4">
-                <ContactField label="Subject" required>
+                <ContactField label={mounted && language === "hi" ? "विषय" : "Subject"} required>
                   <select
                     required
                     value={form.subject}
@@ -184,11 +187,11 @@ export function ContactPage() {
               </div>
 
               <div className="mt-4">
-                <ContactField label="Message" required>
+                <ContactField label={mounted && language === "hi" ? "संदेश" : "Message"} required>
                   <textarea
                     required
                     rows={6}
-                    placeholder="Tell us what's on your mind."
+                    placeholder={mounted && language === "hi" ? "हमें बताएं कि आपके दिमाग में क्या है।" : "Tell us what's on your mind."}
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     className="contact-input resize-none h-auto"
@@ -206,7 +209,7 @@ export function ContactPage() {
                 ) : (
                   <Send className="h-4 w-4" />
                 )}
-                {submitting ? "Sending…" : "Send message"}
+                {submitting ? (mounted && language === "hi" ? "भेजा जा रहा है…" : "Sending…") : (mounted && language === "hi" ? "संदेश भेजें" : "Send message")}
               </button>
               <p className="font-ui text-[11px] text-ink-tertiary mt-3">
                 By submitting, you agree to our privacy policy. We&rsquo;ll only

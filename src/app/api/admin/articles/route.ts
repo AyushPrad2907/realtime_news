@@ -21,7 +21,10 @@ export async function GET(req: NextRequest) {
   const authorId = searchParams.get("authorId");
 
   const where: any = {};
-  if (status) where.status = status;
+  const VALID_STATUSES = ["DRAFT", "PENDING", "PUBLISHED", "REJECTED"];
+  if (status && VALID_STATUSES.includes(status)) {
+    where.status = status as ArticleStatus;
+  }
   if (category) where.categorySlug = category;
   if (authorId) where.authorId = authorId;
 
@@ -74,12 +77,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const baseSlug = title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .slice(0, 80);
+  const hasLatin = /[a-z0-9]/i.test(title);
+  const baseSlug = hasLatin
+    ? title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "-")
+        .slice(0, 80)
+    : `article-${Date.now()}`;
   const slug = await uniqueSlug(baseSlug);
 
   const article = await db.article.create({

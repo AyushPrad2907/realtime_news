@@ -30,19 +30,19 @@ export function useAsyncData<T>(
       const result = await fetcher();
       setData(result);
       setError(null);
-    } catch (e: any) {
-      setError(e);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e : new Error(String(e)));
     } finally {
       setLoading(false);
     }
-  }, deps);
+  }, [fetcher, ...deps]);
 
   useEffect(() => {
     const id = setTimeout(() => {
       reload();
     }, 0);
     return () => clearTimeout(id);
-  }, deps);
+  }, [reload]);
 
   return { data, loading, error, reload };
 }

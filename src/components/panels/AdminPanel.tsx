@@ -39,6 +39,8 @@ import {
   adminCreateLiveUpdate,
   adminUpdateLiveUpdate,
   adminDeleteLiveUpdate,
+  adminFetchLayout,
+  adminUpdateLayout,
 } from "@/lib/api-client";
 import { PanelShell, ADMIN_NAV } from "./PanelShell";
 import { CATEGORIES } from "@/lib/mock-data";
@@ -472,7 +474,7 @@ function AdminEditors() {
           toast.error("Password is required for new users.");
           return;
         }
-        await adminCreateEditor(form);
+        await adminCreateEditor(form as any);
         toast.success("Editor created.");
       }
       resetForm();

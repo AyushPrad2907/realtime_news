@@ -6,6 +6,7 @@ import { getCategory, getAuthor } from "@/lib/utils-news";
 import { Clock, Headphones, ArrowRight } from "lucide-react";
 import { TimeAgo } from "@/components/TimeAgo";
 import { useT } from "@/hooks/use-t";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 interface HeroStoryProps {
   article: Article;
@@ -14,9 +15,12 @@ interface HeroStoryProps {
 export function HeroStory({ article }: HeroStoryProps) {
   const { navigate } = useStore();
   const t = useT();
+  const mounted = useHydrated();
   const cat = getCategory(article.category);
   const author = getAuthor(article.authorId);
   const categoryTitle = t(`cat.${article.category}` as any) || cat.name;
+
+  if (!mounted) return null;
 
   return (
     <section className="mb-10 md:mb-16">
@@ -78,7 +82,7 @@ export function HeroStory({ article }: HeroStoryProps) {
                   <span aria-hidden className="hidden md:inline">·</span>
                   <span className="hidden md:flex items-center gap-1">
                     <Headphones className="h-3 w-3" />
-                    Audio
+                    {t("misc.audio")}
                   </span>
                 </>
               )}

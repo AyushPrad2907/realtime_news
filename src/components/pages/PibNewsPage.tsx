@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useStore } from "@/lib/store";
 import { Calendar, Search, RefreshCw, ExternalLink, FileText, ChevronRight, X, ArrowLeft, ZoomIn, ZoomOut } from "lucide-react";
+import DOMPurify from "dompurify";
 import { cn } from "@/lib/utils";
 
 interface PibArticle {
@@ -15,7 +16,7 @@ interface PibArticle {
 import { useT } from "@/hooks/use-t";
 
 export function PibNewsPage() {
-  const { navigate } = useStore();
+  const { navigate, language } = useStore();
   const t = useT();
   const [articles, setArticles] = useState<PibArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +73,7 @@ export function PibNewsPage() {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return dateString;
-      return date.toLocaleDateString("en-IN", {
+      return date.toLocaleDateString(language === "hi" ? "hi-IN" : "en-IN", {
         day: "numeric",
         month: "short",
         year: "numeric",
@@ -217,7 +218,7 @@ export function PibNewsPage() {
                 fontSize === "lg" && "text-lg md:text-xl",
                 fontSize === "xl" && "text-xl md:text-2xl"
               )}
-              dangerouslySetInnerHTML={{ __html: articleHtml || "" }}
+              dangerouslySetInnerHTML={{ __html: typeof window !== "undefined" ? DOMPurify.sanitize(articleHtml || "") : "" }}
             />
             
             {/* Inline helper styles to reset generic styles inside retrieved tables */}
@@ -314,6 +315,7 @@ export function PibNewsPage() {
               placeholder="Filter by keyword (e.g. Ministry, PM, cabinet)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Filter releases by keyword"
               className="w-full pl-9 pr-4 h-10 rounded-md border border-border bg-background focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent text-sm"
             />
           </div>

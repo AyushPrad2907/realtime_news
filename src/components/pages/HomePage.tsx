@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { ARTICLES_LIST } from "@/lib/mock-data";
 import { useArticles, usePodcasts } from "@/lib/use-data";
+import { useT } from "@/hooks/use-t";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { HeroStory } from "@/components/sections/HeroStory";
 import { TopStories } from "@/components/sections/TopStories";
 import { LatestNews } from "@/components/sections/LatestNews";
@@ -48,6 +50,8 @@ function LazySection({ children }: { children: React.ReactNode }) {
 }
 
 export function HomePage() {
+  const t = useT();
+  const mounted = useHydrated();
   // Fetch from real API; mock data is returned instantly as fallback
   const { data: articles, loading } = useArticles({ limit: 50 });
   const { data: podcastData } = usePodcasts();
@@ -141,7 +145,7 @@ export function HomePage() {
   if (!featured) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-        <p className="font-ui text-sm text-ink-secondary">Loading…</p>
+        <p className="font-ui text-sm text-ink-secondary">{mounted ? t("misc.loading") : "Loading…"}</p>
       </div>
     );
   }
@@ -165,7 +169,7 @@ export function HomePage() {
             <AdBanner format="rectangle" />
             <div>
               <h3 className="font-display text-base font-bold mb-3 border-b border-border pb-2">
-                Most Read
+                {mounted ? t("misc.mostRead") : "Most Read"}
               </h3>
               <ol className="space-y-3">
                 {[...list]

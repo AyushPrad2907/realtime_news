@@ -269,31 +269,31 @@ const ARTICLES: Article[] = [
 export const ARTICLES_LIST = ARTICLES;
 
 export const BREAKING_NEWS = [
-  "Parliament clears Digital Public Infrastructure Bill in landmark vote",
-  "Kerala floods: 12,000 moved to relief camps as rivers cross danger marks",
-  "RBI holds repo rate at 6.25%, signals caution on inflation",
-  "India clinch Test series decider against Australia by 17 runs",
-  "ASEAN summit ends with maritime security accord and trade pledge",
+  "संसद ने ऐतिहासिक मतदान में डिजिटल सार्वजनिक अवसंरचना विधेयक को मंजूरी दी",
+  "केरल बाढ़: नदियां खतरे के निशान को पार कर गईं, 12,000 लोगों को राहत शिविरों में भेजा गया",
+  "आरबीआई ने रेपो दर 6.25% पर बरकरार रखी, मुद्रास्फीति पर सतर्कता के संकेत दिए",
+  "भारत ने ऑस्ट्रेलिया के खिलाफ टेस्ट सीरीज का निर्णायक मैच 17 रन से जीता",
+  "आसियान शिखर सम्मेलन समुद्री सुरक्षा समझौते और व्यापार प्रतिज्ञा के साथ समाप्त हुआ",
 ];
 
 export const TRENDING_TOPICS = [
-  "Digital Public Infrastructure Bill",
-  "RBI Monetary Policy",
-  "BharatLM-1 AI Model",
-  "Kerala Floods",
-  "IPL Mega Auction",
-  "World Athletics Championships",
-  "ISRO Reusable Launch Vehicle",
-  "Dengue Vaccine Trial",
+  "डिजिटल सार्वजनिक अवसंरचना विधेयक",
+  "आरबीआई मौद्रिक नीति",
+  "भारतएलएम-1 एआई मॉडल",
+  "केरल बाढ़",
+  "आईपीएल मेगा नीलामी",
+  "विश्व एथलेटिक्स चैंपियनशिप",
+  "इसरो पुन: प्रयोज्य प्रक्षेपण यान",
+  "डेंगू वैक्सीन परीक्षण",
 ];
 
 export const LIVE_UPDATES: LiveUpdate[] = [
-  { id: "u1", timestamp: "11:42 AM", text: "Parliament adjourns sine die after passage of the Digital Public Infrastructure Bill. The session saw 14 sittings over 19 days." },
-  { id: "u2", timestamp: "11:15 AM", text: "Prime Minister addresses the nation following the Bill's passage, calling it \"a defining moment for digital India.\"" },
-  { id: "u3", timestamp: "10:30 AM", text: "The Bill passed with 312 votes in favour and 184 against. Three amendments moved by the opposition were defeated in division." },
-  { id: "u4", timestamp: "09:48 AM", text: "Minister of Electronics and IT begins his reply to the debate. Defends the inclusion of the Cabinet Secretary on the oversight authority." },
-  { id: "u5", timestamp: "09:05 AM", text: "Discussion on the Digital Public Infrastructure Bill enters its sixth hour. Twelve members have spoken so far, including six from the opposition." },
-  { id: "u6", timestamp: "08:20 AM", text: "Parliament convenes for the final day of the monsoon session. The Digital Public Infrastructure Bill listed for passage today." },
+  { id: "u1", timestamp: "पूर्वाह्न 11:42", text: "डिजिटल सार्वजनिक अवसंरचना विधेयक पारित होने के बाद संसद अनिश्चित काल के लिए स्थगित। सत्र में 19 दिनों में 14 बैठकें हुईं।" },
+  { id: "u2", timestamp: "पूर्वाह्न 11:15", text: "प्रधानमंत्री ने विधेयक पारित होने के बाद राष्ट्र को संबोधित किया, इसे \"डिजिटल भारत के लिए एक महत्वपूर्ण क्षण\" कहा।" },
+  { id: "u3", timestamp: "पूर्वाह्न 10:30", text: "विधेयक पक्ष में 312 और विरोध में 184 मतों के साथ पारित हुआ। विपक्ष द्वारा लाए गए तीन संशोधन मतविभाजन में खारिज हो गए।" },
+  { id: "u4", timestamp: "पूर्वाह्न 09:48", text: "इलेक्ट्रॉनिक्स और आईटी मंत्री ने बहस का जवाब देना शुरू किया। निगरानी प्राधिकरण में कैबिनेट सचिव को शामिल करने का बचाव किया।" },
+  { id: "u5", timestamp: "पूर्वाह्न 09:05", text: "डिजिटल सार्वजनिक अवसंरचना विधेयक पर चर्चा छठे घंटे में प्रवेश कर गई। विपक्ष के छह सदस्यों सहित अब तक बारह सदस्यों ने बात की है।" },
+  { id: "u6", timestamp: "पूर्वाह्न 08:20", text: "संसद मानसून सत्र के अंतिम दिन के लिए एकत्रित हुई। डिजिटल सार्वजनिक अवसंरचना विधेयक आज पारित होने के लिए सूचीबद्ध।" },
 ];
 
 export const PODCAST_SERIES: PodcastSeries[] = [

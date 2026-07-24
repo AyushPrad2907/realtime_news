@@ -3,10 +3,14 @@
 import { useStore } from "@/lib/store";
 import { Play, Users } from "lucide-react";
 import { useT } from "@/hooks/use-t";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export function LiveSection() {
   const { navigate, isLive } = useStore();
   const t = useT();
+  const mounted = useHydrated();
+
+  if (!mounted) return null;
 
   return (
     <section className="mb-12 md:mb-16">
@@ -43,7 +47,7 @@ export function LiveSection() {
             {/* Viewer count */}
             <div className="absolute bottom-4 left-4 flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/60 backdrop-blur text-white font-ui text-xs">
               <Users className="h-3 w-3" />
-              <span>4,287 watching</span>
+              <span>4,287 {t("misc.watching")}</span>
             </div>
           </button>
 
@@ -53,12 +57,10 @@ export function LiveSection() {
               {t("live.liveStream")}
             </p>
             <h3 className="font-display text-2xl md:text-3xl font-extrabold leading-tight mb-3">
-              Parliament Passes Digital Infrastructure Bill — Special Coverage
+              {t("live.title")}
             </h3>
             <p className="font-serif text-base text-background/80 mb-5">
-              Join our anchors and correspondents for live analysis as the Bill
-              moves to the President for assent. With expert guests and
-              on-the-ground reporting.
+              {t("live.desc")}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <button
@@ -69,8 +71,8 @@ export function LiveSection() {
                 {t("live.watchLive")}
               </button>
               <div className="font-ui text-xs text-background/70">
-                <p>On air since 8:00 AM</p>
-                <p>Today · 11 hours of coverage</p>
+                <p>{t("live.onAirSince")}</p>
+                <p>{t("live.coverage")}</p>
               </div>
             </div>
           </div>

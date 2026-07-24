@@ -1,0 +1,59 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useStore } from "@/lib/store";
+
+export function GoogleTranslate() {
+  const { language } = useStore();
+  const hasMounted = useRef(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return; // skip on first mount — avoid reload on page load
+    }
+
+    const rawMatch = document.cookie.match(/googtrans=([^;]+)/);
+    const currentVal = rawMatch ? decodeURIComponent(rawMatch[1]) : null;
+    const targetVal = language === "hi" ? "/en/hi" : "/en/en";
+
+    if (currentVal === targetVal) return; // already correct, no reload needed
+
+    // Clear any existing googtrans cookies
+    document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname}`;
+
+    // Set new value
+    document.cookie = `googtrans=${targetVal}; path=/`;
+    document.cookie = `googtrans=${targetVal}; path=/; domain=${window.location.hostname}`;
+    window.location.reload();
+  }, [language, mounted]);
+
+  if (!mounted) return null;
+
+  return (
+    <>
+      <div id="google_translate_element" style={{ display: "none" }} suppressHydrationWarning></div>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.googleTranslateElementInit = function() {
+              new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'hi,en',
+                autoDisplay: false
+              }, 'google_translate_element');
+            }
+          `,
+        }}
+      />
+      <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" />
+    </>
+  );
+}

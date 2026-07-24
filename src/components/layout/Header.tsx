@@ -63,7 +63,7 @@ export function Header() {
             <button
               onClick={() => setSearchOpen(true)}
               className="md:hidden -ml-1 p-1.5 sm:p-2 rounded-md hover:bg-muted transition-colors"
-              aria-label="Open search"
+              aria-label={mounted ? t("aria.openSearch") : "Open search"}
             >
               <Search className="h-5 w-5" />
             </button>
@@ -75,7 +75,7 @@ export function Header() {
                 navigate({ type: "date-archive", date: today });
               }}
               className="md:hidden p-1.5 sm:p-2 rounded-md hover:bg-muted transition-colors"
-              aria-label="Browse by date"
+              aria-label={mounted ? t("aria.browseDate") : "Browse by date"}
             >
               <CalendarIcon className="h-5 w-5" />
             </button>
@@ -84,7 +84,7 @@ export function Header() {
             <button
               onClick={() => navigate({ type: "home" })}
               className="flex items-center gap-2 group"
-              aria-label="Go to homepage"
+              aria-label={mounted ? t("aria.homepage") : "Go to homepage"}
             >
               <span className="font-display text-[15px] min-[375px]:text-[17px] sm:text-xl md:text-2xl font-extrabold tracking-tight">
                 News<span className="text-brand">varta</span>
@@ -108,7 +108,7 @@ export function Header() {
               >
                 {item.label === "Live" ? (
                   <span className="flex items-center gap-1.5">
-                    {t(item.key)}
+                    {mounted ? t(item.key) : item.label}
                     {isLive && (
                       <span className="relative flex h-1.5 w-1.5">
                         <span className="animate-live-pulse absolute inline-flex h-full w-full rounded-full bg-live" />
@@ -117,7 +117,7 @@ export function Header() {
                     )}
                   </span>
                 ) : (
-                  t(item.key)
+                  mounted ? t(item.key) : item.label
                 )}
               </button>
             ))}
@@ -146,7 +146,7 @@ export function Header() {
             <button
               onClick={() => setSearchOpen(true)}
               className="hidden md:inline-flex items-center gap-2 px-3 h-9 rounded-md border border-border hover:bg-muted transition-colors text-sm text-ink-secondary"
-              aria-label="Open search (Ctrl+K)"
+              aria-label={mounted ? t("aria.openSearchKbd") : "Open search (Ctrl+K)"}
             >
               <Search className="h-4 w-4" />
               <span className="text-xs">{t("search.label")}</span>
@@ -160,7 +160,7 @@ export function Header() {
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 className="p-2 rounded-md hover:bg-muted transition-colors"
-                aria-label="Toggle theme"
+                aria-label={mounted ? t("aria.toggleTheme") : "Toggle theme"}
               >
                 {theme === "dark" ? (
                   <Sun className="h-4 w-4" />
@@ -175,7 +175,7 @@ export function Header() {
               <button
                 onClick={() => setLanguage(language === "en" ? "hi" : "en")}
                 className="inline-flex items-center gap-1 px-2.5 h-8 rounded-md border border-border bg-background hover:bg-muted text-ink-secondary transition-colors font-ui text-xs font-bold"
-                aria-label="Change language"
+                aria-label={mounted ? t("aria.changeLanguage") : "Change language"}
               >
                 <Languages className="h-3.5 w-3.5" />
                 <span>{language === "en" ? "EN" : "हिं"}</span>
@@ -223,7 +223,7 @@ export function Header() {
                             className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-left font-ui text-sm"
                           >
                             <Shield className="h-3.5 w-3.5 text-brand" />
-                            {t("Admin Panel")}
+                            {t("misc.adminPanel")}
                           </button>
                         )}
                         <button
@@ -234,7 +234,7 @@ export function Header() {
                           className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-left font-ui text-sm"
                         >
                           <PenLine className="h-3.5 w-3.5 text-brand" />
-                          {t("Editor Panel")}
+                          {t("misc.editorPanel")}
                         </button>
                         <button
                           onClick={async () => {
@@ -246,7 +246,7 @@ export function Header() {
                           className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-muted text-left font-ui text-sm text-destructive"
                         >
                           <LogOut className="h-3.5 w-3.5" />
-                          {t("Sign out")}
+                          {t("misc.signOut")}
                         </button>
                       </motion.div>
                     </>
@@ -259,7 +259,7 @@ export function Header() {
                 className="hidden md:inline-flex items-center gap-1.5 px-3 h-9 rounded-md border border-border hover:bg-muted transition-colors font-ui text-xs font-semibold"
               >
                 <UserCircle2 className="h-3.5 w-3.5" />
-                {t("Newsroom")}
+                {t("misc.newsroom")}
               </button>
             )}
 
@@ -267,7 +267,7 @@ export function Header() {
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="md:hidden p-1.5 sm:p-2 rounded-md hover:bg-muted transition-colors"
-              aria-label="Open menu"
+              aria-label={mounted ? t("aria.openMenu") : "Open menu"}
             >
               <Menu className="h-5 w-5" />
             </button>

@@ -93,9 +93,9 @@ export function useLive() {
     isLive: true,
     viewerCount: 4287,
     startedAt: new Date(new Date().setHours(8, 0, 0, 0)).toISOString(),
-    programTitle: "Parliament Passes Digital Infrastructure Bill — Special Coverage",
+    programTitle: "संसद ने डिजिटल अवसंरचना विधेयक पारित किया — विशेष कवरेज",
     programDesc:
-      "Join our anchors and correspondents for live analysis as the Bill moves to the President for assent. With expert guests and on-the-ground reporting from Parliament House.",
+      "विधेयक पर राष्ट्रपति की स्वीकृति की ओर बढ़ने पर लाइव विश्लेषण के लिए हमारे एंकरों और संवाददाताओं से जुड़ें। संसद भवन से विशेषज्ञ मेहमानों और जमीनी रिपोर्टिंग के साथ।",
     youtubeUrl: "",
     nextBroadcastAt: null,
     showOnHomepage: true,

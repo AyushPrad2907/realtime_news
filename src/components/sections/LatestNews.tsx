@@ -7,6 +7,8 @@ import { AdBanner } from "./AdBanner";
 import { useMemo } from "react";
 import { useT } from "@/hooks/use-t";
 
+import { useHydrated } from "@/hooks/use-hydrated";
+
 interface LatestNewsProps {
   articles: Article[];
 }
@@ -14,6 +16,7 @@ interface LatestNewsProps {
 export function LatestNews({ articles }: LatestNewsProps) {
   const { navigate } = useStore();
   const t = useT();
+  const mounted = useHydrated();
 
   const sorted = useMemo(
     () =>
@@ -28,7 +31,7 @@ export function LatestNews({ articles }: LatestNewsProps) {
     <section className="mb-12 md:mb-16">
       <div className="flex items-end justify-between mb-5 md:mb-6 border-b border-border pb-3">
         <h2 className="h-section flex items-center gap-2">
-          {t("section.latestNews")}
+          {mounted ? t("section.latestNews") : "Latest News"}
           <span className="relative flex h-2 w-2">
             <span className="animate-live-pulse absolute inline-flex h-full w-full rounded-full bg-success" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
@@ -38,7 +41,7 @@ export function LatestNews({ articles }: LatestNewsProps) {
           onClick={() => navigate({ type: "section", slug: "national" })}
           className="font-ui text-xs font-semibold text-brand hover:text-brand-dark transition-colors"
         >
-          {t("section.viewAll")}
+          {mounted ? t("section.viewAll") : "View all →"}
         </button>
       </div>
 

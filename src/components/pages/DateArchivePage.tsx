@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { fetchArticles } from "@/lib/api-client";
+import type { Article } from "@/lib/types";
 import { ARTICLES_LIST } from "@/lib/mock-data";
 import { ArticleCard } from "@/components/cards/ArticleCard";
 import {

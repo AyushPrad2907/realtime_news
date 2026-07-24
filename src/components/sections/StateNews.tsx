@@ -6,10 +6,12 @@ import { ArticleCard } from "@/components/cards/ArticleCard";
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/hooks/use-t";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export function StateNews() {
   const { navigate } = useStore();
   const t = useT();
+  const mounted = useHydrated();
   const [activeState, setActiveState] = useState(INDIAN_STATES[0]);
 
   const articles = useMemo(
@@ -18,12 +20,14 @@ export function StateNews() {
     [activeState]
   );
 
+  if (!mounted) return null;
+
   return (
     <section className="mb-12 md:mb-16">
       <div className="flex items-end justify-between mb-5 md:mb-6 border-b border-border pb-3">
         <h2 className="h-section">{t("section.stateNews")}</h2>
         <span className="font-ui text-xs text-ink-tertiary">
-          {articles.length} {articles.length === 1 ? "story" : "stories"} from {activeState}
+          {articles.length} {articles.length === 1 ? t("misc.story") : t("misc.stories")}{t("misc.from")}{activeState}
         </span>
       </div>
 
@@ -31,7 +35,7 @@ export function StateNews() {
       <div className="grid md:grid-cols-[200px_1fr] gap-6 md:gap-8">
         <aside className="md:border-r md:border-border md:pr-6">
           <p className="font-ui text-[11px] font-bold uppercase tracking-wider text-ink-tertiary mb-3 hidden md:block">
-            Select State
+            {t("misc.selectState")}
           </p>
           <div className="flex md:flex-col gap-2 overflow-x-auto no-scrollbar md:overflow-visible pb-1 md:pb-0">
             {INDIAN_STATES.slice(0, 10).map((s) => (
@@ -55,10 +59,10 @@ export function StateNews() {
           {articles.length === 0 ? (
             <div className="py-12 text-center bg-surface-alt rounded-md">
               <p className="font-ui text-sm text-ink-secondary">
-                No stories available for {activeState} right now.
+                {t("misc.noStoriesFor")} {activeState}
               </p>
               <p className="font-ui text-xs text-ink-tertiary mt-1">
-                Check back later or browse other states.
+                {t("misc.checkBackLater")}
               </p>
             </div>
           ) : (

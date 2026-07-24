@@ -5,13 +5,17 @@ import { CATEGORIES } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import { useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useT } from "@/hooks/use-t";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export function CategoryBar() {
   const { navigate, current } = useStore();
+  const t = useT();
+  const mounted = useHydrated();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(true);
-
+  
   const updateArrows = () => {
     const el = scrollRef.current;
     if (!el) return;
@@ -48,7 +52,7 @@ export function CategoryBar() {
             "hidden md:flex absolute left-0 top-0 bottom-0 z-10 w-10 items-center justify-center bg-gradient-to-r from-background to-transparent transition-opacity",
             canLeft ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
-          aria-label="Scroll categories left"
+          aria-label={mounted ? t("aria.scrollLeft") : "Scroll categories left"}
         >
           <ChevronLeft className="h-4 w-4 text-ink-secondary" />
         </button>
@@ -80,7 +84,7 @@ export function CategoryBar() {
                       style={{ background: cat.colorVar }}
                     />
                   )}
-                  {cat.name}
+                  {mounted ? (t(`cat.${cat.slug}` as any) || cat.name) : cat.name}
                 </span>
               </button>
             );
@@ -94,7 +98,7 @@ export function CategoryBar() {
             "hidden md:flex absolute right-0 top-0 bottom-0 z-10 w-10 items-center justify-center bg-gradient-to-l from-background to-transparent transition-opacity",
             canRight ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
-          aria-label="Scroll categories right"
+          aria-label={mounted ? t("aria.scrollRight") : "Scroll categories right"}
         >
           <ChevronRight className="h-4 w-4 text-ink-secondary" />
         </button>

@@ -7,10 +7,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { subscribeNewsletter } from "@/lib/api-client";
 import { useT } from "@/hooks/use-t";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export function Footer() {
   const { navigate } = useStore();
   const t = useT();
+  const mounted = useHydrated();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -21,12 +23,14 @@ export function Footer() {
     const ok = await subscribeNewsletter(email);
     setSubmitting(false);
     if (ok) {
-      toast.success("You're in! Check your inbox.");
+      toast.success(mounted ? t("misc.subscribeSuccess") : "You're in! Check your inbox.");
       setEmail("");
     } else {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(mounted ? t("misc.subscribeError") : "Something went wrong. Please try again.");
     }
   };
+
+  const currentYear = mounted ? new Date().getFullYear() : 2026;
 
   return (
     <footer className="mt-16 md:mt-24 bg-foreground text-background">
@@ -38,7 +42,7 @@ export function Footer() {
               News<span className="text-brand-light">varta</span>
             </div>
             <p className="mt-3 font-ui text-sm text-white/70 leading-relaxed max-w-xs">
-              Trusted journalism, every hour. Independent reporting on the stories that shape the nation — and the world beyond it.
+              {mounted ? t("misc.footerTagline") : "Trusted journalism, every hour. Independent reporting on the stories that shape the nation — and the world beyond it."}
             </p>
             <div className="flex items-center gap-2 mt-5">
               {[
@@ -64,10 +68,10 @@ export function Footer() {
 
           <div className="md:col-span-2">
             <h4 className="font-display text-lg font-bold mb-1">
-              Never Miss a Story.
+              {mounted ? t("misc.newsletterTitle") : "Never Miss a Story."}
             </h4>
             <p className="font-ui text-sm text-white/70 mb-4">
-              The morning briefing, every weekday at 7 AM. Free, no spam.
+              {mounted ? t("misc.newsletterDesc") : "The morning briefing, every weekday at 7 AM. Free, no spam."}
             </p>
             <form
               onSubmit={onSubscribe}
@@ -78,8 +82,8 @@ export function Footer() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                aria-label="Email address"
+                placeholder={mounted ? t("misc.emailPlaceholder") : "you@example.com"}
+                aria-label={mounted ? t("aria.emailAddress") : "Email address"}
                 className="flex-1 h-11 px-4 rounded-md bg-white/5 border border-white/15 text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-brand-light"
               />
               <button
@@ -87,7 +91,7 @@ export function Footer() {
                 disabled={submitting}
                 className="h-11 px-5 rounded-md bg-brand hover:bg-brand-light text-white font-ui text-sm font-semibold transition-colors disabled:opacity-60"
               >
-                {submitting ? "…" : t("misc.subscribe")}
+                {submitting ? "…" : (mounted ? t("misc.subscribe") : "Subscribe")}
               </button>
             </form>
           </div>
@@ -97,14 +101,14 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-10 border-b border-white/10">
           <div>
             <h5 className="font-ui text-[11px] font-bold uppercase tracking-wider text-white/50 mb-3">
-              {t("misc.more")}
+              {mounted ? t("misc.more") : "More"}
             </h5>
             <ul className="space-y-2">
               {[
-                { label: t("misc.aboutUs"), view: { type: "about" as const } },
-                { label: t("misc.contact"), view: { type: "contact" as const } },
-                { label: t("misc.advertise"), view: { type: "advertise" as const } },
-                { label: t("misc.careers"), view: { type: "careers" as const } },
+                { label: mounted ? t("misc.aboutUs") : "About Us", view: { type: "about" as const } },
+                { label: mounted ? t("misc.contact") : "Contact", view: { type: "contact" as const } },
+                { label: mounted ? t("misc.advertise") : "Advertise With Us", view: { type: "advertise" as const } },
+                { label: mounted ? t("misc.careers") : "Careers", view: { type: "careers" as const } },
               ].map((l) => (
                 <li key={l.label}>
                   <button
@@ -120,15 +124,15 @@ export function Footer() {
 
           <div>
             <h5 className="font-ui text-[11px] font-bold uppercase tracking-wider text-white/50 mb-3">
-              {t("misc.sections")}
+              {mounted ? t("misc.sections") : "Sections"}
             </h5>
             <ul className="space-y-2">
               {[
-                { label: t("nav.live"), view: { type: "section" as const, slug: "live" as const } },
-                { label: t("nav.breaking"), view: { type: "section" as const, slug: "breaking" as const } },
-                { label: t("nav.national"), view: { type: "section" as const, slug: "national" as const } },
-                { label: t("nav.international"), view: { type: "section" as const, slug: "international" as const } },
-                { label: t("nav.podcasts"), view: { type: "section" as const, slug: "podcasts" as const } },
+                { label: mounted ? t("nav.live") : "Live", view: { type: "section" as const, slug: "live" as const } },
+                { label: mounted ? t("nav.breaking") : "Breaking", view: { type: "section" as const, slug: "breaking" as const } },
+                { label: mounted ? t("nav.national") : "National", view: { type: "section" as const, slug: "national" as const } },
+                { label: mounted ? t("nav.international") : "International", view: { type: "section" as const, slug: "international" as const } },
+                { label: mounted ? t("nav.podcasts") : "Podcasts", view: { type: "section" as const, slug: "podcasts" as const } },
               ].map((l) => (
                 <li key={l.label}>
                   <button
@@ -144,7 +148,7 @@ export function Footer() {
 
           <div>
             <h5 className="font-ui text-[11px] font-bold uppercase tracking-wider text-white/50 mb-3">
-              Categories
+              {mounted ? t("misc.categories") : "Categories"}
             </h5>
             <ul className="space-y-2">
               {CATEGORIES.slice(0, 6).map((c) => (
@@ -153,7 +157,7 @@ export function Footer() {
                     onClick={() => navigate({ type: "category", slug: c.slug })}
                     className="font-ui text-sm text-white/80 hover:text-white transition-colors"
                   >
-                    {c.name}
+                    {mounted ? (t(`cat.${c.slug}` as any) || c.name) : c.name}
                   </button>
                 </li>
               ))}
@@ -162,13 +166,13 @@ export function Footer() {
 
           <div>
             <h5 className="font-ui text-[11px] font-bold uppercase tracking-wider text-white/50 mb-3">
-              Legal
+              {mounted ? t("misc.legal") : "Legal"}
             </h5>
             <ul className="space-y-2">
               {[
-                { label: "Privacy Policy", view: { type: "privacy" as const } },
-                { label: "Terms of Service", view: { type: "terms" as const } },
-                { label: "Editorial Policy", view: { type: "about" as const } },
+                { label: mounted ? t("misc.privacy") : "Privacy Policy", view: { type: "privacy" as const } },
+                { label: mounted ? t("misc.terms") : "Terms of Service", view: { type: "terms" as const } },
+                { label: mounted ? t("misc.editorialPolicy") : "Editorial Policy", view: { type: "about" as const } },
               ].map((l) => (
                 <li key={l.label}>
                   <button
@@ -186,10 +190,12 @@ export function Footer() {
         {/* Bottom row */}
         <div className="pt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <p className="font-ui text-xs text-white/60">
-            © {new Date().getFullYear()} Newsvarta. All rights reserved.
+            {mounted
+              ? t("misc.copyright").replace("{year}", String(currentYear))
+              : `© ${currentYear} Newsvarta. All rights reserved.`}
           </p>
           <p className="font-ui text-xs text-white/60">
-            A demo news portal interface — built for illustrative purposes.
+            {mounted ? t("misc.demoNotice") : "A demo news portal interface — built for illustrative purposes."}
           </p>
         </div>
       </div>

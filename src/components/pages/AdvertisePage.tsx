@@ -26,11 +26,15 @@ import {
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { submitAdvertiseInquiry } from "@/lib/api-client";
+import { useStore } from "@/lib/store";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { Loader2 } from "lucide-react";
 
 const STAT_ICONS = [Users, Eye, TrendingUp, Clock];
 
 export function AdvertisePage() {
+  const { language } = useStore();
+  const mounted = useHydrated();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
@@ -62,7 +66,7 @@ export function AdvertisePage() {
     setSubmitting(false);
     if (ok) {
       setSubmitted(true);
-      toast.success("Inquiry received! We'll be in touch within 1 business day.");
+      toast.success(language === "hi" ? "पूछताछ प्राप्त हुई! हम 1 व्यावसायिक दिन के भीतर संपर्क करेंगे।" : "Inquiry received! We'll be in touch within 1 business day.");
       setTimeout(() => {
         document.getElementById("inquiry-form")?.scrollIntoView({ behavior: "smooth" });
       }, 100);
@@ -92,29 +96,27 @@ export function AdvertisePage() {
         />
         <div className="relative mx-auto max-w-[1280px] px-4 md:px-8 py-16 md:py-24 text-center">
           <p className="font-ui text-[11px] font-bold uppercase tracking-[0.2em] text-brand-light mb-4">
-            Advertise With Us
+            {mounted && language === "hi" ? "हमारे साथ विज्ञापन दें" : "Advertise With Us"}
           </p>
           <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight max-w-3xl mx-auto leading-[1.05]">
-            Reach millions of engaged readers.
+            {mounted && language === "hi" ? "लाखों पाठकों तक पहुंचें।" : "Reach millions of engaged readers."}
           </h1>
           <p className="font-serif text-lg md:text-xl text-background/75 mt-5 max-w-2xl mx-auto">
-            The National Dispatch reaches the country&rsquo;s most engaged,
-            informed, and influential readers. Your brand deserves to be seen
-            alongside the journalism they trust.
+            {mounted && language === "hi" ? "द नेशनल डिस्पैच देश के सबसे जागरूक और प्रभावशाली पाठकों तक पहुंचता है। आपका ब्रांड उस पत्रकारिता के साथ दिखने का हकदार है जिस पर वे भरोसा करते हैं।" : "The National Dispatch reaches the country's most engaged, informed, and influential readers. Your brand deserves to be seen alongside the journalism they trust."}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <a
               href="#inquiry-form"
               className="inline-flex items-center gap-2 px-6 h-12 rounded-md bg-brand hover:bg-brand-light text-white font-ui text-sm font-semibold transition-colors"
             >
-              Get in touch
+              {mounted && language === "hi" ? "संपर्क करें" : "Get in touch"}
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
               href="#formats"
               className="inline-flex items-center gap-2 px-6 h-12 rounded-md border border-white/20 hover:bg-white/5 text-background font-ui text-sm font-semibold transition-colors"
             >
-              View ad formats
+              {mounted && language === "hi" ? "विज्ञापन प्रारूप देखें" : "View ad formats"}
             </a>
           </div>
         </div>
@@ -153,11 +155,10 @@ export function AdvertisePage() {
       <section className="py-12 md:py-16 bg-surface-alt">
         <div className="mx-auto max-w-[1280px] px-4 md:px-8">
           <h2 className="font-display text-3xl md:text-4xl font-extrabold text-center mb-2">
-            Why advertise with us?
+            {mounted && language === "hi" ? "हमारे साथ विज्ञापन क्यों दें?" : "Why advertise with us?"}
           </h2>
           <p className="font-serif text-lg text-ink-secondary text-center max-w-2xl mx-auto mb-10 md:mb-12">
-            We treat your brand the way we treat our journalism — with care,
-            transparency, and respect for the reader.
+            {mounted && language === "hi" ? "हम आपके ब्रांड के साथ वैसा ही व्यवहार करते हैं जैसा हम अपनी पत्रकारिता के साथ करते हैं — देखभाल, पारदर्शिता और पाठक के सम्मान के साथ।" : "We treat your brand the way we treat our journalism — with care, transparency, and respect for the reader."}
           </p>
           <div className="grid md:grid-cols-3 gap-5 md:gap-6">
             {ADVERTISE_BENEFITS.map((b, i) => (
@@ -186,11 +187,10 @@ export function AdvertisePage() {
       <section id="formats" className="py-12 md:py-16">
         <div className="mx-auto max-w-[1280px] px-4 md:px-8">
           <h2 className="font-display text-3xl md:text-4xl font-extrabold text-center mb-2">
-            Available ad formats
+            {mounted && language === "hi" ? "उपलब्ध विज्ञापन प्रारूप" : "Available ad formats"}
           </h2>
           <p className="font-serif text-lg text-ink-secondary text-center max-w-2xl mx-auto mb-10 md:mb-12">
-            Choose the format that fits your objective — from display to native,
-            podcast to newsletter.
+            {mounted && language === "hi" ? "वह प्रारूप चुनें जो आपके उद्देश्य के अनुकूल हो — डिस्प्ले से लेकर नेटिव, पॉडकास्ट से न्यूज़लेटर तक।" : "Choose the format that fits your objective — from display to native, podcast to newsletter."}
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {AD_FORMATS.map((fmt) => (
@@ -219,7 +219,7 @@ export function AdvertisePage() {
       <section className="py-12 md:py-16 bg-surface-alt">
         <div className="mx-auto max-w-[1280px] px-4 md:px-8">
           <h2 className="font-display text-3xl md:text-4xl font-extrabold text-center mb-10 md:mb-12">
-            How it works
+            {mounted && language === "hi" ? "यह कैसे काम करता है" : "How it works"}
           </h2>
           <div className="grid md:grid-cols-4 gap-5 md:gap-6 relative">
             {ADVERTISE_PROCESS.map((p, i) => (
@@ -250,10 +250,10 @@ export function AdvertisePage() {
       <section className="py-12 md:py-16">
         <div className="mx-auto max-w-3xl px-4 md:px-8">
           <h2 className="font-display text-3xl md:text-4xl font-extrabold text-center mb-2">
-            Frequently asked questions
+            {mounted && language === "hi" ? "अक्सर पूछे जाने वाले प्रश्न" : "Frequently asked questions"}
           </h2>
           <p className="font-serif text-lg text-ink-secondary text-center mb-10">
-            Can&rsquo;t find what you&rsquo;re looking for? Get in touch below.
+            {mounted && language === "hi" ? "क्या आपको वह नहीं मिल रहा है जिसकी आप तलाश कर रहे हैं? नीचे संपर्क करें।" : "Can't find what you're looking for? Get in touch below."}
           </p>
           <Accordion type="single" collapsible className="w-full">
             {ADVERTISE_FAQ.map((item, i) => (
@@ -274,11 +274,10 @@ export function AdvertisePage() {
       <section id="inquiry-form" className="py-12 md:py-16 bg-foreground text-background">
         <div className="mx-auto max-w-3xl px-4 md:px-8">
           <h2 className="font-display text-3xl md:text-4xl font-extrabold text-center mb-2">
-            Get in touch
+            {mounted && language === "hi" ? "संपर्क करें" : "Get in touch"}
           </h2>
           <p className="font-serif text-lg text-background/75 text-center mb-10">
-            Tell us a little about your campaign. We&rsquo;ll get back to you
-            within one business day.
+            {mounted && language === "hi" ? "हमें अपने अभियान के बारे में थोड़ा बताएं। हम एक कार्यदिवस के भीतर आपसे संपर्क करेंगे।" : "Tell us a little about your campaign. We'll get back to you within one business day."}
           </p>
 
           {submitted ? (
@@ -291,7 +290,7 @@ export function AdvertisePage() {
                 <Check className="h-7 w-7" />
               </div>
               <h3 className="font-display text-2xl font-bold mb-2">
-                Inquiry received.
+                {mounted && language === "hi" ? "पूछताछ प्राप्त हुई।" : "Inquiry received."}
               </h3>
               <p className="font-serif text-base text-background/80 max-w-md mx-auto">
                 Thank you for your interest. A member of our partnerships team
@@ -302,7 +301,7 @@ export function AdvertisePage() {
                 onClick={() => setSubmitted(false)}
                 className="mt-6 px-5 h-11 rounded-md border border-white/20 hover:bg-white/5 font-ui text-sm font-semibold transition-colors"
               >
-                Submit another inquiry
+                {mounted && language === "hi" ? "एक और पूछताछ सबमिट करें" : "Submit another inquiry"}
               </button>
             </motion.div>
           ) : (
@@ -311,7 +310,7 @@ export function AdvertisePage() {
               className="p-6 md:p-8 rounded-lg border border-white/15 bg-white/5"
             >
               <div className="grid sm:grid-cols-2 gap-4">
-                <Field label="Full name" required>
+                <Field label={mounted && language === "hi" ? "पूरा नाम" : "Full name"} required>
                   <input
                     type="text"
                     required
@@ -321,7 +320,7 @@ export function AdvertisePage() {
                     className="form-input"
                   />
                 </Field>
-                <Field label="Email address" required>
+                <Field label={mounted && language === "hi" ? "ईमेल पता" : "Email address"} required>
                   <input
                     type="email"
                     required
@@ -331,7 +330,7 @@ export function AdvertisePage() {
                     className="form-input"
                   />
                 </Field>
-                <Field label="Phone number">
+                <Field label={mounted && language === "hi" ? "फोन नंबर" : "Phone number"}>
                   <input
                     type="tel"
                     autoComplete="tel"
@@ -340,7 +339,7 @@ export function AdvertisePage() {
                     className="form-input"
                   />
                 </Field>
-                <Field label="Company / brand" required>
+                <Field label={mounted && language === "hi" ? "कंपनी / ब्रांड" : "Company / brand"} required>
                   <input
                     type="text"
                     required
@@ -350,7 +349,7 @@ export function AdvertisePage() {
                     className="form-input"
                   />
                 </Field>
-                <Field label="Website URL">
+                <Field label={mounted && language === "hi" ? "वेबसाइट URL" : "Website URL"}>
                   <input
                     type="url"
                     placeholder="https://"
@@ -359,7 +358,7 @@ export function AdvertisePage() {
                     className="form-input"
                   />
                 </Field>
-                <Field label="Monthly budget">
+                <Field label={mounted && language === "hi" ? "मासिक बजट" : "Monthly budget"}>
                   <select
                     value={form.budget}
                     onChange={(e) => setForm({ ...form, budget: e.target.value })}
@@ -376,7 +375,7 @@ export function AdvertisePage() {
               </div>
 
               <div className="mt-4">
-                <Field label="Interested ad formats">
+                <Field label={mounted && language === "hi" ? "रुचि वाले विज्ञापन प्रारूप" : "Interested ad formats"}>
                   <div className="flex flex-wrap gap-2 mt-1">
                     {AD_FORMATS.map((f) => (
                       <label
@@ -397,7 +396,7 @@ export function AdvertisePage() {
               </div>
 
               <div className="mt-4">
-                <Field label="Campaign start date">
+                <Field label={mounted && language === "hi" ? "अभियान प्रारंभ तिथि" : "Campaign start date"}>
                   <input
                     type="date"
                     value={form.startDate}
@@ -408,7 +407,7 @@ export function AdvertisePage() {
               </div>
 
               <div className="mt-4">
-                <Field label="Message / additional notes">
+                <Field label={mounted && language === "hi" ? "संदेश / अतिरिक्त नोट्स" : "Message / additional notes"}>
                   <textarea
                     rows={4}
                     placeholder="Tell us about your campaign objectives, target audience, and timeline."
@@ -427,11 +426,11 @@ export function AdvertisePage() {
                 {submitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Submitting…
+                    {mounted && language === "hi" ? "सबमिट किया जा रहा है…" : "Submitting…"}
                   </>
                 ) : (
                   <>
-                    Submit inquiry
+                    {mounted && language === "hi" ? "पूछताछ सबमिट करें" : "Submit inquiry"}
                     <ArrowRight className="h-4 w-4" />
                   </>
                 )}

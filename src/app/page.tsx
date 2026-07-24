@@ -3,6 +3,7 @@
 import { useStore } from "@/lib/store";
 import { Header } from "@/components/layout/Header";
 import { CategoryBar } from "@/components/layout/CategoryBar";
+import { AdTicker } from "@/components/layout/AdTicker";
 import { BreakingTicker } from "@/components/layout/BreakingTicker";
 import { Footer } from "@/components/layout/Footer";
 import { MobileNav } from "@/components/layout/MobileNav";
