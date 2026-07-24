@@ -96,8 +96,57 @@ export function ArticlePage({ slug }: ArticlePageProps) {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-20 flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-ink-tertiary" />
+      <div className="mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-8 animate-pulse">
+        {/* Breadcrumb skeleton */}
+        <div className="flex items-center gap-2 mb-6">
+          <div className="h-4 w-12 bg-muted rounded" />
+          <div className="h-3 w-3 bg-muted rounded-full" />
+          <div className="h-4 w-24 bg-muted rounded" />
+          <div className="h-3 w-3 bg-muted rounded-full" />
+          <div className="h-4 w-48 bg-muted rounded" />
+        </div>
+
+        {/* Hero Image skeleton */}
+        <div className="w-full aspect-[16/10] md:aspect-[16/9] bg-muted rounded-lg md:rounded-xl mb-6" />
+
+        <div className="grid lg:grid-cols-[1fr_300px] gap-8 lg:gap-12">
+          {/* Main content column */}
+          <div className="min-w-0">
+            {/* Title skeleton */}
+            <div className="h-8 md:h-10 bg-muted rounded w-11/12 mb-3" />
+            <div className="h-8 md:h-10 bg-muted rounded w-3/4 mb-6" />
+
+            {/* Standfirst skeleton */}
+            <div className="h-5 bg-muted rounded w-full mb-2.5" />
+            <div className="h-5 bg-muted rounded w-5/6 mb-6" />
+
+            {/* Meta bar skeleton */}
+            <div className="flex items-center gap-3 py-4 border-y border-border mb-6">
+              <div className="h-7 w-7 rounded-full bg-muted" />
+              <div className="h-4 w-24 bg-muted rounded" />
+              <div className="h-4 w-2 bg-muted rounded" />
+              <div className="h-4 w-20 bg-muted rounded" />
+            </div>
+
+            {/* Article body paragraphs skeleton */}
+            <div className="space-y-4">
+              <div className="h-4 bg-muted rounded w-full" />
+              <div className="h-4 bg-muted rounded w-full" />
+              <div className="h-4 bg-muted rounded w-11/12" />
+              <div className="h-4 bg-muted rounded w-full" />
+              <div className="h-4 bg-muted rounded w-5/6" />
+              <div className="h-4 bg-muted rounded w-full mt-6" />
+              <div className="h-4 bg-muted rounded w-full" />
+              <div className="h-4 bg-muted rounded w-4/5" />
+            </div>
+          </div>
+
+          {/* Sidebar column skeleton */}
+          <div className="hidden lg:block space-y-6">
+            <div className="h-[250px] w-full bg-muted rounded-lg" />
+            <div className="h-[400px] w-full bg-muted rounded-lg" />
+          </div>
+        </div>
       </div>
     );
   }
