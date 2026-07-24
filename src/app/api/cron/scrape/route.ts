@@ -1,269 +1,14 @@
-import dotenv from "dotenv";
-dotenv.config();
-
-import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
 import Parser from "rss-parser";
 
-const db = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL
-        ? process.env.DATABASE_URL.includes("?")
-          ? `${process.env.DATABASE_URL}&connection_limit=1`
-          : `${process.env.DATABASE_URL}?connection_limit=1`
-        : undefined,
-    },
-  },
-});
+// Set maximum duration for this function to 5 minutes on Vercel
+export const maxDuration = 300; 
+export const dynamic = "force-dynamic";
+
 const parser = new Parser();
 
-interface FeedConfig {
-  name: string;
-  url: string;
-  source: "pib" | "hindustan" | "general-rss";
-  defaultCategory?: string;
-  state?: string;
-  lang: "hi" | "en";
-}
-
-const FEEDS: FeedConfig[] = [
-  // National PIB
-  {
-    name: "PIB National (Hindi)",
-    url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2",
-    source: "pib",
-    lang: "hi",
-  },
-  {
-    name: "PIB National (English)",
-    url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1",
-    source: "pib",
-    lang: "en",
-  },
-  // Regional PIB (State releases)
-  {
-    name: "PIB Delhi (Hindi)",
-    url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&Regid=3",
-    source: "pib",
-    state: "Delhi",
-    lang: "hi",
-  },
-  {
-    name: "PIB Bihar (Hindi)",
-    url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&Regid=13",
-    source: "pib",
-    state: "Bihar",
-    lang: "hi",
-  },
-  {
-    name: "PIB Punjab (Hindi)",
-    url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&Regid=20",
-    source: "pib",
-    state: "Punjab",
-    lang: "hi",
-  },
-  // Live Hindustan
-  {
-    name: "Live Hindustan National (Hindi)",
-    url: "https://feed.livehindustan.com/rss/national",
-    source: "hindustan",
-    defaultCategory: "national",
-    lang: "hi",
-  },
-  {
-    name: "Live Hindustan Business (Hindi)",
-    url: "https://feed.livehindustan.com/rss/business",
-    source: "hindustan",
-    defaultCategory: "economy",
-    lang: "hi",
-  },
-  {
-    name: "Live Hindustan Sports (Hindi)",
-    url: "https://feed.livehindustan.com/rss/sports",
-    source: "hindustan",
-    defaultCategory: "sports",
-    lang: "hi",
-  },
-  {
-    name: "Live Hindustan Science & Tech (Hindi)",
-    url: "https://feed.livehindustan.com/rss/science-technology",
-    source: "hindustan",
-    defaultCategory: "technology",
-    lang: "hi",
-  },
-  // --- New User-defined Topic RSS Feeds ---
-  // Public Service Commissions
-  {
-    name: "Jagran Josh Gov Jobs (PSC/SSC)",
-    url: "https://www.jagranjosh.com/government-jobs/feed",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  {
-    name: "Drishti IAS Feed",
-    url: "https://www.drishtiias.com/feed",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  {
-    name: "GKToday UPSC Feed",
-    url: "https://www.gktoday.in/gk/feed/",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  // Railways
-  {
-    name: "Business Standard Railways",
-    url: "https://www.business-standard.com/rss/topic/indian-railways.rss",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  {
-    name: "IRCTC News Blog Feed",
-    url: "https://irctcnews.in/feed",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  // Banking / RBI
-  {
-    name: "RBI Press Releases",
-    url: "https://rbi.org.in/Scripts/rss.aspx",
-    source: "general-rss",
-    defaultCategory: "economy",
-    lang: "en",
-  },
-  {
-    name: "RBI Notifications",
-    url: "https://www.rbi.org.in/scripts/NotificationRSS.aspx",
-    source: "general-rss",
-    defaultCategory: "economy",
-    lang: "en",
-  },
-  {
-    name: "Business Standard Banking",
-    url: "https://www.business-standard.com/rss/finance/banking.rss",
-    source: "general-rss",
-    defaultCategory: "economy",
-    lang: "en",
-  },
-  // SSC
-  {
-    name: "Jagran Josh SSC Feed",
-    url: "https://www.jagranjosh.com/ssc/feed",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  {
-    name: "Adda247 SSC Feed",
-    url: "https://www.adda247.com/ssc/feed",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  // ISRO / DRDO
-  {
-    name: "Business Standard DRDO",
-    url: "https://www.business-standard.com/rss/topic/drdo.rss",
-    source: "general-rss",
-    defaultCategory: "science",
-    lang: "en",
-  },
-  {
-    name: "Business Standard ISRO",
-    url: "https://www.business-standard.com/rss/topic/isro.rss",
-    source: "general-rss",
-    defaultCategory: "science",
-    lang: "en",
-  },
-  {
-    name: "The Print Science Feed",
-    url: "https://theprint.in/category/science/feed/",
-    source: "general-rss",
-    defaultCategory: "science",
-    lang: "en",
-  },
-  // Sports
-  {
-    name: "ESPN Cricinfo India",
-    url: "https://www.espncricinfo.com/rss/content/story/feeds/6.xml",
-    source: "general-rss",
-    defaultCategory: "sports",
-    lang: "en",
-  },
-  {
-    name: "Business Standard Sports",
-    url: "https://www.business-standard.com/rss/sports.rss",
-    source: "general-rss",
-    defaultCategory: "sports",
-    lang: "en",
-  },
-  {
-    name: "India Today Sports",
-    url: "https://www.indiatoday.in/rss/sports",
-    source: "general-rss",
-    defaultCategory: "sports",
-    lang: "en",
-  },
-  // Politics
-  {
-    name: "The Hindu Politics Feed",
-    url: "https://www.thehindu.com/news/national/politics/feeder/default.rss",
-    source: "general-rss",
-    defaultCategory: "politics",
-    lang: "en",
-  },
-  {
-    name: "The Print Politics Feed",
-    url: "https://theprint.in/category/politics/feed/",
-    source: "general-rss",
-    defaultCategory: "politics",
-    lang: "en",
-  },
-  {
-    name: "The Wire Politics",
-    url: "https://thewire.in/category/politics/feed",
-    source: "general-rss",
-    defaultCategory: "politics",
-    lang: "en",
-  },
-  // Cine World
-  {
-    name: "Pinkvilla Entertainment",
-    url: "https://www.pinkvilla.com/rss.xml",
-    source: "general-rss",
-    defaultCategory: "entertainment",
-    lang: "en",
-  },
-  {
-    name: "Bollywood Life Feed",
-    url: "https://bollywoodlife.com/feed",
-    source: "general-rss",
-    defaultCategory: "entertainment",
-    lang: "en",
-  },
-  {
-    name: "Koimoi Entertainment Feed",
-    url: "https://www.koimoi.com/feed/",
-    source: "general-rss",
-    defaultCategory: "entertainment",
-    lang: "en",
-  },
-  {
-    name: "BollywoodHungama News",
-    url: "https://www.bollywoodhungama.com/rss/news.xml",
-    source: "general-rss",
-    defaultCategory: "entertainment",
-    lang: "en",
-  },
-];
-
-// Helper to determine category from keywords
+// Map categories
 function getCategoryFromText(text: string, defaultCat = "national"): string {
   const t = text.toLowerCase();
   if (t.includes("cabinet") || t.includes("election") || t.includes("parliament") || t.includes("pm modi") || t.includes("narendra modi") || t.includes("minister") || t.includes("president")) {
@@ -293,12 +38,11 @@ function getCategoryFromText(text: string, defaultCat = "national"): string {
   return defaultCat;
 }
 
-// Helper to extract specific search/topic tags from title and body text
+// Extract search keywords
 function extractCustomTags(title: string, body: string): string[] {
   const tags: string[] = [];
   const text = `${title} ${body}`.toLowerCase();
 
-  // PSC exam bodies
   if (text.includes("upsc") || text.includes("union public service") || text.includes("संघ लोक सेवा आयोग")) tags.push("UPSC");
   if (text.includes("mpsc") || text.includes("महाराष्ट्र लोक सेवा आयोग")) tags.push("MPSC");
   if (text.includes("bpsc") || text.includes("bihar public service") || text.includes("बिहार लोक सेवा आयोग")) tags.push("BPSC");
@@ -307,30 +51,24 @@ function extractCustomTags(title: string, body: string): string[] {
   if (text.includes("ukpsc") || text.includes("uttarakhand public service") || text.includes("उत्तराखंड लोक सेवा आयोग")) tags.push("UKPSC");
   if (text.includes("cgpsc") || text.includes("chhattisgarh public service") || text.includes("छत्तीसगढ़ लोक सेवा आयोग")) tags.push("Chhattisgarh PSC");
 
-  // Railways
   if (text.includes("railway") || text.includes("irctc") || text.includes("रेलवे") || text.includes("भारतीय रेल")) tags.push("Railways");
 
-  // Banking
   if (text.includes("banking") || text.includes(" rbi") || text.includes("reserve bank") || text.includes("भारतीय रिजर्व बैंक")) tags.push("RBI");
   if (text.includes("ibps") || text.includes("ibpsc")) tags.push("IBPSC");
   if (text.includes("bank") || text.includes("बैंक")) tags.push("Banking");
 
-  // SSC / Boards
   if (text.includes("bssc") || text.includes("bihar staff selection") || text.includes("बिहार कर्मचारी चयन")) tags.push("Bihar Staff Selection");
   if (text.includes("ugc") || text.includes("university grants") || text.includes("विश्वविद्यालय अनुदान")) tags.push("UGC");
   if (text.includes("ssc") || text.includes("staff selection commission") || text.includes("कर्मचारी चयन आयोग")) tags.push("SSC");
 
-  // Space & Defence
   if (text.includes("isro") || text.includes("इसरो") || text.includes("space research")) tags.push("ISRO");
   if (text.includes("drdo") || text.includes("डीआरडीओ") || text.includes("defence research")) tags.push("DRDO");
   if (text.includes("barc") || text.includes("भाभा परमाणु") || text.includes("bhabha atomic")) tags.push("BARC");
 
-  // Sports
   if (text.includes("bcci") || text.includes("cricket") || text.includes("क्रिकेट")) tags.push("BCCI");
   if (text.includes("hockey india") || text.includes("hockey federation") || text.includes("हॉकी")) tags.push("Hockey Federation of India");
   if (text.includes("olympic") || text.includes("ioa") || text.includes("ओलंपिक")) tags.push("Indian Olympic Committee");
 
-  // Political Parties
   if (text.includes("bjp") || text.includes("भाजपा") || text.includes("भारतीय जनता पार्टी")) tags.push("BJP");
   if (text.includes("inc") || text.includes("congress") || text.includes("कांग्रेस")) tags.push("INC");
   if (text.includes("samajwadi") || text.includes("समाजवादी पार्टी") || text.includes(" sp ")) tags.push("Samajwadi Party");
@@ -343,10 +81,8 @@ function extractCustomTags(title: string, body: string): string[] {
   if (text.includes("shiv sena") || text.includes("शिवसेना") || text.includes("shivsena")) tags.push("Shiv Sena");
   if (text.includes("mns") || text.includes("मनसे") || text.includes("maharashtra navnirman")) tags.push("MNS");
 
-  // Personalities
   if (text.includes("byakti") || text.includes("personality") || text.includes("व्यक्ति")) tags.push("Byakti");
 
-  // Cine World
   if (text.includes("bollywood") || text.includes("cinema") || text.includes("entertainment") || text.includes("film") || text.includes("movie") || text.includes("मनोरंजन") || text.includes("फिल्म") || text.includes("सिनेमा")) {
     tags.push("Cine World");
   }
@@ -366,7 +102,6 @@ async function scrapePibBody(prid: string): Promise<string> {
     if (!res.ok) return "";
     const html = await res.text();
     
-    // Extract PdfDiv block using simple balancer or basic tag index
     const startTag = 'id="PdfDiv"';
     const startIdx = html.indexOf(startTag);
     if (startIdx === -1) return "";
@@ -396,8 +131,6 @@ async function scrapePibBody(prid: string): Promise<string> {
     }
 
     let bodyHtml = html.substring(tagEndIndex + 1, currentIndex - 6).trim();
-
-    // Sanitize and clean up formatting
     bodyHtml = bodyHtml
       .replace(/<style[\s\S]*?<\/style>/gi, "")
       .replace(/<font[^>]*>/gi, "")
@@ -411,58 +144,60 @@ async function scrapePibBody(prid: string): Promise<string> {
   return "";
 }
 
-// Ensure default scraper users exist in the database
-async function ensureScraperUsers() {
-  await db.user.upsert({
-    where: { email: "pib-scraper@newsvarta.com" },
-    create: {
-      id: "pib-scraper",
-      email: "pib-scraper@newsvarta.com",
-      name: "पत्र सूचना कार्यालय (PIB)",
-      passwordHash: "no-login-allowed",
-      role: "EDITOR",
-      status: "ACTIVE",
-      jobTitle: "ऑटोमेटेड फीड",
-    },
-    update: {},
-  });
+// Feeds to check
+const FEEDS: { name: string; url: string; source: "pib" | "hindustan" | "general-rss"; defaultCategory?: string }[] = [
+  { name: "PIB National (Hindi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2", source: "pib" },
+  { name: "PIB National (English)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1", source: "pib" },
+  { name: "Live Hindustan National (Hindi)", url: "https://feed.livehindustan.com/rss/national", source: "hindustan", defaultCategory: "national" },
+  { name: "Live Hindustan Business (Hindi)", url: "https://feed.livehindustan.com/rss/business", source: "hindustan", defaultCategory: "economy" },
+  { name: "Live Hindustan Sports (Hindi)", url: "https://feed.livehindustan.com/rss/sports", source: "hindustan", defaultCategory: "sports" },
+  { name: "Live Hindustan Science & Tech (Hindi)", url: "https://feed.livehindustan.com/rss/science-technology", source: "hindustan", defaultCategory: "technology" },
+  
+  // Public Service Commissions
+  { name: "Jagran Josh Gov Jobs (PSC/SSC)", url: "https://www.jagranjosh.com/government-jobs/feed", source: "general-rss", defaultCategory: "national" },
+  { name: "Drishti IAS Feed", url: "https://www.drishtiias.com/feed", source: "general-rss", defaultCategory: "national" },
+  { name: "GKToday UPSC Feed", url: "https://www.gktoday.in/gk/feed/", source: "general-rss", defaultCategory: "national" },
+  
+  // Railways
+  { name: "Business Standard Railways", url: "https://www.business-standard.com/rss/topic/indian-railways.rss", source: "general-rss", defaultCategory: "national" },
+  { name: "IRCTC News Blog Feed", url: "https://irctcnews.in/feed", source: "general-rss", defaultCategory: "national" },
+  
+  // Banking / RBI
+  { name: "RBI Press Releases", url: "https://rbi.org.in/Scripts/rss.aspx", source: "general-rss", defaultCategory: "economy" },
+  { name: "RBI Notifications", url: "https://www.rbi.org.in/scripts/NotificationRSS.aspx", source: "general-rss", defaultCategory: "economy" },
+  
+  // SSC
+  { name: "Jagran Josh SSC Feed", url: "https://www.jagranjosh.com/ssc/feed", source: "general-rss", defaultCategory: "national" },
+  { name: "Adda247 SSC Feed", url: "https://www.adda247.com/ssc/feed", source: "general-rss", defaultCategory: "national" },
+  
+  // ISRO / DRDO
+  { name: "The Print Science Feed", url: "https://theprint.in/category/science/feed/", source: "general-rss", defaultCategory: "science" },
+  
+  // Sports
+  { name: "ESPN Cricinfo India", url: "https://www.espncricinfo.com/rss/content/story/feeds/6.xml", source: "general-rss", defaultCategory: "sports" },
+  
+  // Politics
+  { name: "The Print Politics Feed", url: "https://theprint.in/category/politics/feed/", source: "general-rss", defaultCategory: "politics" },
+  
+  // Cine World
+  { name: "Pinkvilla Entertainment", url: "https://www.pinkvilla.com/rss.xml", source: "general-rss", defaultCategory: "entertainment" },
+  { name: "Bollywood Life Feed", url: "https://bollywoodlife.com/feed", source: "general-rss", defaultCategory: "entertainment" },
+  { name: "Koimoi Entertainment Feed", url: "https://www.koimoi.com/feed/", source: "general-rss", defaultCategory: "entertainment" },
+  { name: "BollywoodHungama News", url: "https://www.bollywoodhungama.com/rss/news.xml", source: "general-rss", defaultCategory: "entertainment" },
+];
 
-  await db.user.upsert({
-    where: { email: "hindustan-scraper@newsvarta.com" },
-    create: {
-      id: "hindustan-scraper",
-      email: "hindustan-scraper@newsvarta.com",
-      name: "लाइव हिन्दुस्तान",
-      passwordHash: "no-login-allowed",
-      role: "EDITOR",
-      status: "ACTIVE",
-      jobTitle: "ऑटोमेटेड फीड",
-    },
-    update: {},
-  });
+export async function GET(req: Request) {
+  // Simple check to ensure authorization header matches CRON_SECRET if set
+  const authHeader = req.headers.get("Authorization");
+  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response("Unauthorized", { status: 401 });
+  }
 
-  await db.user.upsert({
-    where: { email: "rss-scraper@newsvarta.com" },
-    create: {
-      id: "automated-rss-scraper",
-      email: "rss-scraper@newsvarta.com",
-      name: "न्यूज़वार्ता समाचार सेवा",
-      passwordHash: "no-login-allowed",
-      role: "EDITOR",
-      status: "ACTIVE",
-      jobTitle: "ऑटोमेटेड फीड",
-    },
-    update: {},
-  });
-}
+  let addedCount = 0;
+  let deletedCount = 0;
 
-// Main run loop of the scraper
-async function runScraper() {
-  console.log(`[${new Date().toLocaleTimeString()}] Running automated news feed scraper...`);
   try {
-    await ensureScraperUsers();
-
-    // Cleanup old articles (older than 1 day)
+    // 1. Cleanup old articles (older than 24 hours)
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const deleteResult = await db.article.deleteMany({
       where: {
@@ -471,20 +206,16 @@ async function runScraper() {
         },
       },
     });
-    console.log(`[Cleanup] Deleted ${deleteResult.count} articles older than 1 day.`);
+    deletedCount = deleteResult.count;
 
+    // 2. Fetch new feed items
     for (const feed of FEEDS) {
-      console.log(`Processing: ${feed.name}`);
       try {
         const res = await fetch(feed.url, {
-          headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-          },
+          headers: { "User-Agent": "Mozilla/5.0" },
+          next: { revalidate: 0 } // Bypass Next.js cache for live updates
         });
-        if (!res.ok) {
-          console.warn(`Failed to fetch feed ${feed.name}: ${res.status}`);
-          continue;
-        }
+        if (!res.ok) continue;
 
         const xml = await res.text();
         const cleanEntities = xml
@@ -502,14 +233,11 @@ async function runScraper() {
         for (const item of parsed.items) {
           if (!item.title || !item.link) continue;
 
-          // Generate unique slug
           let slug = "";
           let authorId = "";
           let body = "";
           let categorySlug = feed.defaultCategory || "national";
-          let stateTags: string | null = null;
-          let heroImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=60"; // Default news image
-          let heroCaption = feed.name;
+          const heroImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800";
 
           if (feed.source === "pib") {
             const pridMatch = item.link.match(/PRID=([0-9]+)/i);
@@ -529,7 +257,6 @@ async function runScraper() {
               body = `<p>${body}</p>`;
             }
           } else {
-            // General RSS feed handler
             const hash = Buffer.from(item.link).toString("base64").substring(0, 16);
             slug = `rss-${hash}`;
             authorId = "automated-rss-scraper";
@@ -542,25 +269,13 @@ async function runScraper() {
 
           if (!slug || !body) continue;
 
-          // Add state tag if regional feed
-          if (feed.state) {
-            stateTags = JSON.stringify([feed.state]);
-          }
+          const existing = await db.article.findUnique({ where: { slug } });
+          if (existing) continue;
 
-          // Check if article already exists
-          const existing = await db.article.findUnique({
-            where: { slug },
-          });
-
-          if (existing) continue; // Skip duplicates
-
-          console.log(`Adding new article: ${item.title}`);
-          const dateStr = item.pubDate || item.isoDate || new Date().toISOString();
-
-          // Extract custom search and topic tags
           const customTags = extractCustomTags(item.title, body);
           const baseTags = feed.source === "pib" ? ["PIB", "Official"] : feed.source === "hindustan" ? ["Hindustan", "Latest"] : ["News", feed.name];
           const allTags = Array.from(new Set([...baseTags, ...customTags]));
+          const dateStr = item.pubDate || item.isoDate || new Date().toISOString();
 
           await db.article.create({
             data: {
@@ -570,11 +285,10 @@ async function runScraper() {
               body,
               categorySlug,
               tags: JSON.stringify(allTags),
-              stateTags,
               authorId,
               status: "PUBLISHED",
               heroImage,
-              heroCaption,
+              heroCaption: feed.name,
               heroCredit: feed.source === "pib" ? "PIB" : feed.source === "hindustan" ? "Live Hindustan" : feed.name,
               readingTime: Math.max(3, Math.ceil(body.split(" ").length / 200)),
               publishedAt: new Date(dateStr),
@@ -582,21 +296,20 @@ async function runScraper() {
               submittedAt: new Date(),
             },
           });
+          addedCount++;
         }
       } catch (err) {
-        console.error(`Error scraping feed ${feed.name}:`, err);
+        console.error(`Cron error scraping feed ${feed.name}:`, err);
       }
     }
-    console.log(`[${new Date().toLocaleTimeString()}] Scraper run completed successfully.`);
-  } catch (globalErr) {
-    console.error("Global scraper crash:", globalErr);
-  }
-}
 
-// Standard cron-loop: run every 10 minutes when script is executed in daemon mode
-if (process.argv.includes("--daemon")) {
-  runScraper();
-  setInterval(runScraper, 10 * 60 * 1000); // 10 minutes
-} else {
-  runScraper().then(() => process.exit(0));
+    return NextResponse.json({
+      success: true,
+      added: addedCount,
+      deleted: deletedCount,
+    });
+  } catch (error: any) {
+    console.error("Cron global error:", error);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
 }
