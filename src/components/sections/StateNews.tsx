@@ -30,7 +30,7 @@ export function StateNews() {
 
       {/* State selector — horizontal scroll on mobile, vertical list on desktop */}
       <div className="grid md:grid-cols-[200px_1fr] gap-6 md:gap-8">
-        <aside className="md:border-r md:border-border md:pr-6">
+        <aside className="min-w-0 md:border-r md:border-border md:pr-6">
           <p className="font-ui text-[11px] font-bold uppercase tracking-wider text-ink-tertiary mb-3 hidden md:block">
             {t("misc.selectState")}
           </p>
