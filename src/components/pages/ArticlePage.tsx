@@ -301,7 +301,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 py-4 border-y border-border font-ui text-xs text-ink-secondary mb-6">
             <div className="flex items-center gap-2">
               <img
-                src={author.avatar}
+                src={author.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(author.name)}`}
                 alt={author.name}
                 className="h-7 w-7 rounded-full object-cover"
               />
@@ -432,7 +432,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
           {/* Author card */}
           <div className="mt-8 p-5 md:p-6 rounded-lg bg-surface-alt flex gap-4 items-start">
             <img
-              src={author.avatar}
+              src={author.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(author.name)}`}
               alt={author.name}
               className="h-14 w-14 md:h-16 md:w-16 rounded-full object-cover shrink-0"
             />
