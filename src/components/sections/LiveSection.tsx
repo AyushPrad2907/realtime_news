@@ -6,7 +6,7 @@ import { useT } from "@/hooks/use-t";
 import { useHydrated } from "@/hooks/use-hydrated";
 
 export function LiveSection() {
-  const { navigate, isLive } = useStore();
+  const { navigate, isLive, language } = useStore();
   const t = useT();
   const mounted = useHydrated();
 
@@ -23,7 +23,7 @@ export function LiveSection() {
           >
             <img
               src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=1200&h=675&fit=crop&q=80"
-              alt="Live news broadcast"
+              alt={mounted ? t("aria.liveBroadcast") : "Live news broadcast"}
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -47,7 +47,7 @@ export function LiveSection() {
             {/* Viewer count */}
             <div className="absolute bottom-4 left-4 flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/60 backdrop-blur text-white font-ui text-xs">
               <Users className="h-3 w-3" />
-              <span>4,287 {t("misc.watching")}</span>
+              <span>{language === "hi" ? "४,२८७" : "4,287"} {t("misc.watching")}</span>
             </div>
           </button>
 

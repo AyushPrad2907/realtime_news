@@ -1,9 +1,10 @@
 "use client";
 
 import { useStore } from "@/lib/store";
-import { ARTICLES_LIST, INDIAN_STATES } from "@/lib/mock-data";
+import { INDIAN_STATES } from "@/lib/mock-data";
+import { useArticles } from "@/lib/use-data";
 import { ArticleCard } from "@/components/cards/ArticleCard";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/hooks/use-t";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -14,11 +15,7 @@ export function StateNews() {
   const mounted = useHydrated();
   const [activeState, setActiveState] = useState(INDIAN_STATES[0]);
 
-  const articles = useMemo(
-    () =>
-      ARTICLES_LIST.filter((a) => a.states?.includes(activeState)).slice(0, 4),
-    [activeState]
-  );
+  const { data: articles, loading } = useArticles({ state: activeState, limit: 4 });
 
   if (!mounted) return null;
 
@@ -56,7 +53,13 @@ export function StateNews() {
         </aside>
 
         <div>
-          {articles.length === 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="animate-pulse bg-muted rounded-lg h-32" />
+              ))}
+            </div>
+          ) : articles.length === 0 ? (
             <div className="py-12 text-center bg-surface-alt rounded-md">
               <p className="font-ui text-sm text-ink-secondary">
                 {t("misc.noStoriesFor")} {activeState}

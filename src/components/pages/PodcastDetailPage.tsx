@@ -92,10 +92,10 @@ export function PodcastDetailPage({ slug }: PodcastDetailPageProps) {
 
   useEffect(() => {
     if (episode) {
-      document.title = `${episode.title} — Podcast — The National Dispatch`;
+      document.title = `${episode.title} — Podcast — NewsVarta`;
     }
     return () => {
-      document.title = "The National Dispatch";
+      document.title = "NewsVarta";
     };
   }, [episode]);
 
@@ -212,62 +212,74 @@ export function PodcastDetailPage({ slug }: PodcastDetailPageProps) {
             </div>
           </div>
 
-          {/* Audio player */}
-          <div className="bg-surface-alt border border-border/60 rounded-lg p-4 md:p-5 mb-6">
-            <div className="flex items-center gap-4 mb-4">
-              <button
-                onClick={onPlayClick}
-                className="h-14 w-14 md:h-16 md:w-16 shrink-0 rounded-full bg-brand hover:bg-brand-dark text-white flex items-center justify-center shadow-lg transition-colors"
-                aria-label={showPlay ? "Play episode" : "Pause episode"}
-              >
-                {showPlay ? (
-                  <Play className="h-6 w-6 ml-0.5" fill="currentColor" />
-                ) : (
-                  <Pause className="h-6 w-6" fill="currentColor" />
-                )}
-              </button>
-              <div className="flex-1 min-w-0">
-                <p className="font-display text-base font-bold line-clamp-1">
-                  {episode.title}
-                </p>
-                <p className="font-ui text-[11px] text-ink-tertiary">
-                  {series.name}
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => toast.message("Downloading episode…")}
-                  className="p-2 rounded-md hover:bg-muted transition-colors"
-                  aria-label="Download episode"
-                >
-                  <Download className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={onShare}
-                  className="p-2 rounded-md hover:bg-muted transition-colors"
-                  aria-label="Share episode"
-                >
-                  <Share2 className="h-4 w-4" />
-                </button>
-              </div>
+          {/* Audio player / Video Player */}
+          {episode.videoId ? (
+            <div className="aspect-video rounded-lg overflow-hidden bg-black mb-6">
+              <iframe
+                src={`https://www.youtube.com/embed/${episode.videoId}?autoplay=0`}
+                title={episode.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full border-0"
+              />
             </div>
+          ) : (
+            <div className="bg-surface-alt border border-border/60 rounded-lg p-4 md:p-5 mb-6">
+              <div className="flex items-center gap-4 mb-4">
+                <button
+                  onClick={onPlayClick}
+                  className="h-14 w-14 md:h-16 md:w-16 shrink-0 rounded-full bg-brand hover:bg-brand-dark text-white flex items-center justify-center shadow-lg transition-colors"
+                  aria-label={showPlay ? "Play episode" : "Pause episode"}
+                >
+                  {showPlay ? (
+                    <Play className="h-6 w-6 ml-0.5" fill="currentColor" />
+                  ) : (
+                    <Pause className="h-6 w-6" fill="currentColor" />
+                  )}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p className="font-display text-base font-bold line-clamp-1">
+                    {episode.title}
+                  </p>
+                  <p className="font-ui text-[11px] text-ink-tertiary">
+                    {series.name}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => toast.message("Downloading episode…")}
+                    className="p-2 rounded-md hover:bg-muted transition-colors"
+                    aria-label="Download episode"
+                  >
+                    <Download className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={onShare}
+                    className="p-2 rounded-md hover:bg-muted transition-colors"
+                    aria-label="Share episode"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
 
-            {/* Seek bar */}
-            <div className="flex items-center gap-3">
-              <span className="font-ui text-[11px] tabular-nums text-ink-secondary w-12 text-right">
-                {formatCurrentTime(currentSeconds)}
-              </span>
-              <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden relative cursor-pointer">
-                <div
-                  className="h-full bg-brand transition-all duration-1000 ease-linear"
-                  style={{ width: `${progress}%` }}
-                />
+              {/* Seek bar */}
+              <div className="flex items-center gap-3">
+                <span className="font-ui text-[11px] tabular-nums text-ink-secondary w-12 text-right">
+                  {formatCurrentTime(currentSeconds)}
+                </span>
+                <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden relative cursor-pointer">
+                  <div
+                    className="h-full bg-brand transition-all duration-1000 ease-linear"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <span className="font-ui text-[11px] tabular-nums text-ink-tertiary w-12">
+                  {episode.duration}
+                </span>
               </div>
-              <span className="font-ui text-[11px] tabular-nums text-ink-tertiary w-12">
-                {episode.duration}
-              </span>
             </div>
-          </div>
+          )}
 
           {/* Show notes */}
           <div className="mb-6">

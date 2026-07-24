@@ -55,7 +55,7 @@ export interface PodcastSeries {
   description: string;
   coverImage: string;
   episodes: number;
-  category: "News" | "Analysis" | "Interviews" | "Special Series";
+  category: string;
 }
 
 export interface PodcastEpisode {
@@ -70,6 +70,7 @@ export interface PodcastEpisode {
   coverImage: string;
   episodeNumber: number;
   showNotes: { time: string; label: string }[];
+  videoId?: string;
 }
 
 export interface LiveUpdate {

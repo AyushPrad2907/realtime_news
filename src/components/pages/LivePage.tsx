@@ -119,7 +119,7 @@ export function LivePage() {
           {/* Program info */}
           <div className="mb-6">
             <p className="font-ui text-[11px] font-bold uppercase tracking-wider text-brand mb-1">
-              The National Dispatch Live · Special Coverage
+              NewsVarta Live · Special Coverage
             </p>
             <h2 className="font-display text-2xl md:text-3xl font-extrabold leading-tight mb-2">
               {programTitle}

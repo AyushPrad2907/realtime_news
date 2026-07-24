@@ -2,7 +2,7 @@
 
 import { useStore } from "@/lib/store";
 import { CATEGORIES } from "@/lib/mock-data";
-import { Twitter, Facebook, Instagram, Youtube, Send, Rss } from "lucide-react";
+import { Instagram, Youtube } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { subscribeNewsletter } from "@/lib/api-client";
@@ -46,18 +46,15 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-2 mt-5">
               {[
-                { Icon: Twitter, label: "Twitter / X" },
-                { Icon: Facebook, label: "Facebook" },
-                { Icon: Instagram, label: "Instagram" },
-                { Icon: Youtube, label: "YouTube" },
-                { Icon: Send, label: "Telegram" },
-                { Icon: Rss, label: "RSS" },
-              ].map(({ Icon, label }) => (
+                { Icon: Youtube, label: "YouTube", href: "https://www.youtube.com/@newsvartanation3327" },
+                { Icon: Instagram, label: "Instagram", href: "https://www.instagram.com/newsvartaworld" },
+              ].map(({ Icon, label, href }) => (
                 <a
                   key={label}
-                  href="#"
+                  href={href}
                   aria-label={label}
-                  onClick={(e) => e.preventDefault()}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="p-2 rounded-md bg-white/5 hover:bg-white/10 transition-colors"
                 >
                   <Icon className="h-4 w-4" />
@@ -193,9 +190,6 @@ export function Footer() {
             {mounted
               ? t("misc.copyright").replace("{year}", String(currentYear))
               : `© ${currentYear} Newsvarta. All rights reserved.`}
-          </p>
-          <p className="font-ui text-xs text-white/60">
-            {mounted ? t("misc.demoNotice") : "A demo news portal interface — built for illustrative purposes."}
           </p>
         </div>
       </div>

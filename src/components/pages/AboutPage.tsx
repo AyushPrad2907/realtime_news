@@ -19,7 +19,7 @@ export function AboutPage() {
             Journalism that holds power to account — and the reader above all.
           </h1>
           <p className="font-serif text-lg md:text-xl text-background/75 mt-6 max-w-2xl">
-            The National Dispatch is an independent news organisation reporting on
+            NewsVarta is an independent news organisation reporting on
             the stories that shape the nation. We are owned by no conglomerate,
             aligned with no party, and answerable — above all — to our readers.
           </p>

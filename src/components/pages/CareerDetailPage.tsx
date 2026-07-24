@@ -60,10 +60,10 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
 
   useEffect(() => {
     if (job) {
-      document.title = `${job.title} — Careers — The National Dispatch`;
+      document.title = `${job.title} — Careers — NewsVarta`;
     }
     return () => {
-      document.title = "The National Dispatch";
+      document.title = "NewsVarta";
     };
   }, [job]);
 

@@ -60,7 +60,7 @@ export function Newsletter() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t("misc.emailPlaceholder")}
-              aria-label="Email address"
+              aria-label={mounted ? t("aria.emailAddress") : "Email address"}
               className="flex-1 h-12 px-4 rounded-md bg-white/10 border border-white/15 text-background placeholder:text-background/50 focus:outline-none focus:ring-2 focus:ring-brand-light font-ui text-sm"
             />
             <button

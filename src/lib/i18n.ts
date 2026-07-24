@@ -149,6 +149,7 @@ export const UI_STRINGS = {
     "aria.scrollLeft": "Scroll categories left",
     "aria.scrollRight": "Scroll categories right",
     "aria.breakingNews": "Breaking news",
+    "aria.liveBroadcast": "Live news broadcast",
     "aria.dismissTicker": "Dismiss breaking news ticker",
   },
   hi: {
@@ -301,6 +302,7 @@ export const UI_STRINGS = {
     "aria.scrollLeft": "श्रेणियों को बाईं ओर स्क्रॉल करें",
     "aria.scrollRight": "श्रेणियों को दाईं ओर स्क्रॉल करें",
     "aria.breakingNews": "ब्रेकिंग न्यूज़",
+    "aria.liveBroadcast": "लाइव समाचार प्रसारण",
     "aria.dismissTicker": "ब्रेकिंग न्यूज़ टिकर बंद करें",
   }
 } as const;

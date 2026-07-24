@@ -10,7 +10,7 @@ const PRIVACY_CONTENT = {
   title: "Privacy Policy",
   updated: "Last updated: July 1, 2025",
   intro:
-    "This privacy policy explains how The National Dispatch collects, uses, and protects information about you when you use our website, mobile applications, and related services. We are committed to being transparent about our data practices and to giving you meaningful control over your information.",
+    "This privacy policy explains how NewsVarta collects, uses, and protects information about you when you use our website, mobile applications, and related services. We are committed to being transparent about our data practices and to giving you meaningful control over your information.",
   sections: [
     {
       h: "Information we collect",
@@ -59,7 +59,7 @@ const TERMS_CONTENT = {
   title: "Terms of Service",
   updated: "Last updated: July 1, 2025",
   intro:
-    "These terms of service govern your use of The National Dispatch website, mobile applications, and related services. By using our service, you agree to these terms. If you do not agree, you may not use our service.",
+    "These terms of service govern your use of NewsVarta website, mobile applications, and related services. By using our service, you agree to these terms. If you do not agree, you may not use our service.",
   sections: [
     {
       h: "Use of our service",
@@ -78,7 +78,7 @@ const TERMS_CONTENT = {
     {
       h: "Intellectual property",
       body: [
-        "All content published on The National Dispatch — including articles, images, podcasts, and graphics — is the property of The National Dispatch or its licensors, and is protected by copyright and other intellectual property laws. You may not use our content for commercial purposes without our written permission.",
+        "All content published on NewsVarta — including articles, images, podcasts, and graphics — is the property of NewsVarta or its licensors, and is protected by copyright and other intellectual property laws. You may not use our content for commercial purposes without our written permission.",
         "Our trademarks and trade dress may not be used in connection with any product or service without our prior written consent.",
       ],
     },
@@ -91,7 +91,7 @@ const TERMS_CONTENT = {
     {
       h: "Limitation of liability",
       body: [
-        "To the fullest extent permitted by law, The National Dispatch shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising from your use of, or inability to use, our service — even if we have been advised of the possibility of such damages.",
+        "To the fullest extent permitted by law, NewsVarta shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising from your use of, or inability to use, our service — even if we have been advised of the possibility of such damages.",
       ],
     },
     {

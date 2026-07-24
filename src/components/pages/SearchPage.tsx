@@ -131,7 +131,7 @@ export function SearchPage({ query: initialQuery }: SearchPageProps) {
         {query.trim() === "" ? (
           <div className="py-8">
             <h1 className="font-display text-2xl md:text-3xl font-bold mb-4">
-              {mounted ? t(language, "search.label") : "Search"} The National Dispatch
+              {mounted ? t(language, "search.label") : "Search"} NewsVarta
             </h1>
             <p className="font-serif text-base text-ink-secondary mb-6 max-w-xl">
               {mounted ? t(language, "misc.searchDesc") : "Find articles, podcasts, and topics across our archive. Use the filters below to refine by date, type, or category."}

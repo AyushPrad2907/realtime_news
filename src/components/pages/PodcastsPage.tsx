@@ -40,7 +40,7 @@ export function PodcastsPage() {
           </h1>
         </div>
         <p className="font-serif text-lg text-ink-secondary max-w-2xl">
-          {mounted ? t(language, "misc.podcastDesc") : "Long-form conversations, daily briefings, and on-the-ground reporting — from the editors and correspondents of The National Dispatch."}
+          {mounted ? t(language, "misc.podcastDesc") : "Long-form conversations, daily briefings, and on-the-ground reporting — from the editors and correspondents of NewsVarta."}
         </p>
       </div>
 

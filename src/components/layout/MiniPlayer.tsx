@@ -105,7 +105,7 @@ function MiniPlayerContent({
             {title}
           </p>
           <p className="font-ui text-[11px] text-ink-tertiary line-clamp-1">
-            {duration} · The National Dispatch Podcast
+            {duration} · NewsVarta
           </p>
         </div>
 

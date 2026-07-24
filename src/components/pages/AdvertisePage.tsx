@@ -102,7 +102,7 @@ export function AdvertisePage() {
             {mounted && language === "hi" ? "लाखों पाठकों तक पहुंचें।" : "Reach millions of engaged readers."}
           </h1>
           <p className="font-serif text-lg md:text-xl text-background/75 mt-5 max-w-2xl mx-auto">
-            {mounted && language === "hi" ? "द नेशनल डिस्पैच देश के सबसे जागरूक और प्रभावशाली पाठकों तक पहुंचता है। आपका ब्रांड उस पत्रकारिता के साथ दिखने का हकदार है जिस पर वे भरोसा करते हैं।" : "The National Dispatch reaches the country's most engaged, informed, and influential readers. Your brand deserves to be seen alongside the journalism they trust."}
+            {mounted && language === "hi" ? "न्यूज़वार्ता देश के सबसे जागरूक और प्रभावशाली पाठकों तक पहुंचता है। आपका ब्रांड उस पत्रकारिता के साथ दिखने का हकदार है जिस पर वे भरोसा करते हैं।" : "NewsVarta reaches the country's most engaged, informed, and influential readers. Your brand deserves to be seen alongside the journalism they trust."}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <a

@@ -37,7 +37,7 @@ interface ArticlePageProps {
 }
 
 export function ArticlePage({ slug }: ArticlePageProps) {
-  const { navigate, back, canGoBack, playEpisode, nowPlaying, isPlaying, togglePlay } = useStore();
+  const { navigate, back, canGoBack, playEpisode, nowPlaying, isPlaying, togglePlay, language } = useStore();
   const t = useT();
   const mounted = useHydrated();
   const [copied, setCopied] = useState(false);
@@ -87,12 +87,12 @@ export function ArticlePage({ slug }: ArticlePageProps) {
 
   useEffect(() => {
     if (article) {
-      document.title = `${article.title} — The National Dispatch`;
+      document.title = `${article.title} — ${language === "hi" ? "न्यूज़वार्ता" : "NewsVarta"}`;
     }
     return () => {
-      document.title = "The National Dispatch";
+      document.title = language === "hi" ? "न्यूज़वार्ता" : "NewsVarta";
     };
-  }, [article]);
+  }, [article, language]);
 
   if (loading) {
     return (
@@ -130,9 +130,23 @@ export function ArticlePage({ slug }: ArticlePageProps) {
       toast.success(t("misc.linkCopied"));
       setTimeout(() => setCopied(false), 2000);
     } else {
-      toast.message(`Sharing to ${platform}…`, {
-        description: "Demo mode — sharing would open the platform in a new tab.",
-      });
+      const url = encodeURIComponent(window.location.href);
+      const title = encodeURIComponent(article.title);
+      let shareUrl = "";
+      
+      if (platform === "twitter") {
+        shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+      } else if (platform === "facebook") {
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+      } else if (platform === "telegram") {
+        shareUrl = `https://t.me/share/url?url=${url}&text=${title}`;
+      } else if (platform === "email") {
+        shareUrl = `mailto:?subject=${title}&body=${url}`;
+      }
+
+      if (shareUrl) {
+        window.open(shareUrl, "_blank", "noopener,noreferrer");
+      }
     }
   };
 
@@ -149,7 +163,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
         description: article.standfirst,
         publishedAt: article.publishedAt,
         duration: article.audioDuration ?? "—",
-        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+        audioUrl: "",
         coverImage: article.heroImage,
         episodeNumber: 0,
         showNotes: [],
