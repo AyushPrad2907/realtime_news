@@ -403,16 +403,42 @@ async function runScraper() {
     for (const feed of FEEDS) {
       console.log(`Processing: ${feed.name}`);
       try {
-        const res = await fetch(feed.url, {
-          headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "application/xml, text/xml, */*",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Connection": "keep-alive",
-          },
-        });
-        if (!res.ok) {
-          console.warn(`Failed to fetch feed ${feed.name}: ${res.status}`);
+        let res;
+        let retries = 3;
+        let delay = 500;
+        let fetchSuccess = false;
+
+        while (retries > 0) {
+          try {
+            res = await fetch(feed.url, {
+              headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "application/xml, text/xml, */*",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Connection": "keep-alive",
+              },
+            });
+            if (!res.ok) {
+              if (res.status === 429 || res.status >= 500) {
+                throw new Error(`HTTP status ${res.status}`);
+              }
+              console.warn(`Failed to fetch feed ${feed.name}: ${res.status}`);
+              break;
+            }
+            fetchSuccess = true;
+            break;
+          } catch (fetchErr: any) {
+            retries--;
+            if (retries === 0) {
+              console.warn(`Failed to fetch feed ${feed.name} after retries: ${fetchErr.message || fetchErr}`);
+              break;
+            }
+            await new Promise((resolve) => setTimeout(resolve, delay));
+            delay *= 3;
+          }
+        }
+
+        if (!fetchSuccess || !res) {
           continue;
         }
 
