@@ -77,11 +77,11 @@
 
   /* Surfaces */
   --background: oklch(0.99 0.002 60);
-  --foreground: oklch(0.18 0.012 60);
+  --foreground: oklch(0.12 0.008 60);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.012 60);
+  --card-foreground: oklch(0.12 0.008 60);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.012 60);
+  --popover-foreground: oklch(0.12 0.008 60);
 
   /* Brand — deep editorial red */
   --brand: oklch(0.52 0.19 27);
@@ -93,20 +93,20 @@
   --primary-foreground: oklch(0.98 0.005 60);
 
   --secondary: oklch(0.96 0.006 60);
-  --secondary-foreground: oklch(0.22 0.012 60);
+  --secondary-foreground: oklch(0.16 0.008 60);
   --muted: oklch(0.96 0.006 60);
-  --muted-foreground: oklch(0.46 0.012 60);
+  --muted-foreground: oklch(0.35 0.01 60);
   --accent: oklch(0.96 0.012 30);
-  --accent-foreground: oklch(0.22 0.012 60);
+  --accent-foreground: oklch(0.16 0.008 60);
   --destructive: oklch(0.55 0.22 27);
   --border: oklch(0.91 0.005 60);
   --input: oklch(0.91 0.005 60);
   --ring: var(--brand);
 
   /* Ink scale */
-  --ink: oklch(0.18 0.012 60);
-  --ink-secondary: oklch(0.42 0.012 60);
-  --ink-tertiary: oklch(0.62 0.012 60);
+  --ink: oklch(0.12 0.008 60);
+  --ink-secondary: oklch(0.32 0.01 60);
+  --ink-tertiary: oklch(0.50 0.01 60);
   --surface-alt: oklch(0.97 0.005 60);
 
   /* Status */
@@ -557,3 +557,10 @@ body {
   top: 0px !important; 
   position: static !important;
 }
+
+/* Prevent Google Translate from overriding text colors (e.g. forcing black in dark mode) */
+font {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+

@@ -268,7 +268,7 @@ export function PibNewsPage() {
                 font-weight: 600 !important;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
-                color: var(--brand) !important;
+                color: inherit !important;
                 font-size: 0.95rem !important;
                 padding-bottom: 15px;
               }

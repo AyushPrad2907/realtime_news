@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { serializeArticle } from "@/lib/serializers";
+import https from "https";
 import { ARTICLES_LIST } from "@/lib/mock-data";
 import Parser from "rss-parser";
 
@@ -406,11 +407,23 @@ async function translateText(text: string, targetLang: string): Promise<string> 
   if (!text || targetLang === "en") return text;
   try {
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-    const res = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0" }
+    const resBody = await new Promise<string>((resolve, reject) => {
+      https.get(url, {
+        headers: { "User-Agent": "Mozilla/5.0" }
+      }, (res) => {
+        let body = "";
+        res.on("data", (chunk) => body += chunk);
+        res.on("end", () => {
+          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(body);
+          } else {
+            reject(new Error(`HTTP status ${res.statusCode}`));
+          }
+        });
+      }).on("error", reject);
     });
-    if (!res.ok) return text;
-    const data = await res.json();
+
+    const data = JSON.parse(resBody);
     if (data && data[0]) {
       return data[0].map((x: any) => x[0]).join("");
     }

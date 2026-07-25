@@ -68,6 +68,7 @@ export function AdBanner({ format, className, label }: AdBannerProps) {
   useEffect(() => {
     // Select a campaign based on placement/random to distribute them
     const randomIndex = Math.floor(Math.random() * CAMPAIGNS.length);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCampaign(CAMPAIGNS[randomIndex]);
   }, [format]);
 
