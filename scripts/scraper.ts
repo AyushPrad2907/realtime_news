@@ -487,6 +487,12 @@ async function runScraper() {
         }
 
         const xml = await res.text();
+        const trimmedXml = xml.trim();
+        if (trimmedXml.startsWith("<!DOCTYPE html") || trimmedXml.startsWith("<html") || trimmedXml.startsWith("<!doctype html")) {
+          console.warn(`Failed to parse feed ${feed.name}: Content is HTML, not XML.`);
+          continue;
+        }
+
         const cleanEntities = xml
           .replace(/&zwj;/gi, "\u200d")
           .replace(/&ndash;/gi, "–")
@@ -497,7 +503,14 @@ async function runScraper() {
           .replace(/&rdquo;/gi, "”")
           .replace(/&ldquo;/gi, "“");
         const cleanXml = cleanEntities.replace(/&(?!(amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);)/g, "&amp;");
-        const parsed = await parser.parseString(cleanXml);
+        
+        let parsed;
+        try {
+          parsed = await parser.parseString(cleanXml);
+        } catch (parseErr: any) {
+          console.warn(`Failed to parse feed ${feed.name}: ${parseErr.message || parseErr}`);
+          continue;
+        }
 
         for (const item of parsed.items) {
           if (!item.title || !item.link) continue;
