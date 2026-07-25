@@ -360,7 +360,6 @@ export async function GET(req: Request) {
           let authorId = "";
           let body = "";
           let categorySlug = feed.defaultCategory || "national";
-          const heroImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800";
 
           if (feed.source === "pib") {
             const pridMatch = item.link.match(/PRID=([0-9]+)/i);
@@ -392,13 +391,70 @@ export async function GET(req: Request) {
 
           if (!slug || !body) continue;
 
+          // Extract image from RSS item metadata (enclosure, media:content, media:thumbnail)
+          let rssImage: string | null = null;
+          if (item.enclosure?.url) {
+            rssImage = item.enclosure.url;
+          } else {
+            const mediaContent = (item as any)["media:content"] || (item as any).mediaContent;
+            if (mediaContent) {
+              if (Array.isArray(mediaContent) && mediaContent[0]?.$.url) {
+                rssImage = mediaContent[0].$.url;
+              } else if (mediaContent.$?.url) {
+                rssImage = mediaContent.$.url;
+              } else if (typeof mediaContent === "object" && mediaContent.url) {
+                rssImage = mediaContent.url;
+              }
+            }
+            if (!rssImage) {
+              const mediaThumbnail = (item as any)["media:thumbnail"] || (item as any).mediaThumbnail;
+              if (mediaThumbnail) {
+                if (Array.isArray(mediaThumbnail) && mediaThumbnail[0]?.$.url) {
+                  rssImage = mediaThumbnail[0].$.url;
+                } else if (mediaThumbnail.$?.url) {
+                  rssImage = mediaThumbnail.$.url;
+                } else if (typeof mediaThumbnail === "object" && mediaThumbnail.url) {
+                  rssImage = mediaThumbnail.url;
+                }
+              }
+            }
+          }
+
+          let heroImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800";
+          if (rssImage) {
+            heroImage = rssImage;
+          } else {
+            // Fallback to extracting the first image from the article body HTML
+            const imgMatch = body.match(/<img\s+[^>]*src=["']([^"']+)["']/i);
+            if (imgMatch) {
+              let src = imgMatch[1];
+              if (src.startsWith("/")) {
+                try {
+                  const origin = new URL(feed.url).origin;
+                  src = `${origin}${src}`;
+                } catch (e) {}
+              } else if (src.startsWith("../")) {
+                try {
+                  const origin = new URL(feed.url).origin;
+                  src = `${origin}/${src.replace(/^\.\.\//, "")}`;
+                } catch (e) {}
+              }
+              heroImage = src;
+            }
+          }
+
           const existing = await db.article.findUnique({ where: { slug } });
           if (existing) continue;
+
+          const dateStr = item.pubDate || item.isoDate || new Date().toISOString();
+          const publishedAtDate = new Date(dateStr);
+          if (publishedAtDate < oneDayAgo) {
+            continue; // Skip articles older than 24 hours (would be immediately cleaned up anyway)
+          }
 
           const customTags = extractCustomTags(item.title, body);
           const baseTags = feed.source === "pib" ? ["PIB", "Official"] : feed.source === "hindustan" ? ["Hindustan", "Latest"] : ["News", feed.name];
           const allTags = Array.from(new Set([...baseTags, ...customTags]));
-          const dateStr = item.pubDate || item.isoDate || new Date().toISOString();
 
           await db.article.create({
             data: {
@@ -414,7 +470,7 @@ export async function GET(req: Request) {
               heroCaption: feed.name,
               heroCredit: feed.source === "pib" ? "PIB" : feed.source === "hindustan" ? "Live Hindustan" : feed.name,
               readingTime: Math.max(3, Math.ceil(body.split(" ").length / 200)),
-              publishedAt: new Date(dateStr),
+              publishedAt: publishedAtDate,
               approvedAt: new Date(),
               submittedAt: new Date(),
             },
