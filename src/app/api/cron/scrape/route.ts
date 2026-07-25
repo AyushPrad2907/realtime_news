@@ -8,34 +8,273 @@ export const dynamic = "force-dynamic";
 
 const parser = new Parser();
 
-// Map categories
-function getCategoryFromText(text: string, defaultCat = "national"): string {
-  const t = text.toLowerCase();
-  if (t.includes("cabinet") || t.includes("election") || t.includes("parliament") || t.includes("pm modi") || t.includes("narendra modi") || t.includes("minister") || t.includes("president")) {
-    if (t.includes("visit") || t.includes("international") || t.includes("bilateral") || t.includes("foreign")) {
-      return "international";
-    }
-    return "politics";
+interface FeedConfig {
+  name: string;
+  url: string;
+  source: "pib" | "hindustan" | "general-rss";
+  defaultCategory?: string;
+  state?: string;
+  lang: "hi" | "en";
+}
+
+// Feeds to check
+const FEEDS: FeedConfig[] = [
+  { name: "PIB National (Hindi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2", source: "pib", lang: "hi" },
+  { name: "PIB National (English)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1", source: "pib", lang: "en" },
+  
+  // --- Working General Feeds ---
+  {
+    name: "IRCTC News Blog Feed",
+    url: "https://irctcnews.in/feed",
+    source: "general-rss",
+    defaultCategory: "national",
+    lang: "en",
+  },
+  {
+    name: "The Print Science Feed",
+    url: "https://theprint.in/category/science/feed/",
+    source: "general-rss",
+    defaultCategory: "science",
+    lang: "en",
+  },
+  {
+    name: "ESPN Cricinfo India",
+    url: "https://www.espncricinfo.com/rss/content/story/feeds/6.xml",
+    source: "general-rss",
+    defaultCategory: "sports",
+    lang: "en",
+  },
+  {
+    name: "India Today Sports",
+    url: "https://www.indiatoday.in/rss/1206550",
+    source: "general-rss",
+    defaultCategory: "sports",
+    lang: "en",
+  },
+  {
+    name: "The Hindu Politics Feed",
+    url: "https://www.thehindu.com/news/national/feeder/default.rss",
+    source: "general-rss",
+    defaultCategory: "politics",
+    lang: "en",
+  },
+  {
+    name: "The Print Politics Feed",
+    url: "https://theprint.in/category/politics/feed/",
+    source: "general-rss",
+    defaultCategory: "politics",
+    lang: "en",
+  },
+  {
+    name: "Pinkvilla Entertainment",
+    url: "https://www.pinkvilla.com/rss.xml",
+    source: "general-rss",
+    defaultCategory: "entertainment",
+    lang: "en",
+  },
+  {
+    name: "Koimoi Entertainment Feed",
+    url: "https://www.koimoi.com/feed/",
+    source: "general-rss",
+    defaultCategory: "entertainment",
+    lang: "en",
+  },
+  {
+    name: "BollywoodHungama News",
+    url: "https://www.bollywoodhungama.com/rss/news.xml",
+    source: "general-rss",
+    defaultCategory: "entertainment",
+    lang: "en",
+  },
+
+  // --- Creative Commons (CC-BY) / Open Sources ---
+  {
+    name: "Global Voices (Hindi)",
+    url: "https://hi.globalvoices.org/feed/",
+    source: "general-rss",
+    defaultCategory: "international",
+    lang: "hi",
+  },
+  {
+    name: "Global Voices (English)",
+    url: "https://globalvoices.org/feed",
+    source: "general-rss",
+    defaultCategory: "international",
+    lang: "en",
+  },
+  {
+    name: "Mongabay India (English)",
+    url: "https://india.mongabay.com/feed/",
+    source: "general-rss",
+    defaultCategory: "science",
+    lang: "en",
+  },
+  {
+    name: "The Conversation",
+    url: "https://theconversation.com/articles.atom",
+    source: "general-rss",
+    defaultCategory: "national",
+    lang: "en",
+  },
+  {
+    name: "ProPublica",
+    url: "https://www.propublica.org/feeds/propublica/main",
+    source: "general-rss",
+    defaultCategory: "politics",
+    lang: "en",
+  },
+  // Government / Official (100% public domain)
+  {
+    name: "Doordarshan National",
+    url: "https://ddnews.gov.in/feed/",
+    source: "general-rss",
+    defaultCategory: "national",
+    lang: "en",
+  },
+  // Creative Commons / Open Sources / Reliable international
+  {
+    name: "BBC News World",
+    url: "https://feeds.bbci.co.uk/news/world/rss.xml",
+    source: "general-rss",
+    defaultCategory: "international",
+    lang: "en",
+  },
+  {
+    name: "BBC News Hindi",
+    url: "https://feeds.bbci.co.uk/hindi/rss.xml",
+    source: "general-rss",
+    defaultCategory: "international",
+    lang: "hi",
+  },
+  // Sports
+  {
+    name: "Sportstar (The Hindu)",
+    url: "https://sportstar.thehindu.com/feeder/default.rss",
+    source: "general-rss",
+    defaultCategory: "sports",
+    lang: "en",
+  },
+  // Technology & Business
+  {
+    name: "TechCrunch",
+    url: "https://techcrunch.com/feed/",
+    source: "general-rss",
+    defaultCategory: "technology",
+    lang: "en",
+  },
+  {
+    name: "Inc42 Startup News",
+    url: "https://inc42.com/feed/",
+    source: "general-rss",
+    defaultCategory: "economy",
+    lang: "en",
+  },
+  // Health
+  {
+    name: "Medical News Today",
+    url: "https://www.medicalnewstoday.com/feed",
+    source: "general-rss",
+    defaultCategory: "health",
+    lang: "en",
   }
-  if (t.includes("economy") || t.includes("gst") || t.includes("gdp") || t.includes("tax") || t.includes("finance") || t.includes("budget") || t.includes("trade") || t.includes("commerce") || t.includes("शेयर") || t.includes("बाजार") || t.includes("व्यापार")) {
-    return "economy";
+];
+
+// Helper to determine category from keywords using a scoring system
+function getCategoryFromText(title: string, bodyText: string, defaultCat = "national"): string {
+  const text = `${title} ${bodyText}`.toLowerCase();
+  const scores: Record<string, number> = {
+    politics: 0,
+    economy: 0,
+    sports: 0,
+    health: 0,
+    technology: 0,
+    science: 0,
+    entertainment: 0,
+    international: 0,
+    national: 0,
+  };
+
+  // Politics
+  if (text.includes("cabinet") || text.includes("election") || text.includes("parliament") || text.includes("lok sabha") || text.includes("rajya sabha") || text.includes("minister") || text.includes("president") || text.includes("bjp") || text.includes("congress") || text.includes("pm modi") || text.includes("narendra modi")) {
+    scores.politics += 3;
   }
-  if (t.includes("sports") || t.includes("hockey") || t.includes("cricket") || t.includes("championship") || t.includes("medal") || t.includes("khelo") || t.includes("खेल") || t.includes("मैच") || t.includes("टीम")) {
-    return "sports";
+  if (text.includes("vote") || text.includes("party") || text.includes("mps") || text.includes("mlas")) {
+    scores.politics += 1.5;
   }
-  if (t.includes("health") || t.includes("ayushman") || t.includes("disease") || t.includes("medical") || t.includes("vaccine") || t.includes("स्वास्थ्य") || t.includes("अस्पताल") || t.includes("डॉक्टर")) {
-    return "health";
+
+  // Economy
+  if (text.includes("economy") || text.includes("gst") || text.includes("gdp") || text.includes("inflation") || text.includes("tax") || text.includes("finance") || text.includes("budget") || text.includes("trade") || text.includes("commerce") || text.includes("शेयर") || text.includes("बाजार") || text.includes("व्यापार")) {
+    scores.economy += 3;
   }
-  if (t.includes("technology") || t.includes("digital") || t.includes("software") || t.includes("telecom") || t.includes("ai") || t.includes("स्मार्टफोन") || t.includes("लॉन्च")) {
-    return "technology";
+  if (text.includes("sensex") || text.includes("nifty") || text.includes("rbi") || text.includes("stock") || text.includes("market")) {
+    scores.economy += 2;
   }
-  if (t.includes("space") || t.includes("isro") || t.includes("satellite") || t.includes("science") || t.includes("research") || t.includes("विज्ञान") || t.includes("अंतरिक्ष")) {
-    return "science";
+
+  // Sports
+  if (text.includes("sports") || text.includes("hockey") || text.includes("cricket") || text.includes("championship") || text.includes("medal") || text.includes("khelo") || text.includes("खेल") || text.includes("मैच") || text.includes("टीम")) {
+    scores.sports += 3;
   }
-  if (t.includes("entertainment") || t.includes("film") || t.includes("cinema") || t.includes("movie") || t.includes("actor") || t.includes("actress") || t.includes("मनोरंजन") || t.includes("फिल्म") || t.includes("सिनेमा")) {
-    return "entertainment";
+  if (text.includes("athlete") || text.includes("stadium") || text.includes("coach") || text.includes("score")) {
+    scores.sports += 1.5;
   }
-  return defaultCat;
+
+  // Health
+  if (text.includes("health") || text.includes("ayushman") || text.includes("disease") || text.includes("medical") || text.includes("vaccine") || text.includes("स्वास्थ्य") || text.includes("अस्पताल") || text.includes("डॉक्टर") || text.includes("who")) {
+    scores.health += 3;
+  }
+  if (text.includes("patient") || text.includes("clinical") || text.includes("virus") || text.includes("hospital")) {
+    scores.health += 1.5;
+  }
+
+  // Technology
+  if (text.includes("technology") || text.includes("digital") || text.includes("software") || text.includes("telecom") || text.includes("ai") || text.includes("स्मार्टफोन") || text.includes("लॉन्च") || text.includes("artificial intelligence") || text.includes("tech")) {
+    scores.technology += 3;
+  }
+
+  // Science
+  if (text.includes("space") || text.includes("isro") || text.includes("satellite") || text.includes("science") || text.includes("research") || text.includes("विज्ञान") || text.includes("अंतरिक्ष") || text.includes("nasa")) {
+    scores.science += 3;
+  }
+
+  // Entertainment
+  if (text.includes("entertainment") || text.includes("film") || text.includes("cinema") || text.includes("movie") || text.includes("actor") || text.includes("actress") || text.includes("मनोरंजन") || text.includes("फिल्म") || text.includes("सिनेमा") || text.includes("bollywood") || text.includes("hollywood")) {
+    scores.entertainment += 3;
+  }
+
+  // International
+  if (text.includes("visit") || text.includes("international") || text.includes("bilateral") || text.includes("foreign") || text.includes("global") || text.includes("un ") || text.includes("united nations")) {
+    scores.international += 3;
+  }
+
+  const top = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+  return top[1] > 0 ? top[0] : defaultCat;
+}
+
+// Clean and sanitize body HTML content
+function cleanBody(raw: string): string {
+  if (!raw) return "";
+  return raw
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<img[^>]*width=["']?1["']?[^>]*>/gi, "") // Remove 1px tracking pixels
+    .replace(/\[…\]|\[\.{3}\]|Read more.*/gi, "")     // Remove read more text
+    .replace(/<a[^>]*href=["'][^"']*utm_[^"']*["'][^>]*>.*?<\/a>/gi, "") // Remove UTM link tracking
+    .trim();
+}
+
+// Convert HTML content into clean plain text for standfirst/preview
+function toPlainText(html: string): string {
+  if (!html) return "";
+  return html
+    .replace(/<[^>]+>/g, " ")      // Strip all tags
+    .replace(/\s+/g, " ")          // Normalize whitespace
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim()
+    .substring(0, 300);            // Cap to 300 chars
 }
 
 // Extract search keywords
@@ -81,13 +320,64 @@ function extractCustomTags(title: string, body: string): string[] {
   if (text.includes("shiv sena") || text.includes("शिवसेना") || text.includes("shivsena")) tags.push("Shiv Sena");
   if (text.includes("mns") || text.includes("मनसे") || text.includes("maharashtra navnirman")) tags.push("MNS");
 
-  if (text.includes("byakti") || text.includes("personality") || text.includes("व्यक्ति")) tags.push("Byakti");
+  if (
+    text.includes("celebrity") ||
+    text.includes("celebrities") ||
+    text.includes("superstar") ||
+    text.includes("famous") ||
+    text.includes("actor") ||
+    text.includes("actress") ||
+    text.includes("influencer") ||
+    text.includes("मशहूर") ||
+    text.includes("सेलिब्रिटी") ||
+    text.includes("हस्ती") ||
+    text.includes("प्रसिद्ध")
+  ) {
+    tags.push("Celebrity");
+  }
 
   if (text.includes("bollywood") || text.includes("cinema") || text.includes("entertainment") || text.includes("film") || text.includes("movie") || text.includes("मनोरंजन") || text.includes("फिल्म") || text.includes("सिनेमा")) {
     tags.push("Cine World");
   }
 
   return tags;
+}
+
+// Detect Indian states from article title and body content
+function detectStates(title: string, body: string, feedState?: string): string | null {
+  const states: string[] = [];
+  if (feedState) {
+    states.push(feedState);
+  }
+
+  const text = `${title} ${body}`.toLowerCase();
+  
+  const stateMappings: { state: string; keywords: string[] }[] = [
+    { state: "Maharashtra", keywords: ["maharashtra", "mumbai", "pune", "nagpur", "महाराष्ट्र", "मुंबई"] },
+    { state: "Delhi", keywords: ["delhi", "new delhi", "दिल्ली", "नई दिल्ली"] },
+    { state: "Karnataka", keywords: ["karnataka", "bengaluru", "bangalore", "कर्नाटक", "बेंगलुरु"] },
+    { state: "Tamil Nadu", keywords: ["tamil nadu", "chennai", "तमिलनाडु", "चेन्नई"] },
+    { state: "West Bengal", keywords: ["west bengal", "kolkata", "पश्चिम बंगाल", "कोलकाता"] },
+    { state: "Uttar Pradesh", keywords: ["uttar pradesh", "lucknow", "kanpur", "ayodhya", "varanasi", "उत्तर प्रदेश", "लखनऊ"] },
+    { state: "Gujarat", keywords: ["gujarat", "ahmedabad", "gandhinagar", "गुजरात", "अहमदाबाद"] },
+    { state: "Rajasthan", keywords: ["rajasthan", "jaipur", "राजस्थान", "जयपुर"] },
+    { state: "Kerala", keywords: ["kerala", "kochi", "thiruvananthapuram", "केरल", "कोच्चि"] },
+    { state: "Telangana", keywords: ["telangana", "hyderabad", "तेलंगाना", "हैदराबाद"] },
+    { state: "Bihar", keywords: ["bihar", "patna", "बिहार", "पटना"] },
+    { state: "Punjab", keywords: ["punjab", "amritsar", "ludhiana", "पंजाब", "अमृतसर", "chandigarh", "चंडीगढ़"] },
+    { state: "Madhya Pradesh", keywords: ["madhya pradesh", "bhopal", "indore", "मध्य प्रदेश", "भोपाल"] },
+    { state: "Odisha", keywords: ["odisha", "bhubaneswar", "ओडिशा", "भुवनेश्वर"] },
+    { state: "Assam", keywords: ["assam", "guwahati", "असम", "गुवाहाटी"] }
+  ];
+
+  for (const mapping of stateMappings) {
+    if (mapping.keywords.some(kw => text.includes(kw))) {
+      states.push(mapping.state);
+    }
+  }
+
+  const uniqueStates = Array.from(new Set(states));
+  return uniqueStates.length > 0 ? JSON.stringify(uniqueStates) : null;
 }
 
 // Scrape full body from PIB release
@@ -168,99 +458,56 @@ async function scrapePibBody(prid: string): Promise<string> {
   return "";
 }
 
-// Feeds to check
-const FEEDS: { name: string; url: string; source: "pib" | "hindustan" | "general-rss"; defaultCategory?: string }[] = [
-  { name: "PIB National (Hindi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2", source: "pib" },
-  { name: "PIB National (English)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1", source: "pib" },
-  
-  // --- Working General Feeds ---
-  {
-    name: "IRCTC News Blog Feed",
-    url: "https://irctcnews.in/feed",
-    source: "general-rss",
-    defaultCategory: "national",
-  },
-  {
-    name: "The Print Science Feed",
-    url: "https://theprint.in/category/science/feed/",
-    source: "general-rss",
-    defaultCategory: "science",
-  },
-  {
-    name: "ESPN Cricinfo India",
-    url: "https://www.espncricinfo.com/rss/content/story/feeds/6.xml",
-    source: "general-rss",
-    defaultCategory: "sports",
-  },
-  {
-    name: "India Today Sports",
-    url: "https://www.indiatoday.in/rss/1206550",
-    source: "general-rss",
-    defaultCategory: "sports",
-  },
-  {
-    name: "The Hindu Politics Feed",
-    url: "https://www.thehindu.com/news/national/feeder/default.rss",
-    source: "general-rss",
-    defaultCategory: "politics",
-  },
-  {
-    name: "The Print Politics Feed",
-    url: "https://theprint.in/category/politics/feed/",
-    source: "general-rss",
-    defaultCategory: "politics",
-  },
-  {
-    name: "Pinkvilla Entertainment",
-    url: "https://www.pinkvilla.com/rss.xml",
-    source: "general-rss",
-    defaultCategory: "entertainment",
-  },
-  {
-    name: "Koimoi Entertainment Feed",
-    url: "https://www.koimoi.com/feed/",
-    source: "general-rss",
-    defaultCategory: "entertainment",
-  },
-  {
-    name: "BollywoodHungama News",
-    url: "https://www.bollywoodhungama.com/rss/news.xml",
-    source: "general-rss",
-    defaultCategory: "entertainment",
-  },
+// Convert feed name to unique ID format
+function getFeedAuthorId(feedName: string): string {
+  return feedName.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").substring(0, 30);
+}
 
-  // --- Creative Commons (CC-BY) / Open Sources ---
-  {
-    name: "Global Voices (Hindi)",
-    url: "https://hi.globalvoices.org/feed/",
-    source: "general-rss",
-    defaultCategory: "international",
-  },
-  {
-    name: "Global Voices (English)",
-    url: "https://globalvoices.org/feed",
-    source: "general-rss",
-    defaultCategory: "international",
-  },
-  {
-    name: "Mongabay India (English)",
-    url: "https://india.mongabay.com/feed/",
-    source: "general-rss",
-    defaultCategory: "science",
-  },
-  {
-    name: "The Conversation",
-    url: "https://theconversation.com/articles.atom",
-    source: "general-rss",
-    defaultCategory: "national",
-  },
-  {
-    name: "ProPublica",
-    url: "https://www.propublica.org/feeds/propublica/main",
-    source: "general-rss",
-    defaultCategory: "politics",
+// Ensure default scraper users exist in the database
+async function ensureScraperUsers() {
+  const standardScrapers = [
+    { id: "pib-scraper", email: "pib-scraper@newsvarta.com", name: "पत्र सूचना कार्यालय (PIB)" },
+    { id: "hindustan-scraper", email: "hindustan-scraper@newsvarta.com", name: "लाइव हिन्दुस्तान" },
+    { id: "automated-rss-scraper", email: "rss-scraper@newsvarta.com", name: "न्यूज़वार्ता समाचार सेवा" }
+  ];
+
+  for (const scraper of standardScrapers) {
+    await db.user.upsert({
+      where: { email: scraper.email },
+      create: {
+        id: scraper.id,
+        email: scraper.email,
+        name: scraper.name,
+        passwordHash: "no-login-allowed",
+        role: "EDITOR",
+        status: "ACTIVE",
+        jobTitle: "ऑटोमेटेड फीड",
+      },
+      update: {},
+    });
   }
-];
+
+  // Generate unique users for each RSS feed source to attribute them properly
+  for (const feed of FEEDS) {
+    if (feed.source === "pib" || feed.source === "hindustan") continue;
+    const authorId = getFeedAuthorId(feed.name);
+    const email = `${authorId}@newsvarta.com`;
+    
+    await db.user.upsert({
+      where: { email },
+      create: {
+        id: authorId,
+        email,
+        name: feed.name,
+        passwordHash: "no-login-allowed",
+        role: "EDITOR",
+        status: "ACTIVE",
+        jobTitle: "ऑटोमेटेड फीड",
+      },
+      update: {},
+    });
+  }
+}
 
 export async function GET(req: Request) {
   // Simple check to ensure authorization header matches CRON_SECRET if set
@@ -273,6 +520,8 @@ export async function GET(req: Request) {
   let deletedCount = 0;
 
   try {
+    await ensureScraperUsers();
+
     // 1. Cleanup old articles (older than 24 hours)
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const deleteResult = await db.article.deleteMany({
@@ -360,6 +609,8 @@ export async function GET(req: Request) {
           let authorId = "";
           let body = "";
           let categorySlug = feed.defaultCategory || "national";
+          let stateTags: string | null = null;
+          let heroCaption = feed.name;
 
           if (feed.source === "pib") {
             const pridMatch = item.link.match(/PRID=([0-9]+)/i);
@@ -367,23 +618,25 @@ export async function GET(req: Request) {
             if (!prid) continue;
             slug = `pib-${prid}`;
             authorId = "pib-scraper";
-            categorySlug = getCategoryFromText(item.title, "national");
-            body = await scrapePibBody(prid);
+            body = cleanBody(await scrapePibBody(prid));
+            categorySlug = getCategoryFromText(item.title, body, "national");
           } else if (feed.source === "hindustan") {
-            const hash = Buffer.from(item.link).toString("base64").substring(0, 16);
+            const hash = Buffer.from(item.link).toString("base64url").substring(0, 24);
             slug = `hindustan-${hash}`;
             authorId = "hindustan-scraper";
-            categorySlug = feed.defaultCategory || getCategoryFromText(item.title, "national");
-            body = item.content || item.summary || item.description || "";
+            const rawBody = item.content || item.summary || item.description || "";
+            body = cleanBody(rawBody);
+            categorySlug = feed.defaultCategory || getCategoryFromText(item.title, body, "national");
             if (body && !body.includes("<p>")) {
               body = `<p>${body}</p>`;
             }
           } else {
-            const hash = Buffer.from(item.link).toString("base64").substring(0, 16);
+            const hash = Buffer.from(item.link).toString("base64url").substring(0, 24);
             slug = `rss-${hash}`;
-            authorId = "automated-rss-scraper";
-            categorySlug = feed.defaultCategory || getCategoryFromText(item.title, "national");
-            body = item.content || item.summary || item.description || "";
+            authorId = getFeedAuthorId(feed.name);
+            const rawBody = item.content || item.summary || item.description || "";
+            body = cleanBody(rawBody);
+            categorySlug = feed.defaultCategory || getCategoryFromText(item.title, body, "national");
             if (body && !body.includes("<p>")) {
               body = `<p>${body}</p>`;
             }
@@ -443,13 +696,16 @@ export async function GET(req: Request) {
             }
           }
 
+          // Add state tag by parsing content
+          stateTags = detectStates(item.title, body, feed.state);
+
           const existing = await db.article.findUnique({ where: { slug } });
           if (existing) continue;
 
           const dateStr = item.pubDate || item.isoDate || new Date().toISOString();
           const publishedAtDate = new Date(dateStr);
           if (publishedAtDate < oneDayAgo) {
-            continue; // Skip articles older than 24 hours (would be immediately cleaned up anyway)
+            continue; // Skip articles older than 24 hours
           }
 
           const customTags = extractCustomTags(item.title, body);
@@ -460,14 +716,15 @@ export async function GET(req: Request) {
             data: {
               slug,
               title: item.title,
-              standfirst: item.summary || item.description || item.title,
+              standfirst: toPlainText(item.summary || item.description || item.title),
               body,
               categorySlug,
               tags: JSON.stringify(allTags),
+              stateTags,
               authorId,
               status: "PUBLISHED",
               heroImage,
-              heroCaption: feed.name,
+              heroCaption,
               heroCredit: feed.source === "pib" ? "PIB" : feed.source === "hindustan" ? "Live Hindustan" : feed.name,
               readingTime: Math.max(3, Math.ceil(body.split(" ").length / 200)),
               publishedAt: publishedAtDate,
