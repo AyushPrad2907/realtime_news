@@ -4,13 +4,14 @@ dotenv.config();
 import { PrismaClient } from "@prisma/client";
 import Parser from "rss-parser";
 
+const connectionUrl = process.env.DIRECT_URL || process.env.DATABASE_URL;
 const db = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.DATABASE_URL
-        ? process.env.DATABASE_URL.includes("?")
-          ? `${process.env.DATABASE_URL}&connection_limit=1`
-          : `${process.env.DATABASE_URL}?connection_limit=1`
+      url: connectionUrl
+        ? connectionUrl.includes("?")
+          ? `${connectionUrl}&connection_limit=1`
+          : `${connectionUrl}?connection_limit=1`
         : undefined,
     },
   },
@@ -62,123 +63,12 @@ const FEEDS: FeedConfig[] = [
     state: "Punjab",
     lang: "hi",
   },
-  // Live Hindustan
-  {
-    name: "Live Hindustan National (Hindi)",
-    url: "https://feed.livehindustan.com/rss/national",
-    source: "hindustan",
-    defaultCategory: "national",
-    lang: "hi",
-  },
-  {
-    name: "Live Hindustan Business (Hindi)",
-    url: "https://feed.livehindustan.com/rss/business",
-    source: "hindustan",
-    defaultCategory: "economy",
-    lang: "hi",
-  },
-  {
-    name: "Live Hindustan Sports (Hindi)",
-    url: "https://feed.livehindustan.com/rss/sports",
-    source: "hindustan",
-    defaultCategory: "sports",
-    lang: "hi",
-  },
-  {
-    name: "Live Hindustan Science & Tech (Hindi)",
-    url: "https://feed.livehindustan.com/rss/science-technology",
-    source: "hindustan",
-    defaultCategory: "technology",
-    lang: "hi",
-  },
-  // --- New User-defined Topic RSS Feeds ---
-  // Public Service Commissions
-  {
-    name: "Jagran Josh Gov Jobs (PSC/SSC)",
-    url: "https://www.jagranjosh.com/government-jobs/feed",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  {
-    name: "Drishti IAS Feed",
-    url: "https://www.drishtiias.com/feed",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  {
-    name: "GKToday UPSC Feed",
-    url: "https://www.gktoday.in/gk/feed/",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  // Railways
-  {
-    name: "Business Standard Railways",
-    url: "https://www.business-standard.com/rss/topic/indian-railways.rss",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
+  // --- Working General Feeds ---
   {
     name: "IRCTC News Blog Feed",
     url: "https://irctcnews.in/feed",
     source: "general-rss",
     defaultCategory: "national",
-    lang: "en",
-  },
-  // Banking / RBI
-  {
-    name: "RBI Press Releases",
-    url: "https://rbi.org.in/Scripts/rss.aspx",
-    source: "general-rss",
-    defaultCategory: "economy",
-    lang: "en",
-  },
-  {
-    name: "RBI Notifications",
-    url: "https://www.rbi.org.in/scripts/NotificationRSS.aspx",
-    source: "general-rss",
-    defaultCategory: "economy",
-    lang: "en",
-  },
-  {
-    name: "Business Standard Banking",
-    url: "https://www.business-standard.com/rss/finance/banking.rss",
-    source: "general-rss",
-    defaultCategory: "economy",
-    lang: "en",
-  },
-  // SSC
-  {
-    name: "Jagran Josh SSC Feed",
-    url: "https://www.jagranjosh.com/ssc/feed",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  {
-    name: "Adda247 SSC Feed",
-    url: "https://www.adda247.com/ssc/feed",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  // ISRO / DRDO
-  {
-    name: "Business Standard DRDO",
-    url: "https://www.business-standard.com/rss/topic/drdo.rss",
-    source: "general-rss",
-    defaultCategory: "science",
-    lang: "en",
-  },
-  {
-    name: "Business Standard ISRO",
-    url: "https://www.business-standard.com/rss/topic/isro.rss",
-    source: "general-rss",
-    defaultCategory: "science",
     lang: "en",
   },
   {
@@ -188,7 +78,6 @@ const FEEDS: FeedConfig[] = [
     defaultCategory: "science",
     lang: "en",
   },
-  // Sports
   {
     name: "ESPN Cricinfo India",
     url: "https://www.espncricinfo.com/rss/content/story/feeds/6.xml",
@@ -197,23 +86,15 @@ const FEEDS: FeedConfig[] = [
     lang: "en",
   },
   {
-    name: "Business Standard Sports",
-    url: "https://www.business-standard.com/rss/sports.rss",
-    source: "general-rss",
-    defaultCategory: "sports",
-    lang: "en",
-  },
-  {
     name: "India Today Sports",
-    url: "https://www.indiatoday.in/rss/sports",
+    url: "https://www.indiatoday.in/rss/1206550",
     source: "general-rss",
     defaultCategory: "sports",
     lang: "en",
   },
-  // Politics
   {
     name: "The Hindu Politics Feed",
-    url: "https://www.thehindu.com/news/national/politics/feeder/default.rss",
+    url: "https://www.thehindu.com/news/national/feeder/default.rss",
     source: "general-rss",
     defaultCategory: "politics",
     lang: "en",
@@ -226,23 +107,8 @@ const FEEDS: FeedConfig[] = [
     lang: "en",
   },
   {
-    name: "The Wire Politics",
-    url: "https://thewire.in/category/politics/feed",
-    source: "general-rss",
-    defaultCategory: "politics",
-    lang: "en",
-  },
-  // Cine World
-  {
     name: "Pinkvilla Entertainment",
     url: "https://www.pinkvilla.com/rss.xml",
-    source: "general-rss",
-    defaultCategory: "entertainment",
-    lang: "en",
-  },
-  {
-    name: "Bollywood Life Feed",
-    url: "https://bollywoodlife.com/feed",
     source: "general-rss",
     defaultCategory: "entertainment",
     lang: "en",
@@ -261,6 +127,43 @@ const FEEDS: FeedConfig[] = [
     defaultCategory: "entertainment",
     lang: "en",
   },
+
+  // --- Creative Commons (CC-BY) / Open Sources ---
+  {
+    name: "Global Voices (Hindi)",
+    url: "https://hi.globalvoices.org/feed/",
+    source: "general-rss",
+    defaultCategory: "international",
+    lang: "hi",
+  },
+  {
+    name: "Global Voices (English)",
+    url: "https://globalvoices.org/feed",
+    source: "general-rss",
+    defaultCategory: "international",
+    lang: "en",
+  },
+  {
+    name: "Mongabay India (English)",
+    url: "https://india.mongabay.com/feed/",
+    source: "general-rss",
+    defaultCategory: "science",
+    lang: "en",
+  },
+  {
+    name: "The Conversation",
+    url: "https://theconversation.com/articles.atom",
+    source: "general-rss",
+    defaultCategory: "national",
+    lang: "en",
+  },
+  {
+    name: "ProPublica",
+    url: "https://www.propublica.org/feeds/propublica/main",
+    source: "general-rss",
+    defaultCategory: "politics",
+    lang: "en",
+  }
 ];
 
 // Helper to determine category from keywords
@@ -357,15 +260,39 @@ function extractCustomTags(title: string, body: string): string[] {
 // Scrape full body from PIB release
 async function scrapePibBody(prid: string): Promise<string> {
   const url = `https://pib.gov.in/PressReleaseIframePage.aspx?PRID=${prid}`;
+  let html = "";
+  let retries = 3;
+  let delay = 500;
+
+  while (retries > 0) {
+    try {
+      const res = await fetch(url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Language": "en-US,en;q=0.9",
+        },
+      });
+      if (!res.ok) {
+        if (res.status === 429 || res.status >= 500) {
+          throw new Error(`HTTP status ${res.status}`);
+        }
+        return "";
+      }
+      html = await res.text();
+      break;
+    } catch (e: any) {
+      retries--;
+      if (retries === 0) {
+        console.error(`Failed to scrape PIB body for PRID: ${prid} after retries. Error:`, e.message || e);
+        return "";
+      }
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      delay *= 3;
+    }
+  }
+
   try {
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      },
-    });
-    if (!res.ok) return "";
-    const html = await res.text();
-    
     // Extract PdfDiv block using simple balancer or basic tag index
     const startTag = 'id="PdfDiv"';
     const startIdx = html.indexOf(startTag);
@@ -478,7 +405,10 @@ async function runScraper() {
       try {
         const res = await fetch(feed.url, {
           headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "application/xml, text/xml, */*",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Connection": "keep-alive",
           },
         });
         if (!res.ok) {
