@@ -1,0 +1,15 @@
+{
+  "projectId": "0d9be54d-8a02-4b7a-be8f-c559dbd70eb6",
+  "type": "frontend",
+  "name": "View PIB News Releases Page",
+  "description": "Verify that a user can access the PIB News section from the menu and see government press releases.",
+  "priority": "p1",
+  "planSteps": [
+    { "type": "action", "description": "Navigate to the homepage" },
+    { "type": "action", "description": "Click on the PIB News link in the main navigation menu" },
+    {
+      "type": "assertion",
+      "description": "Verify the PIB news page loads, showing official government press releases"
+    }
+  ]
+}

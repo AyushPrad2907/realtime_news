@@ -621,20 +621,20 @@ export async function GET(req: Request) {
             body = cleanBody(await scrapePibBody(prid));
             categorySlug = getCategoryFromText(item.title, body, "national");
           } else if (feed.source === "hindustan") {
-            const hash = Buffer.from(item.link).toString("base64url").substring(0, 24);
+            const hash = Buffer.from(item.link).toString("base64url");
             slug = `hindustan-${hash}`;
             authorId = "hindustan-scraper";
-            const rawBody = item.content || item.summary || item.description || "";
+            const rawBody = (item as any)["content:encoded"] || item.content || item.summary || item.description || "";
             body = cleanBody(rawBody);
             categorySlug = feed.defaultCategory || getCategoryFromText(item.title, body, "national");
             if (body && !body.includes("<p>")) {
               body = `<p>${body}</p>`;
             }
           } else {
-            const hash = Buffer.from(item.link).toString("base64url").substring(0, 24);
+            const hash = Buffer.from(item.link).toString("base64url");
             slug = `rss-${hash}`;
             authorId = getFeedAuthorId(feed.name);
-            const rawBody = item.content || item.summary || item.description || "";
+            const rawBody = (item as any)["content:encoded"] || item.content || item.summary || item.description || "";
             body = cleanBody(rawBody);
             categorySlug = feed.defaultCategory || getCategoryFromText(item.title, body, "national");
             if (body && !body.includes("<p>")) {
@@ -644,55 +644,62 @@ export async function GET(req: Request) {
 
           if (!slug || !body) continue;
 
-          // Extract image from RSS item metadata (enclosure, media:content, media:thumbnail)
-          let rssImage: string | null = null;
+          // Extract image from RSS item metadata (enclosure, media:content, media:thumbnail) or body fields
+          let heroImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800";
           if (item.enclosure?.url) {
-            rssImage = item.enclosure.url;
+            heroImage = item.enclosure.url;
           } else {
             const mediaContent = (item as any)["media:content"] || (item as any).mediaContent;
             if (mediaContent) {
               if (Array.isArray(mediaContent) && mediaContent[0]?.$.url) {
-                rssImage = mediaContent[0].$.url;
+                heroImage = mediaContent[0].$.url;
               } else if (mediaContent.$?.url) {
-                rssImage = mediaContent.$.url;
+                heroImage = mediaContent.$.url;
               } else if (typeof mediaContent === "object" && mediaContent.url) {
-                rssImage = mediaContent.url;
+                heroImage = mediaContent.url;
               }
             }
-            if (!rssImage) {
+            if (heroImage.startsWith("https://images.unsplash.com")) {
               const mediaThumbnail = (item as any)["media:thumbnail"] || (item as any).mediaThumbnail;
               if (mediaThumbnail) {
                 if (Array.isArray(mediaThumbnail) && mediaThumbnail[0]?.$.url) {
-                  rssImage = mediaThumbnail[0].$.url;
+                  heroImage = mediaThumbnail[0].$.url;
                 } else if (mediaThumbnail.$?.url) {
-                  rssImage = mediaThumbnail.$.url;
+                  heroImage = mediaThumbnail.$.url;
                 } else if (typeof mediaThumbnail === "object" && mediaThumbnail.url) {
-                  rssImage = mediaThumbnail.url;
+                  heroImage = mediaThumbnail.url;
                 }
               }
             }
           }
 
-          let heroImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800";
-          if (rssImage) {
-            heroImage = rssImage;
-          } else {
-            // Fallback to extracting the first image from the article body HTML
-            const imgMatch = body.match(/<img\s+[^>]*src=["']([^"']+)["']/i);
-            if (imgMatch) {
-              let src = imgMatch[1];
-              if (src.startsWith("/")) {
-                try {
-                  const origin = new URL(feed.url).origin;
-                  src = `${origin}${src}`;
-                } catch (e) {}
-              } else if (src.startsWith("../")) {
-                try {
-                  const origin = new URL(feed.url).origin;
-                  src = `${origin}/${src.replace(/^\.\.\//, "")}`;
-                } catch (e) {}
+          // If no image metadata is found, search other item properties (content:encoded, description, content, summary) for an <img> tag
+          if (heroImage.startsWith("https://images.unsplash.com")) {
+            const searchFields = [
+              (item as any)["content:encoded"] || "",
+              item.content || "",
+              item.summary || "",
+              item.description || "",
+              body || ""
+            ];
+            for (const field of searchFields) {
+              const imgMatch = field.match(/<img\s+[^>]*src=["']([^"']+)["']/i);
+              if (imgMatch) {
+                let src = imgMatch[1];
+                if (src.startsWith("/")) {
+                  try {
+                    const origin = new URL(feed.url).origin;
+                    src = `${origin}${src}`;
+                  } catch (e) {}
+                } else if (src.startsWith("../")) {
+                  try {
+                    const origin = new URL(feed.url).origin;
+                    src = `${origin}/${src.replace(/^\.\.\//, "")}`;
+                  } catch (e) {}
+                }
+                heroImage = src;
+                break;
               }
-              heroImage = src;
             }
           }
 
@@ -700,7 +707,15 @@ export async function GET(req: Request) {
           stateTags = detectStates(item.title, body, feed.state);
 
           const existing = await db.article.findUnique({ where: { slug } });
-          if (existing) continue;
+          if (existing) {
+            if (existing.heroImage.startsWith("https://images.unsplash.com") && !heroImage.startsWith("https://images.unsplash.com")) {
+              await db.article.update({
+                where: { id: existing.id },
+                data: { heroImage },
+              });
+            }
+            continue;
+          }
 
           const dateStr = item.pubDate || item.isoDate || new Date().toISOString();
           const publishedAtDate = new Date(dateStr);
