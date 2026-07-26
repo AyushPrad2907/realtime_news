@@ -106,5 +106,6 @@ export function useLive() {
 }
 
 export function useBreaking() {
-  return useApiData(fetchBreaking, BREAKING_NEWS, []);
+  const language = useStore((s) => s.language);
+  return useApiData(() => fetchBreaking(language), BREAKING_NEWS, [language]);
 }

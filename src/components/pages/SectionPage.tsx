@@ -3,6 +3,7 @@
 import { useStore } from "@/lib/store";
 import { ARTICLES_LIST, PODCAST_EPISODES, PODCAST_SERIES } from "@/lib/mock-data";
 import { ArticleCard } from "@/components/cards/ArticleCard";
+import { useArticles } from "@/lib/use-data";
 import { PodcastCard } from "@/components/cards/PodcastCard";
 import { LiveSection } from "@/components/sections/LiveSection";
 import { AdBanner } from "@/components/sections/AdBanner";
@@ -65,16 +66,38 @@ function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "internatio
   const Icon = config.Icon;
   const filterFn = config.filter;
 
-  const articles = useMemo(
-    () =>
-      ARTICLES_LIST.filter(filterFn).sort(
-        (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-      ),
-    [filterFn]
-  );
+  const { data: fetchedArticles, loading } = useArticles({ limit: 100 });
+
+  const articles = useMemo(() => {
+    const list = fetchedArticles.length > 0 ? fetchedArticles : ARTICLES_LIST;
+    return list.filter(filterFn).sort(
+      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
+  }, [fetchedArticles, filterFn]);
 
   const visible = articles.slice(0, visibleCount);
   const [lead, ...rest] = visible;
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-8 animate-pulse">
+        <header className="mb-8 md:mb-10 pb-6 border-b border-border">
+          <div className="h-10 w-48 bg-muted/70 rounded mb-3" />
+          <div className="h-5 w-2/3 bg-muted/70 rounded mb-4" />
+        </header>
+        <div className="aspect-[16/9] md:aspect-[21/9] bg-muted/60 rounded-xl mb-10" />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="space-y-3">
+              <div className="aspect-[16/9] bg-muted/60 rounded-md" />
+              <div className="h-5 w-full bg-muted/70 rounded" />
+              <div className="h-3 w-2/3 bg-muted/70 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-8">

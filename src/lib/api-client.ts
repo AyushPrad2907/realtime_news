@@ -102,8 +102,8 @@ export async function fetchLive(): Promise<{
   return res.json();
 }
 
-export async function fetchBreaking(): Promise<string[]> {
-  const res = await fetch(`/api/breaking`, { cache: "no-store" });
+export async function fetchBreaking(lang: "en" | "hi" = "en"): Promise<string[]> {
+  const res = await fetch(`/api/breaking?lang=${lang}`, { cache: "no-store" });
   if (!res.ok) return [];
   const data = await res.json();
   return data.items as string[];

@@ -498,13 +498,17 @@ async function scrapePibBody(prid: string): Promise<string> {
 
   while (retries > 0) {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 seconds timeout
       const res = await fetch(url, {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
           "Accept-Language": "en-US,en;q=0.9",
         },
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       if (!res.ok) {
         if (res.status === 429 || res.status >= 500) {
           throw new Error(`HTTP status ${res.status}`);
@@ -698,6 +702,8 @@ async function runScraper() {
 
         while (retries > 0) {
           try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 seconds timeout
             res = await fetch(feed.url, {
               headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -705,7 +711,9 @@ async function runScraper() {
                 "Accept-Language": "en-US,en;q=0.9",
                 "Connection": "keep-alive",
               },
+              signal: controller.signal,
             });
+            clearTimeout(timeoutId);
             if (!res.ok) {
               if (res.status === 429 || res.status >= 500) {
                 throw new Error(`HTTP status ${res.status}`);
@@ -850,16 +858,20 @@ async function runScraper() {
               const imgMatch = field.match(/<img\s+[^>]*src=["']([^"']+)["']/i);
               if (imgMatch) {
                 let src = imgMatch[1];
-                if (src.startsWith("/")) {
-                  try {
-                    const origin = new URL(feed.url).origin;
-                    src = `${origin}${src}`;
-                  } catch (e) {}
-                } else if (src.startsWith("../")) {
-                  try {
-                    const origin = new URL(feed.url).origin;
-                    src = `${origin}/${src.replace(/^\.\.\//, "")}`;
-                  } catch (e) {}
+                if (!src.startsWith("http") && !src.startsWith("//")) {
+                  if (feed.source === "pib") {
+                    if (src.startsWith("/")) src = src.substring(1);
+                    src = `https://static.pib.gov.in/${src}`;
+                  } else {
+                    try {
+                      const origin = new URL(feed.url).origin;
+                      if (src.startsWith("/")) {
+                        src = `${origin}${src}`;
+                      } else {
+                        src = `${origin}/${src.replace(/^\.\.\//, "")}`;
+                      }
+                    } catch (e) {}
+                  }
                 }
                 heroImage = src;
                 break;

@@ -398,18 +398,34 @@ export async function GET(req: NextRequest) {
     const dbArticles = await db.article.findMany({
       where,
       orderBy,
-      take: limit,
+      take: Math.max(200, limit * 4), // Fetch a larger batch to filter by language
       include: { author: true, category: true },
     });
     serializedDb = dbArticles.map(serializeArticle);
+
+    // Native language partitioning
+    const wantHindi = lang === "hi";
+    serializedDb = serializedDb.filter((art) => {
+      const isHindi = /[\u0900-\u097F]/.test(art.title);
+      return wantHindi ? isHindi : !isHindi;
+    });
     
-    // If DB is empty, fetch live fallback feeds
+    // If DB is empty or has no matches for the selected language, fetch live fallback feeds
     if (serializedDb.length === 0) {
-      serializedDb = await fetchLiveFallbackFeeds(lang, category, state, breaking, featured, date);
+      const fallback = await fetchLiveFallbackFeeds(lang, category, state, breaking, featured, date);
+      serializedDb = fallback.filter((art) => {
+        const isHindi = /[\u0900-\u097F]/.test(art.title);
+        return wantHindi ? isHindi : !isHindi;
+      });
     }
   } catch (dbError) {
     console.error("Prisma database connection failed. Falling back to live RSS feeds:", dbError);
-    serializedDb = await fetchLiveFallbackFeeds(lang, category, state, breaking, featured, date);
+    const fallback = await fetchLiveFallbackFeeds(lang, category, state, breaking, featured, date);
+    const wantHindi = lang === "hi";
+    serializedDb = fallback.filter((art) => {
+      const isHindi = /[\u0900-\u097F]/.test(art.title);
+      return wantHindi ? isHindi : !isHindi;
+    });
   }
 
   // Combine and Sort
@@ -433,19 +449,6 @@ export async function GET(req: NextRequest) {
 
   // Slice to the requested limit
   const result = combined.slice(0, limit);
-
-  // Pre-translate titles and standfirsts to Hindi server-side if lang is "hi"
-  if (lang === "hi") {
-    await Promise.all(
-      result.map(async (article, idx) => {
-        result[idx] = {
-          ...article,
-          title: await translateText(article.title, "hi"),
-          standfirst: await translateText(article.standfirst, "hi"),
-        };
-      })
-    );
-  }
 
   return NextResponse.json({
     articles: result,
