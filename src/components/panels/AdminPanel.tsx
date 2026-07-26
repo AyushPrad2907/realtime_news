@@ -1886,12 +1886,12 @@ function ApplicationsTab() {
                 {a.city && <p className="font-ui text-[11px] text-ink-secondary">📍 {a.city}</p>}
                 {a.linkedinUrl && (
                   <p className="font-ui text-[11px] text-ink-secondary">
-                    <a href={a.linkedinUrl} target="_blank" rel="noreferrer" className="text-brand hover:underline">LinkedIn ↗</a>
+                    <a href={a.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">LinkedIn ↗</a>
                   </p>
                 )}
                 {a.portfolioUrl && (
                   <p className="font-ui text-[11px] text-ink-secondary">
-                    <a href={a.portfolioUrl} target="_blank" rel="noreferrer" className="text-brand hover:underline">Portfolio ↗</a>
+                    <a href={a.portfolioUrl} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">Portfolio ↗</a>
                   </p>
                 )}
                 {a.coverLetter && (

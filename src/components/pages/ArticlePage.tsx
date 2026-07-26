@@ -255,6 +255,36 @@ export function ArticlePage({ slug }: ArticlePageProps) {
   // Render article body with HTML
   const renderBody = () => {
     const sourceUrl = getSourceLink();
+    const isSummaryOnly = !article.body.includes("<") && article.body.endsWith("…");
+
+    if (isSummaryOnly) {
+      return (
+        <>
+          <div className="article-body font-serif text-base md:text-lg leading-relaxed text-foreground select-text selection:bg-brand/20">
+            <p className="text-ink-secondary italic border-l-4 border-brand/40 pl-4 py-2 my-4 bg-brand/5 rounded-r">
+              {article.body}
+            </p>
+          </div>
+          {sourceUrl && (
+            <div className="mt-8 pt-6 border-t border-border flex justify-center">
+              <a
+                href={sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand text-white font-medium rounded-full shadow hover:bg-brand/90 transition-all duration-200"
+              >
+                <span>Read Full Article on Source</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
+                  <path fillRule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+                </svg>
+              </a>
+            </div>
+          )}
+        </>
+      );
+    }
+
     // Use dangerouslySetInnerHTML for the rich body content
     return (
       <>

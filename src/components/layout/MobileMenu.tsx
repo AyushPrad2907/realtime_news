@@ -26,7 +26,11 @@ const UTILITY_LINKS = [
 ];
 
 export function MobileMenu() {
-  const { mobileMenuOpen, setMobileMenuOpen, navigate } = useStore();
+  const { mobileMenuOpen, setMobileMenuOpen, navigate: storeNavigate } = useStore();
+  const navigate = (view: any) => {
+    storeNavigate(view);
+    setMobileMenuOpen(false);
+  };
   const t = useT();
 
   useEffect(() => {

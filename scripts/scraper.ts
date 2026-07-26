@@ -16,7 +16,16 @@ const db = new PrismaClient({
     },
   },
 });
-const parser = new Parser();
+const parser = new Parser({
+  customFields: {
+    item: [
+      ["media:content", "media:content", { keepArray: true }],
+      ["media:thumbnail", "media:thumbnail", { keepArray: true }],
+      ["media:group", "media:group"],
+      ["enclosure", "enclosure"],
+    ],
+  },
+});
 
 interface FeedConfig {
   name: string;
@@ -25,6 +34,7 @@ interface FeedConfig {
   defaultCategory?: string;
   state?: string;
   lang: "hi" | "en";
+  summaryOnly?: boolean;
 }
 
 const FEEDS: FeedConfig[] = [
@@ -63,72 +73,46 @@ const FEEDS: FeedConfig[] = [
     state: "Punjab",
     lang: "hi",
   },
-  // --- Working General Feeds ---
-  {
-    name: "IRCTC News Blog Feed",
-    url: "https://irctcnews.in/feed",
-    source: "general-rss",
-    defaultCategory: "national",
-    lang: "en",
-  },
-  {
-    name: "The Print Science Feed",
-    url: "https://theprint.in/category/science/feed/",
-    source: "general-rss",
-    defaultCategory: "science",
-    lang: "en",
-  },
-  {
-    name: "ESPN Cricinfo India",
-    url: "https://www.espncricinfo.com/rss/content/story/feeds/6.xml",
-    source: "general-rss",
-    defaultCategory: "sports",
-    lang: "en",
-  },
-  {
-    name: "India Today Sports",
-    url: "https://www.indiatoday.in/rss/1206550",
-    source: "general-rss",
-    defaultCategory: "sports",
-    lang: "en",
-  },
-  {
-    name: "The Hindu Politics Feed",
-    url: "https://www.thehindu.com/news/national/feeder/default.rss",
-    source: "general-rss",
-    defaultCategory: "politics",
-    lang: "en",
-  },
-  {
-    name: "The Print Politics Feed",
-    url: "https://theprint.in/category/politics/feed/",
-    source: "general-rss",
-    defaultCategory: "politics",
-    lang: "en",
-  },
-  {
-    name: "Pinkvilla Entertainment",
-    url: "https://www.pinkvilla.com/rss.xml",
-    source: "general-rss",
-    defaultCategory: "entertainment",
-    lang: "en",
-  },
-  {
-    name: "Koimoi Entertainment Feed",
-    url: "https://www.koimoi.com/feed/",
-    source: "general-rss",
-    defaultCategory: "entertainment",
-    lang: "en",
-  },
-  {
-    name: "BollywoodHungama News",
-    url: "https://www.bollywoodhungama.com/rss/news.xml",
-    source: "general-rss",
-    defaultCategory: "entertainment",
-    lang: "en",
-  },
+  
+  // ─── PIB Ministry-Specific Feeds (Public Domain) ──────────────────────────
+  { name: "PIB Railways (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=10", source: "pib", defaultCategory: "national", lang: "en" },
+  { name: "PIB Railways (Hi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=10", source: "pib", defaultCategory: "national", lang: "hi" },
+  { name: "PIB Civil Aviation (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=26", source: "pib", defaultCategory: "national", lang: "en" },
+  { name: "PIB Defence (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=33", source: "pib", defaultCategory: "national", lang: "en" },
+  { name: "PIB Defence (Hi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=33", source: "pib", defaultCategory: "national", lang: "hi" },
+  { name: "PIB Dept of Space / ISRO (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=14", source: "pib", defaultCategory: "science", lang: "en" },
+  { name: "PIB Dept of Space / ISRO (Hi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=14", source: "pib", defaultCategory: "science", lang: "hi" },
+  { name: "PIB Dept of Atomic Energy / BARC (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=56", source: "pib", defaultCategory: "science", lang: "en" },
+  { name: "PIB Finance Ministry (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=7", source: "pib", defaultCategory: "economy", lang: "en" },
+  { name: "PIB Finance Ministry (Hi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=7", source: "pib", defaultCategory: "economy", lang: "hi" },
+  { name: "PIB Education Ministry (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=8", source: "pib", defaultCategory: "national", lang: "en" },
+  { name: "PIB Education Ministry (Hi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=8", source: "pib", defaultCategory: "national", lang: "hi" },
+  { name: "PIB Youth Affairs & Sports (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=52", source: "pib", defaultCategory: "sports", lang: "en" },
+  { name: "PIB Youth Affairs & Sports (Hi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=52", source: "pib", defaultCategory: "sports", lang: "hi" },
+  { name: "PIB Health Ministry (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=13", source: "pib", defaultCategory: "health", lang: "en" },
+  { name: "PIB Health Ministry (Hi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=13", source: "pib", defaultCategory: "health", lang: "hi" },
+  { name: "PIB Home Affairs (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=52", source: "pib", defaultCategory: "politics", lang: "en" },
+  { name: "PIB PMO (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=3", source: "pib", defaultCategory: "politics", lang: "en" },
+  { name: "PIB PMO (Hi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=3", source: "pib", defaultCategory: "politics", lang: "hi" },
+  { name: "PIB Electronics & IT (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=1323", source: "pib", defaultCategory: "technology", lang: "en" },
+  { name: "PIB Agriculture (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=27", source: "pib", defaultCategory: "national", lang: "en" },
+  { name: "PIB Agriculture (Hi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=27", source: "pib", defaultCategory: "national", lang: "hi" },
+  { name: "PIB Environment (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=30", source: "pib", defaultCategory: "science", lang: "en" },
+  { name: "PIB Earth Sciences (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=67", source: "pib", defaultCategory: "science", lang: "en" },
+  { name: "PIB Cabinet Decisions (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=61", source: "pib", defaultCategory: "politics", lang: "en" },
+  { name: "PIB Cabinet Decisions (Hi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=61", source: "pib", defaultCategory: "politics", lang: "hi" },
+  { name: "PIB AYUSH (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=80", source: "pib", defaultCategory: "health", lang: "en" },
+  { name: "PIB Culture (En)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=17", source: "pib", defaultCategory: "entertainment", lang: "en" },
+  { name: "PIB Culture (Hi)", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=17", source: "pib", defaultCategory: "entertainment", lang: "hi" },
 
-  // --- Creative Commons (CC-BY) / Open Sources ---
+  // --- Safe Public Domain / Open Sources / CC-BY ---
+  {
+    name: "Digital India",
+    url: "https://www.digitalindia.gov.in/rss.xml",
+    source: "general-rss",
+    defaultCategory: "technology",
+    lang: "en",
+  },
   {
     name: "Global Voices (Hindi)",
     url: "https://hi.globalvoices.org/feed/",
@@ -164,7 +148,6 @@ const FEEDS: FeedConfig[] = [
     defaultCategory: "politics",
     lang: "en",
   },
-  // Government / Official (100% public domain)
   {
     name: "Doordarshan National",
     url: "https://ddnews.gov.in/feed/",
@@ -172,13 +155,87 @@ const FEEDS: FeedConfig[] = [
     defaultCategory: "national",
     lang: "en",
   },
-  // Creative Commons / Open Sources / Reliable international
+
+  // ─── Commercial Sources (Downgraded to summaryOnly) ──────────────────────
+  {
+    name: "IRCTC News Blog Feed",
+    url: "https://irctcnews.in/feed",
+    source: "general-rss",
+    defaultCategory: "national",
+    lang: "en",
+    summaryOnly: true,
+  },
+  {
+    name: "The Print Science Feed",
+    url: "https://theprint.in/category/science/feed/",
+    source: "general-rss",
+    defaultCategory: "science",
+    lang: "en",
+    summaryOnly: true,
+  },
+  {
+    name: "The Print Politics Feed",
+    url: "https://theprint.in/category/politics/feed/",
+    source: "general-rss",
+    defaultCategory: "politics",
+    lang: "en",
+    summaryOnly: true,
+  },
+  {
+    name: "ESPN Cricinfo India",
+    url: "https://www.espncricinfo.com/rss/content/story/feeds/6.xml",
+    source: "general-rss",
+    defaultCategory: "sports",
+    lang: "en",
+    summaryOnly: true,
+  },
+  {
+    name: "India Today Sports",
+    url: "https://www.indiatoday.in/rss/1206550",
+    source: "general-rss",
+    defaultCategory: "sports",
+    lang: "en",
+    summaryOnly: true,
+  },
+  {
+    name: "The Hindu Politics Feed",
+    url: "https://www.thehindu.com/news/national/feeder/default.rss",
+    source: "general-rss",
+    defaultCategory: "politics",
+    lang: "en",
+    summaryOnly: true,
+  },
+  {
+    name: "Pinkvilla Entertainment",
+    url: "https://www.pinkvilla.com/rss.xml",
+    source: "general-rss",
+    defaultCategory: "entertainment",
+    lang: "en",
+    summaryOnly: true,
+  },
+  {
+    name: "Koimoi Entertainment Feed",
+    url: "https://www.koimoi.com/feed/",
+    source: "general-rss",
+    defaultCategory: "entertainment",
+    lang: "en",
+    summaryOnly: true,
+  },
+  {
+    name: "BollywoodHungama News",
+    url: "https://www.bollywoodhungama.com/rss/news.xml",
+    source: "general-rss",
+    defaultCategory: "entertainment",
+    lang: "en",
+    summaryOnly: true,
+  },
   {
     name: "BBC News World",
     url: "https://feeds.bbci.co.uk/news/world/rss.xml",
     source: "general-rss",
     defaultCategory: "international",
     lang: "en",
+    summaryOnly: true,
   },
   {
     name: "BBC News Hindi",
@@ -186,22 +243,23 @@ const FEEDS: FeedConfig[] = [
     source: "general-rss",
     defaultCategory: "international",
     lang: "hi",
+    summaryOnly: true,
   },
-  // Sports
   {
     name: "Sportstar (The Hindu)",
     url: "https://sportstar.thehindu.com/feeder/default.rss",
     source: "general-rss",
     defaultCategory: "sports",
     lang: "en",
+    summaryOnly: true,
   },
-  // Technology & Business
   {
     name: "TechCrunch",
     url: "https://techcrunch.com/feed/",
     source: "general-rss",
     defaultCategory: "technology",
     lang: "en",
+    summaryOnly: true,
   },
   {
     name: "Inc42 Startup News",
@@ -209,14 +267,15 @@ const FEEDS: FeedConfig[] = [
     source: "general-rss",
     defaultCategory: "economy",
     lang: "en",
+    summaryOnly: true,
   },
-  // Health
   {
     name: "Medical News Today",
     url: "https://www.medicalnewstoday.com/feed",
     source: "general-rss",
     defaultCategory: "health",
     lang: "en",
+    summaryOnly: true,
   }
 ];
 
@@ -291,12 +350,12 @@ function getCategoryFromText(title: string, bodyText: string, defaultCat = "nati
   return top[1] > 0 ? top[0] : defaultCat;
 }
 
-// Clean and sanitize body HTML content
 function cleanBody(raw: string): string {
   if (!raw) return "";
   return raw
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/\uFFFD/g, "") // Strip UTF-8 replacement characters
     .replace(/<img[^>]*width=["']?1["']?[^>]*>/gi, "") // Remove 1px tracking pixels
     .replace(/\[…\]|\[\.{3}\]|Read more.*/gi, "")     // Remove read more text
     .replace(/<a[^>]*href=["'][^"']*utm_[^"']*["'][^>]*>.*?<\/a>/gi, "") // Remove UTM link tracking
@@ -452,7 +511,8 @@ async function scrapePibBody(prid: string): Promise<string> {
         }
         return "";
       }
-      html = await res.text();
+      const buffer = await res.arrayBuffer();
+      html = new TextDecoder("utf-8").decode(buffer);
       break;
     } catch (e: any) {
       retries--;
@@ -563,6 +623,45 @@ function getFeedAuthorId(feedName: string): string {
   return feedName.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").substring(0, 30);
 }
 
+// Clean up existing commercial articles in database retroactively
+async function cleanupExistingCommercialArticles() {
+  console.log("Cleaning up existing commercial articles to display summaries only...");
+  const summaryOnlyAuthorIds = new Set(
+    FEEDS.filter(f => f.summaryOnly).map(f => {
+      if (f.source === "pib") return "pib-scraper";
+      if (f.source === "hindustan") return "hindustan-scraper";
+      return getFeedAuthorId(f.name);
+    })
+  );
+  summaryOnlyAuthorIds.add("hindustan-scraper");
+
+  const articles = await db.article.findMany({
+    where: {
+      authorId: {
+        in: Array.from(summaryOnlyAuthorIds)
+      }
+    }
+  });
+
+  console.log(`Found ${articles.length} articles from commercial sources to process.`);
+  let updatedCount = 0;
+  for (const art of articles) {
+    const plain = toPlainText(art.body);
+    if (!art.body.includes("<") && art.body.endsWith("…")) {
+      continue;
+    }
+    const truncatedBody = plain.substring(0, 200).trimEnd() + (plain.length > 200 ? "…" : "");
+    if (art.body !== truncatedBody) {
+      await db.article.update({
+        where: { id: art.id },
+        data: { body: truncatedBody }
+      });
+      updatedCount++;
+    }
+  }
+  console.log(`Retroactively truncated ${updatedCount} commercial articles.`);
+}
+
 // Main run loop of the scraper
 async function runScraper() {
   console.log(`[${new Date().toLocaleTimeString()}] Running automated news feed scraper...`);
@@ -572,6 +671,7 @@ async function runScraper() {
 
   try {
     await ensureScraperUsers();
+    await cleanupExistingCommercialArticles();
 
     // Cleanup old articles (older than 1 day)
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -632,7 +732,8 @@ async function runScraper() {
           continue;
         }
 
-        const xml = await res.text();
+        const buffer = await res.arrayBuffer();
+        const xml = new TextDecoder("utf-8").decode(buffer);
         const trimmedXml = xml.trim();
         if (trimmedXml.startsWith("<!DOCTYPE html") || trimmedXml.startsWith("<html") || trimmedXml.startsWith("<!doctype html")) {
           console.warn(`Failed to parse feed ${feed.name}: Content is HTML, not XML.`);
@@ -704,6 +805,11 @@ async function runScraper() {
             }
           }
 
+          if (feed.summaryOnly && body) {
+            const plain = toPlainText(body);
+            body = plain.substring(0, 200).trimEnd() + (plain.length > 200 ? "…" : "");
+          }
+
           if (!slug || !body) continue;
 
           // Extract image from RSS item metadata (enclosure, media:content, media:thumbnail) or body fields
@@ -713,23 +819,19 @@ async function runScraper() {
           } else {
             const mediaContent = (item as any)["media:content"] || (item as any).mediaContent;
             if (mediaContent) {
-              if (Array.isArray(mediaContent) && mediaContent[0]?.$.url) {
-                heroImage = mediaContent[0].$.url;
-              } else if (mediaContent.$?.url) {
-                heroImage = mediaContent.$.url;
-              } else if (typeof mediaContent === "object" && mediaContent.url) {
-                heroImage = mediaContent.url;
+              if (Array.isArray(mediaContent) && mediaContent[0]) {
+                heroImage = mediaContent[0].url || mediaContent[0].$.url || mediaContent[0].$?.url || heroImage;
+              } else if (typeof mediaContent === "object") {
+                heroImage = mediaContent.url || mediaContent.$.url || mediaContent.$?.url || heroImage;
               }
             }
             if (heroImage.startsWith("https://images.unsplash.com")) {
               const mediaThumbnail = (item as any)["media:thumbnail"] || (item as any).mediaThumbnail;
               if (mediaThumbnail) {
-                if (Array.isArray(mediaThumbnail) && mediaThumbnail[0]?.$.url) {
-                  heroImage = mediaThumbnail[0].$.url;
-                } else if (mediaThumbnail.$?.url) {
-                  heroImage = mediaThumbnail.$.url;
-                } else if (typeof mediaThumbnail === "object" && mediaThumbnail.url) {
-                  heroImage = mediaThumbnail.url;
+                if (Array.isArray(mediaThumbnail) && mediaThumbnail[0]) {
+                  heroImage = mediaThumbnail[0].url || mediaThumbnail[0].$.url || mediaThumbnail[0].$?.url || heroImage;
+                } else if (typeof mediaThumbnail === "object") {
+                  heroImage = mediaThumbnail.url || mediaThumbnail.$.url || mediaThumbnail.$?.url || heroImage;
                 }
               }
             }

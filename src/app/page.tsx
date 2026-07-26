@@ -77,6 +77,7 @@ export default function Home() {
         return <ArticlePage slug={current.slug} />;
       case "section":
         if (current.slug === "live") return <LivePage />;
+        if (current.slug === "podcasts") return <PodcastsPage />;
         return <SectionPage slug={current.slug} />;
       case "category":
         return <CategoryPage slug={current.slug} />;

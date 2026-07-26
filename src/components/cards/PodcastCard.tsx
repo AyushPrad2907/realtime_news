@@ -31,9 +31,9 @@ export function PodcastCard({ episode, variant = "default", className }: Podcast
 
   if (variant === "compact") {
     return (
-      <button
+      <div
         onClick={() => navigate({ type: "podcast-episode", slug: episode.slug })}
-        className={cn("group flex items-center gap-3 w-full text-left", className)}
+        className={cn("group flex items-center gap-3 w-full text-left cursor-pointer", className)}
       >
         <div className="relative shrink-0">
           <img
@@ -67,7 +67,7 @@ export function PodcastCard({ episode, variant = "default", className }: Podcast
             {episode.duration}
           </p>
         </div>
-      </button>
+      </div>
     );
   }
 

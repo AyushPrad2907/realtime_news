@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { ARTICLES_LIST } from "@/lib/mock-data";
+import { useStore } from "@/lib/store";
 import { useArticles, usePodcasts } from "@/lib/use-data";
 import { useT } from "@/hooks/use-t";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -23,6 +24,7 @@ function LazySection({ children }: { children: React.ReactNode }) {
 }
 
 export function HomePage() {
+  const { navigate } = useStore();
   const t = useT();
   const mounted = useHydrated();
   // Fetch from real API; mock data is returned instantly as fallback
@@ -150,12 +152,17 @@ export function HomePage() {
                   .slice(0, 5)
                   .map((a, i) => (
                     <li key={a.id} className="flex gap-3">
-                      <span className="font-display text-2xl font-extrabold text-ink-tertiary/40 tabular-nums leading-none">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <p className="font-ui text-sm leading-snug line-clamp-2 flex-1">
-                        {a.title}
-                      </p>
+                      <button
+                        onClick={() => navigate({ type: "article", slug: a.slug })}
+                        className="flex gap-3 text-left hover:text-brand transition-colors flex-1"
+                      >
+                        <span className="font-display text-2xl font-extrabold text-ink-tertiary/40 tabular-nums leading-none">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <p className="font-ui text-sm leading-snug line-clamp-2 flex-1">
+                          {a.title}
+                        </p>
+                      </button>
                     </li>
                   ))}
               </ol>

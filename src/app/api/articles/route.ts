@@ -51,7 +51,8 @@ async function getPibArticleImage(prid: string): Promise<string> {
       next: { revalidate: 3600 }, // Cache scraper page fetch for 1 hour
     });
     if (!res.ok) return "";
-    const html = await res.text();
+    const buffer = await res.arrayBuffer();
+    const html = new TextDecoder("utf-8").decode(buffer);
     
     // Match both relative and absolute image paths on the official site
     const imgRegex = /(?:https:\/\/static\.pib\.gov\.in)?\/?WriteReadData\/(?:userfiles\/image|specificdocs\/photo)\/[^\s"'>]+/i;
@@ -91,7 +92,8 @@ async function fetchPibArticles(lang: string = "en"): Promise<any[]> {
 
     if (!res.ok) return [];
     
-    const xml = await res.text();
+    const buffer = await res.arrayBuffer();
+    const xml = new TextDecoder("utf-8").decode(buffer);
     // Replace html entities (zwj, ndash, mdash, nbsp, curly quotes) with unicode or plain characters
     const cleanEntities = xml
       .replace(/&zwj;/gi, "\u200d")
@@ -172,7 +174,16 @@ async function fetchLiveFallbackFeeds(
   date?: string | null
 ): Promise<any[]> {
   const isHindi = lang === "hi";
-  const parser = new Parser();
+  const parser = new Parser({
+    customFields: {
+      item: [
+        ["media:content", "media:content", { keepArray: true }],
+        ["media:thumbnail", "media:thumbnail", { keepArray: true }],
+        ["media:group", "media:group"],
+        ["enclosure", "enclosure"],
+      ],
+    },
+  });
   const articles: any[] = [];
 
   // Determine which feeds to fetch
@@ -247,7 +258,8 @@ async function fetchLiveFallbackFeeds(
           next: { revalidate: 300 }
         });
         if (!res.ok) return;
-        const xml = await res.text();
+        const buffer = await res.arrayBuffer();
+        const xml = new TextDecoder("utf-8").decode(buffer);
         const cleanEntities = xml
           .replace(/&zwj;/gi, "\u200d")
           .replace(/&ndash;/gi, "–")
@@ -269,11 +281,49 @@ async function fetchLiveFallbackFeeds(
           const itemCategory = feed.defaultCategory || getCategoryFromTitle(item.title || "");
           const pubDate = item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString();
 
+          let heroImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800";
+          if (item.enclosure?.url) {
+            heroImage = item.enclosure.url;
+          } else {
+            const mediaContent = (item as any)["media:content"] || (item as any).mediaContent;
+            if (mediaContent) {
+              if (Array.isArray(mediaContent) && mediaContent[0]) {
+                heroImage = mediaContent[0].url || mediaContent[0].$.url || mediaContent[0].$?.url || heroImage;
+              } else if (typeof mediaContent === "object") {
+                heroImage = mediaContent.url || mediaContent.$.url || mediaContent.$?.url || heroImage;
+              }
+            }
+            if (heroImage.startsWith("https://images.unsplash.com")) {
+              const mediaThumbnail = (item as any)["media:thumbnail"] || (item as any).mediaThumbnail;
+              if (mediaThumbnail) {
+                if (Array.isArray(mediaThumbnail) && mediaThumbnail[0]) {
+                  heroImage = mediaThumbnail[0].url || mediaThumbnail[0].$.url || mediaThumbnail[0].$?.url || heroImage;
+                } else if (typeof mediaThumbnail === "object") {
+                  heroImage = mediaThumbnail.url || mediaThumbnail.$.url || mediaThumbnail.$?.url || heroImage;
+                }
+              }
+            }
+            if (heroImage.startsWith("https://images.unsplash.com")) {
+              const searchFields = [
+                (item as any)["content:encoded"] || "",
+                item.content || "",
+                (item as any).description || ""
+              ];
+              for (const field of searchFields) {
+                const imgMatch = field.match(/<img\s+[^>]*src=["']([^"']+)["']/i);
+                if (imgMatch) {
+                  heroImage = imgMatch[1];
+                  break;
+                }
+              }
+            }
+          }
+
           articles.push({
             id: slug,
             slug,
             title: item.title || "",
-            standfirst: item.contentSnippet || item.description || (isHindi ? "विज्ञप्ति।" : "Official Release."),
+            standfirst: item.contentSnippet || (item as any).description || (isHindi ? "विज्ञप्ति।" : "Official Release."),
             body: item.content || item.contentSnippet || "",
             category: itemCategory,
             tags: feed.source === "pib" ? ["PIB"] : ["Hindustan"],
@@ -281,7 +331,7 @@ async function fetchLiveFallbackFeeds(
             authorId: feed.source === "pib" ? "pib-scraper" : "hindustan-scraper",
             publishedAt: pubDate,
             views: 100 + index * 5,
-            heroImage: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800",
+            heroImage,
             heroCaption: feed.name,
             heroCredit: feed.source === "pib" ? "PIB" : "Hindustan",
             isFeatured: index === 0 && !category,

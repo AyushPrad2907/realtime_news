@@ -17,17 +17,22 @@ export function PodcastsPage() {
   const mounted = useHydrated();
   const { language } = useStore();
   const [filter, setFilter] = useState<Filter>("All");
+  const [selectedSeriesId, setSelectedSeriesId] = useState<string | null>(null);
   const { data } = usePodcasts();
   const series = data.series.length > 0 ? data.series : PODCAST_SERIES;
   const allEpisodes = data.episodes.length > 0 ? data.episodes : PODCAST_EPISODES;
 
   const filteredEpisodes = useMemo(() => {
-    if (filter === "All") return allEpisodes;
-    return allEpisodes.filter((ep) => {
+    let list = allEpisodes;
+    if (selectedSeriesId) {
+      list = list.filter((ep) => ep.seriesId === selectedSeriesId);
+    }
+    if (filter === "All") return list;
+    return list.filter((ep) => {
       const s = series.find((x) => x.id === ep.seriesId);
       return s?.category === filter;
     });
-  }, [filter, allEpisodes, series]);
+  }, [filter, selectedSeriesId, allEpisodes, series]);
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 md:px-8 pt-4 md:pt-8">
@@ -51,7 +56,13 @@ export function PodcastsPage() {
           {series.map((s) => (
             <div
               key={s.id}
-              className="group cursor-pointer"
+              onClick={() => setSelectedSeriesId(selectedSeriesId === s.id ? null : s.id)}
+              className={cn(
+                "group cursor-pointer p-2 rounded-lg border transition-all duration-200",
+                selectedSeriesId === s.id 
+                  ? "border-brand bg-brand/5 shadow-sm" 
+                  : "border-transparent hover:border-border hover:bg-muted/30"
+              )}
             >
               <div className="overflow-hidden rounded-md aspect-square bg-muted mb-2.5 relative">
                 <img
