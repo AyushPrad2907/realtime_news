@@ -786,7 +786,10 @@ async function runScraper() {
           }
 
           const dateStr = item.pubDate || item.isoDate || new Date().toISOString();
-          const publishedAtDate = new Date(dateStr);
+          let publishedAtDate = new Date(dateStr);
+          if (isNaN(publishedAtDate.getTime())) {
+            publishedAtDate = new Date();
+          }
           if (publishedAtDate < oneDayAgo) {
             skippedForFeed++;
             continue; // Skip articles older than 24 hours
@@ -814,7 +817,7 @@ async function runScraper() {
               heroCaption,
               heroCredit: feed.source === "pib" ? "PIB" : feed.source === "hindustan" ? "Live Hindustan" : feed.name,
               readingTime: Math.max(3, Math.ceil(body.split(" ").length / 200)),
-              publishedAt: new Date(dateStr),
+              publishedAt: publishedAtDate,
               approvedAt: new Date(),
               submittedAt: new Date(),
             },

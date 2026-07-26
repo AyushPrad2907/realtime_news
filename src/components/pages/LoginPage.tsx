@@ -25,21 +25,26 @@ export function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const ok = await signIn(email, password);
-    if (!ok) {
-      setError("Invalid email or password.");
+    try {
+      const ok = await signIn(email, password);
+      if (!ok) {
+        setError("Invalid email or password.");
+        setLoading(false);
+        return;
+      }
+      await refreshSession();
+      toast.success("Signed in successfully.");
       setLoading(false);
-      return;
-    }
-    await refreshSession();
-    toast.success("Signed in successfully.");
-    setLoading(false);
-    // Route based on role
-    const { user } = useStore.getState();
-    if (user?.role === "ADMIN") {
-      navigate({ type: "admin", view: "dashboard" });
-    } else {
-      navigate({ type: "editor", view: "dashboard" });
+      // Route based on role
+      const { user } = useStore.getState();
+      if (user?.role === "ADMIN") {
+        navigate({ type: "admin", view: "dashboard" });
+      } else {
+        navigate({ type: "editor", view: "dashboard" });
+      }
+    } catch (err: any) {
+      setError(err?.message || "An unexpected error occurred.");
+      setLoading(false);
     }
   };
 

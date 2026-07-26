@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
-  const { email } = await req.json();
+  let email: string;
+  try {
+    const body = await req.json();
+    email = body?.email;
+  } catch (e) {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
   if (!email || !email.includes("@")) {
     return NextResponse.json({ error: "Invalid email" }, { status: 400 });
   }

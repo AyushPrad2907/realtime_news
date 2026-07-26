@@ -67,10 +67,12 @@ export function SearchOverlay() {
 
   const submitSearch = () => {
     if (!query.trim()) return;
+    setSearchOpen(false);
     navigate({ type: "search", query: query.trim() });
   };
 
   const selectSuggestion = (slug: string) => {
+    setSearchOpen(false);
     navigate({ type: "article", slug });
   };
 
@@ -209,7 +211,10 @@ export function SearchOverlay() {
                         {categoryMatches.map((c, i) => (
                           <button
                             key={c.slug}
-                            onClick={() => navigate({ type: "category", slug: c.slug })}
+                            onClick={() => {
+                              setSearchOpen(false);
+                              navigate({ type: "category", slug: c.slug });
+                            }}
                             onMouseEnter={() => setActiveIndex(suggestions.length + i)}
                             className={cn(
                               "w-full flex items-center justify-between p-3 rounded-md text-left transition-colors",

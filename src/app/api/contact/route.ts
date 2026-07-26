@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  let body: any;
+  try {
+    body = await req.json();
+  } catch (e) {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
   const { fullName, email, subject, message } = body ?? {};
   if (!fullName || !email || !subject || !message) {
     return NextResponse.json(

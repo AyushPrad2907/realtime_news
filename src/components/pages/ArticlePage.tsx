@@ -63,6 +63,11 @@ export function ArticlePage({ slug }: ArticlePageProps) {
           setArticle(null);
         }
         setLoading(false);
+      }).catch(() => {
+        if (!cancelled) {
+          setArticle(null);
+          setLoading(false);
+        }
       });
     }, 0);
     return () => {
@@ -173,7 +178,8 @@ export function ArticlePage({ slug }: ArticlePageProps) {
   const showArticleAudioPlay = !isCurrentAudio || !isPlaying;
 
   const onShare = (platform: string) => {
-    if (platform === "copy") {
+    const p = platform.toLowerCase();
+    if (p === "copy") {
       const url = window.location.href;
       navigator.clipboard?.writeText(url);
       setCopied(true);
@@ -184,13 +190,13 @@ export function ArticlePage({ slug }: ArticlePageProps) {
       const title = encodeURIComponent(article.title);
       let shareUrl = "";
       
-      if (platform === "twitter") {
+      if (p === "twitter") {
         shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
-      } else if (platform === "facebook") {
+      } else if (p === "facebook") {
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-      } else if (platform === "telegram") {
+      } else if (p === "telegram") {
         shareUrl = `https://t.me/share/url?url=${url}&text=${title}`;
-      } else if (platform === "email") {
+      } else if (p === "email") {
         shareUrl = `mailto:?subject=${title}&body=${url}`;
       }
 
@@ -272,68 +278,6 @@ export function ArticlePage({ slug }: ArticlePageProps) {
             </a>
           </div>
         )}
-        <style jsx global>{`
-          .article-body img {
-            max-width: 100% !important;
-            height: auto !important;
-            object-fit: cover !important;
-            border-radius: 8px;
-            margin: 1.5rem auto;
-            display: block;
-          }
-          .article-body,
-          .article-body * {
-            color: inherit !important;
-          }
-          .article-body table {
-            width: 100% !important;
-            border-collapse: collapse;
-          }
-          .article-body td {
-            color: inherit !important;
-            font-family: inherit !important;
-            text-align: left !important;
-          }
-          .article-body p {
-            margin-bottom: 1.5em;
-            text-align: justify;
-            line-height: 1.75;
-            font-family: inherit !important;
-            font-size: inherit !important;
-            color: inherit !important;
-            background-color: transparent !important;
-          }
-          .article-body span {
-            font-family: inherit !important;
-            font-size: inherit !important;
-            color: inherit !important;
-            background-color: transparent !important;
-          }
-          .article-body div {
-            font-family: inherit !important;
-            color: inherit !important;
-          }
-          .article-body div[style*="font-size: 30px"],
-          .article-body div[style*="font-size:30px"] {
-            font-family: var(--font-playfair), serif !important;
-            font-weight: 800 !important;
-            font-size: 1.8rem !important;
-            line-height: 1.3 !important;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            text-align: center !important;
-          }
-          .article-body td[style*="text-align: center"],
-          .article-body td[style*="text-align:center"] {
-            font-family: var(--font-inter), sans-serif !important;
-            font-weight: 600 !important;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: inherit !important;
-            font-size: 0.95rem !important;
-            padding-bottom: 15px;
-          }
-        `}</style>
       </>
     );
   };

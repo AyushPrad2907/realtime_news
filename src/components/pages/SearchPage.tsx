@@ -45,6 +45,12 @@ export function SearchPage({ query: initialQuery }: SearchPageProps) {
         setApiArticles(data.articles);
         setApiPodcasts(data.podcasts);
         setLoading(false);
+      }).catch(() => {
+        if (!cancelled) {
+          setApiArticles([]);
+          setApiPodcasts([]);
+          setLoading(false);
+        }
       });
     }, 200); // debounce
     return () => {

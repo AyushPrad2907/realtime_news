@@ -59,14 +59,17 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let currentUser;
   try {
-    await requireAdmin();
+    currentUser = await requireAdmin();
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 401 });
   }
   const { id } = await params;
   // Prevent self-delete
-  // We can't easily get current user here without session call; client prevents
+  if (currentUser.id === id) {
+    return NextResponse.json({ error: "Cannot delete yourself" }, { status: 400 });
+  }
   await db.user.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }

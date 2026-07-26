@@ -11,9 +11,29 @@ export function ReadingProgress() {
       setReadingProgress(0);
       return;
     }
+    let ticking = false;
     const onScroll = () => {
-      const article = document.querySelector("article") as HTMLElement | null;
-      if (!article) return;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const article = document.querySelector("article") as HTMLElement | null;
+          if (article) {
+            const rect = article.getBoundingClientRect();
+            const articleTop = rect.top + window.scrollY;
+            const articleHeight = rect.height;
+            const viewport = window.innerHeight;
+            const scrolled = window.scrollY - articleTop + viewport * 0.4;
+            const progress = Math.max(0, Math.min(1, scrolled / articleHeight));
+            setReadingProgress(progress);
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    // Run initial call
+    const article = document.querySelector("article") as HTMLElement | null;
+    if (article) {
       const rect = article.getBoundingClientRect();
       const articleTop = rect.top + window.scrollY;
       const articleHeight = rect.height;
@@ -21,9 +41,7 @@ export function ReadingProgress() {
       const scrolled = window.scrollY - articleTop + viewport * 0.4;
       const progress = Math.max(0, Math.min(1, scrolled / articleHeight));
       setReadingProgress(progress);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    }
     return () => window.removeEventListener("scroll", onScroll);
   }, [current, setReadingProgress]);
 

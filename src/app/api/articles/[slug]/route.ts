@@ -196,10 +196,12 @@ export async function GET(
     });
   } catch (dbError) {
     console.error("Prisma database connection failed in details endpoint. Falling back to mock data:", dbError);
-    const mockArticle = ARTICLES_LIST.find((a) => a.slug === slug);
-    if (!mockArticle) {
+    const foundMock = ARTICLES_LIST.find((a) => a.slug === slug);
+    if (!foundMock) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+
+    const mockArticle = { ...foundMock };
 
     // Translate dynamically if target is Hindi
     if (lang === "hi") {

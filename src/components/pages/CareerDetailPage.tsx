@@ -50,6 +50,11 @@ export function CareerDetailPage({ slug }: CareerDetailPageProps) {
         if (data) setJob(data);
         else setJob(null);
         setLoading(false);
+      }).catch(() => {
+        if (!cancelled) {
+          setJob(null);
+          setLoading(false);
+        }
       });
     }, 0);
     return () => {

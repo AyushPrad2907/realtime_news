@@ -56,19 +56,28 @@ export async function GET(req: NextRequest) {
     }),
   ]);
 
-  // Daily views for the last N days (approximation: distribute total views
-  // proportional to articles published that day, or just generate stub trend)
+  const viewsDb = await db.articleView.groupBy({
+    by: ["date"],
+    _sum: { count: true },
+    where: { date: { gte: since } },
+    orderBy: { date: "asc" },
+  });
+
+  const viewsMap = new Map<string, number>();
+  for (const v of viewsDb) {
+    const dateStr = v.date.toISOString().slice(0, 10);
+    viewsMap.set(dateStr, v._sum.count ?? 0);
+  }
+
   const dailyViews: { date: string; views: number }[] = [];
   const today = new Date();
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
-    // Use totalViews / days as baseline + jitter
-    const baseline = Math.floor((totalViews._sum.views ?? 0) / days);
-    const jitter = Math.floor(Math.random() * baseline * 0.5);
+    const dateStr = d.toISOString().slice(0, 10);
     dailyViews.push({
-      date: d.toISOString().slice(0, 10),
-      views: baseline + jitter,
+      date: dateStr,
+      views: viewsMap.get(dateStr) ?? 0,
     });
   }
 

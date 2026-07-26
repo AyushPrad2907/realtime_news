@@ -66,6 +66,11 @@ export function PodcastDetailPage({ slug }: PodcastDetailPageProps) {
           setEpisode(null);
         }
         setLoading(false);
+      }).catch(() => {
+        if (!cancelled) {
+          setEpisode(null);
+          setLoading(false);
+        }
       });
     }, 0);
     return () => {

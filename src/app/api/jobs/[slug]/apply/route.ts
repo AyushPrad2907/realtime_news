@@ -13,7 +13,12 @@ export async function POST(
     return NextResponse.json({ error: "Job not found" }, { status: 404 });
   }
 
-  const body = await req.json();
+  let body: any;
+  try {
+    body = await req.json();
+  } catch (e) {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
   const {
     fullName,
     email,

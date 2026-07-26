@@ -264,7 +264,8 @@ async function fetchLiveFallbackFeeds(
           const pridMatch = item.link?.match(/PRID=(\d+)/);
           const feedSlugName = feed.name.toLowerCase().replace(/[^a-z0-9]/g, "-");
           const prid = pridMatch ? pridMatch[1] : `${feedSlugName}-${index}`;
-          const slug = feed.source === "pib" ? `pib-${prid}` : `hindustan-${index}-${Date.now()}`;
+          const hash = Buffer.from(item.link || `${feed.name}-${index}`).toString("base64url");
+          const slug = feed.source === "pib" ? `pib-${prid}` : `hindustan-${hash}`;
           const itemCategory = feed.defaultCategory || getCategoryFromTitle(item.title || "");
           const pubDate = item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString();
 
@@ -386,9 +387,12 @@ export async function GET(req: NextRequest) {
   // Pre-translate titles and standfirsts to Hindi server-side if lang is "hi"
   if (lang === "hi") {
     await Promise.all(
-      result.map(async (article) => {
-        article.title = await translateText(article.title, "hi");
-        article.standfirst = await translateText(article.standfirst, "hi");
+      result.map(async (article, idx) => {
+        result[idx] = {
+          ...article,
+          title: await translateText(article.title, "hi"),
+          standfirst: await translateText(article.standfirst, "hi"),
+        };
       })
     );
   }
