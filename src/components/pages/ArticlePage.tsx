@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
+import { ProxiedImage } from "@/components/ProxiedImage";
 import type { Article, Author } from "@/lib/types";
 
 import { useT } from "@/hooks/use-t";
@@ -398,7 +399,7 @@ export function ArticlePage({ slug }: ArticlePageProps) {
           {/* Hero image */}
           <figure className="mb-6">
             <div className="overflow-hidden rounded-lg aspect-[16/9] bg-muted">
-              <img
+              <ProxiedImage
                 src={article.heroImage}
                 alt={article.heroCaption ?? article.title}
                 className="h-full w-full object-cover"

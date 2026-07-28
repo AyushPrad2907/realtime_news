@@ -479,7 +479,7 @@ function ArticleEditor({
         </label>
         {heroImage ? (
           <div className="relative rounded-md overflow-hidden border border-border">
-            <img src={heroImage} alt="" className="w-full aspect-[16/9] object-cover" />
+            <img src={heroImage} alt="" referrerPolicy="no-referrer" className="w-full aspect-[16/9] object-cover" />
             <button
               onClick={() => setHeroImage("")}
               className="absolute top-2 right-2 px-2 py-1 rounded-md bg-black/60 text-white text-xs"

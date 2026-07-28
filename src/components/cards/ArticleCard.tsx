@@ -5,6 +5,7 @@ import type { Article } from "@/lib/types";
 import { getCategory, getAuthor } from "@/lib/utils-news";
 import { Clock, Headphones } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ProxiedImage } from "@/components/ProxiedImage";
 import { TimeAgo } from "@/components/TimeAgo";
 import { useT } from "@/hooks/use-t";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -53,7 +54,7 @@ export function ArticleCard({
           </p>
         </div>
         {showImage && (
-          <img
+          <ProxiedImage
             src={article.heroImage}
             alt=""
             loading="lazy"
@@ -72,7 +73,7 @@ export function ArticleCard({
       >
         {showImage && (
           <div className="overflow-hidden rounded-md mb-2.5 aspect-[16/9] bg-muted">
-            <img
+            <ProxiedImage
               src={article.heroImage}
               alt=""
               loading="lazy"
@@ -120,7 +121,7 @@ export function ArticleCard({
           </div>
           {showImage && (
             <div className="shrink-0 overflow-hidden rounded-md aspect-square w-20 h-20 bg-muted">
-              <img
+              <ProxiedImage
                 src={article.heroImage}
                 alt=""
                 loading="lazy"
@@ -144,7 +145,7 @@ export function ArticleCard({
     >
       {showImage && (
         <div className="overflow-hidden rounded-md mb-3 aspect-[16/9] bg-muted">
-          <img
+          <ProxiedImage
             src={article.heroImage}
             alt=""
             loading="lazy"

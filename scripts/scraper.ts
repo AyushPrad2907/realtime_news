@@ -872,6 +872,8 @@ async function runScraper() {
                       }
                     } catch (e) {}
                   }
+                } else if (src.startsWith("//")) {
+                  src = `https:${src}`;
                 }
                 heroImage = src;
                 break;

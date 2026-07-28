@@ -608,6 +608,8 @@ export async function GET(req: Request) {
                         }
                       } catch (e) {}
                     }
+                  } else if (src.startsWith("//")) {
+                    src = `https:${src}`;
                   }
                   heroImage = src;
                   break;

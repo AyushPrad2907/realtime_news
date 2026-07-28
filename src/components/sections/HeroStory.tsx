@@ -4,6 +4,7 @@ import { useStore } from "@/lib/store";
 import type { Article } from "@/lib/types";
 import { getCategory, getAuthor } from "@/lib/utils-news";
 import { Clock, Headphones, ArrowRight } from "lucide-react";
+import { ProxiedImage } from "@/components/ProxiedImage";
 import { TimeAgo } from "@/components/TimeAgo";
 import { useT } from "@/hooks/use-t";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -30,7 +31,7 @@ export function HeroStory({ article }: HeroStoryProps) {
       >
         {/* Background image */}
         <div className="aspect-[16/10] md:aspect-[16/9] relative">
-          <img
+          <ProxiedImage
             src={article.heroImage}
             alt={article.heroCaption ?? article.title}
             className="absolute inset-0 h-full w-full object-cover img-zoom"
