@@ -58,6 +58,14 @@ const FEEDS: FeedConfig[] = [
   { name: "Global Voices (Hindi)", url: "https://hi.globalvoices.org/feed/", source: "general-rss", defaultCategory: "international", lang: "hi", summaryOnly: false },
   { name: "Global Voices (English)", url: "https://globalvoices.org/feed", source: "general-rss", defaultCategory: "international", lang: "en", summaryOnly: false },
   { name: "Mongabay India (English)", url: "https://india.mongabay.com/feed/", source: "general-rss", defaultCategory: "science", lang: "en", summaryOnly: false },
+
+  // --- Jagran Hindi Feeds (100% Syndication Compliant & High Quality) ---
+  { name: "Jagran National (Hindi)", url: "https://rss.jagran.com/rss/news/national.xml", source: "general-rss", defaultCategory: "national", lang: "hi" },
+  { name: "Jagran Business (Hindi)", url: "https://rss.jagran.com/rss/business/business-hindi.xml", source: "general-rss", defaultCategory: "economy", lang: "hi" },
+  { name: "Jagran Sports (Hindi)", url: "https://rss.jagran.com/rss/sports/cricket.xml", source: "general-rss", defaultCategory: "sports", lang: "hi" },
+  { name: "Jagran Entertainment (Hindi)", url: "https://rss.jagran.com/rss/entertainment/bollywood.xml", source: "general-rss", defaultCategory: "entertainment", lang: "hi" },
+  { name: "Jagran Technology (Hindi)", url: "https://rss.jagran.com/rss/technology/tech-news.xml", source: "general-rss", defaultCategory: "technology", lang: "hi" },
+  { name: "Jagran Health (Hindi)", url: "https://rss.jagran.com/rss/lifestyle/health.xml", source: "general-rss", defaultCategory: "health", lang: "hi" },
   { name: "The Conversation", url: "https://theconversation.com/articles.atom", source: "general-rss", defaultCategory: "national", lang: "en", summaryOnly: false },
   { name: "ProPublica", url: "https://www.propublica.org/feeds/propublica/main", source: "general-rss", defaultCategory: "politics", lang: "en", summaryOnly: false },
   { name: "Doordarshan National", url: "https://ddnews.gov.in/feed/", source: "general-rss", defaultCategory: "national", lang: "en", summaryOnly: false },

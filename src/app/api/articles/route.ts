@@ -227,32 +227,32 @@ async function fetchLiveFallbackFeeds(
     });
   }
 
-  // Live Hindustan / International / Category feeds matching user language
+  // Jagran / International / Category feeds matching user language
   if (!state) {
     if (category === "sports") {
       if (isHindi) {
-        feedsToFetch.push({ name: "Hindustan Sports", url: "https://feed.livehindustan.com/rss/sports", source: "hindustan", defaultCategory: "sports" });
+        feedsToFetch.push({ name: "Jagran Sports", url: "https://rss.jagran.com/rss/sports/cricket.xml", source: "hindustan", defaultCategory: "sports" });
       } else {
         feedsToFetch.push({ name: "ESPN Cricinfo", url: "https://www.espncricinfo.com/rss/content/story/feeds/6.xml", source: "hindustan", defaultCategory: "sports" });
         feedsToFetch.push({ name: "India Today Sports", url: "https://www.indiatoday.in/rss/1206550", source: "hindustan", defaultCategory: "sports" });
       }
     } else if (category === "economy") {
       if (isHindi) {
-        feedsToFetch.push({ name: "Hindustan Business", url: "https://feed.livehindustan.com/rss/business", source: "hindustan", defaultCategory: "economy" });
+        feedsToFetch.push({ name: "Jagran Business", url: "https://rss.jagran.com/rss/business/business-hindi.xml", source: "hindustan", defaultCategory: "economy" });
       } else {
         feedsToFetch.push({ name: "Inc42 Startup", url: "https://inc42.com/feed/", source: "hindustan", defaultCategory: "economy" });
         feedsToFetch.push({ name: "PIB Finance", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=7", source: "pib", defaultCategory: "economy" });
       }
     } else if (category === "technology") {
       if (isHindi) {
-        feedsToFetch.push({ name: "Hindustan SciTech", url: "https://feed.livehindustan.com/rss/science-technology", source: "hindustan", defaultCategory: "technology" });
+        feedsToFetch.push({ name: "Jagran Tech", url: "https://rss.jagran.com/rss/technology/tech-news.xml", source: "hindustan", defaultCategory: "technology" });
       } else {
         feedsToFetch.push({ name: "TechCrunch", url: "https://techcrunch.com/feed/", source: "hindustan", defaultCategory: "technology" });
         feedsToFetch.push({ name: "Digital India", url: "https://www.digitalindia.gov.in/rss.xml", source: "hindustan", defaultCategory: "technology" });
       }
     } else if (category === "science") {
       if (isHindi) {
-        feedsToFetch.push({ name: "Hindustan SciTech", url: "https://feed.livehindustan.com/rss/science-technology", source: "hindustan", defaultCategory: "science" });
+        feedsToFetch.push({ name: "Jagran SciTech", url: "https://rss.jagran.com/rss/technology/tech-news.xml", source: "hindustan", defaultCategory: "science" });
         feedsToFetch.push({ name: "PIB ISRO Hi", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=14", source: "pib", defaultCategory: "science" });
       } else {
         feedsToFetch.push({ name: "Mongabay India", url: "https://india.mongabay.com/feed/", source: "hindustan", defaultCategory: "science" });
@@ -260,7 +260,7 @@ async function fetchLiveFallbackFeeds(
       }
     } else if (category === "politics") {
       if (isHindi) {
-        feedsToFetch.push({ name: "Hindustan National", url: "https://feed.livehindustan.com/rss/national", source: "hindustan", defaultCategory: "politics" });
+        feedsToFetch.push({ name: "Jagran National", url: "https://rss.jagran.com/rss/news/national.xml", source: "hindustan", defaultCategory: "politics" });
         feedsToFetch.push({ name: "PIB Cabinet Hi", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=61", source: "pib", defaultCategory: "politics" });
       } else {
         feedsToFetch.push({ name: "The Print Politics", url: "https://theprint.in/category/politics/feed/", source: "hindustan", defaultCategory: "politics" });
@@ -268,14 +268,14 @@ async function fetchLiveFallbackFeeds(
       }
     } else if (category === "entertainment") {
       if (isHindi) {
-        feedsToFetch.push({ name: "Hindustan Entertainment", url: "https://feed.livehindustan.com/rss/entertainment", source: "hindustan", defaultCategory: "entertainment" });
+        feedsToFetch.push({ name: "Jagran Entertainment", url: "https://rss.jagran.com/rss/entertainment/bollywood.xml", source: "hindustan", defaultCategory: "entertainment" });
       } else {
         feedsToFetch.push({ name: "Pinkvilla", url: "https://www.pinkvilla.com/rss.xml", source: "hindustan", defaultCategory: "entertainment" });
         feedsToFetch.push({ name: "Koimoi", url: "https://www.koimoi.com/feed/", source: "hindustan", defaultCategory: "entertainment" });
       }
     } else if (category === "health") {
       if (isHindi) {
-        feedsToFetch.push({ name: "Hindustan Lifestyle", url: "https://feed.livehindustan.com/rss/lifestyle", source: "hindustan", defaultCategory: "health" });
+        feedsToFetch.push({ name: "Jagran Health", url: "https://rss.jagran.com/rss/lifestyle/health.xml", source: "hindustan", defaultCategory: "health" });
         feedsToFetch.push({ name: "PIB Health Hi", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=13", source: "pib", defaultCategory: "health" });
       } else {
         feedsToFetch.push({ name: "Medical News Today", url: "https://www.medicalnewstoday.com/feed", source: "hindustan", defaultCategory: "health" });
@@ -291,7 +291,7 @@ async function fetchLiveFallbackFeeds(
       }
     } else {
       if (isHindi) {
-        feedsToFetch.push({ name: "Hindustan National", url: "https://feed.livehindustan.com/rss/national", source: "hindustan", defaultCategory: "national" });
+        feedsToFetch.push({ name: "Jagran National", url: "https://rss.jagran.com/rss/news/national.xml", source: "hindustan", defaultCategory: "national" });
       } else {
         feedsToFetch.push({ name: "The Conversation", url: "https://theconversation.com/articles.atom", source: "hindustan", defaultCategory: "national" });
         feedsToFetch.push({ name: "Doordarshan", url: "https://ddnews.gov.in/feed/", source: "hindustan", defaultCategory: "national" });

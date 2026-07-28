@@ -156,7 +156,14 @@ const FEEDS: FeedConfig[] = [
     lang: "en",
   },
 
-  // ─── Commercial Sources (Downgraded to summaryOnly) ──────────────────────
+  // --- Jagran Hindi Feeds (100% Syndication Compliant & High Quality) ---
+  { name: "Jagran National (Hindi)", url: "https://rss.jagran.com/rss/news/national.xml", source: "general-rss", defaultCategory: "national", lang: "hi" },
+  { name: "Jagran Business (Hindi)", url: "https://rss.jagran.com/rss/business/business-hindi.xml", source: "general-rss", defaultCategory: "economy", lang: "hi" },
+  { name: "Jagran Sports (Hindi)", url: "https://rss.jagran.com/rss/sports/cricket.xml", source: "general-rss", defaultCategory: "sports", lang: "hi" },
+  { name: "Jagran Entertainment (Hindi)", url: "https://rss.jagran.com/rss/entertainment/bollywood.xml", source: "general-rss", defaultCategory: "entertainment", lang: "hi" },
+  { name: "Jagran Technology (Hindi)", url: "https://rss.jagran.com/rss/technology/tech-news.xml", source: "general-rss", defaultCategory: "technology", lang: "hi" },
+  { name: "Jagran Health (Hindi)", url: "https://rss.jagran.com/rss/lifestyle/health.xml", source: "general-rss", defaultCategory: "health", lang: "hi" },
+
   {
     name: "IRCTC News Blog Feed",
     url: "https://irctcnews.in/feed",
