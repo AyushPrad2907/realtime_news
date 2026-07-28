@@ -217,7 +217,7 @@ async function fetchLiveFallbackFeeds(
     });
   }
 
-  // Live Hindustan (always include if no state is specified, as they don't map to these 3 states easily)
+  // Live Hindustan / international feeds (always include if no state is specified)
   if (!state) {
     if (category === "sports") {
       feedsToFetch.push({
@@ -239,6 +239,20 @@ async function fetchLiveFallbackFeeds(
         url: "https://feed.livehindustan.com/rss/science-technology",
         source: "hindustan",
         defaultCategory: "technology"
+      });
+    } else if (category === "international") {
+      // Dedicated international news feeds so the category page is never empty
+      feedsToFetch.push({
+        name: "TOI World",
+        url: "https://timesofindia.indiatimes.com/rssfeeds/296589292.cms",
+        source: "hindustan",
+        defaultCategory: "international"
+      });
+      feedsToFetch.push({
+        name: "NDTV World",
+        url: "https://feeds.feedburner.com/ndtvnews-world-news",
+        source: "hindustan",
+        defaultCategory: "international"
       });
     } else {
       feedsToFetch.push({
@@ -272,78 +286,88 @@ async function fetchLiveFallbackFeeds(
         const cleanXml = cleanEntities.replace(/&(?!(amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);)/g, "&amp;");
         const parsed = await parser.parseString(cleanXml);
 
-        parsed.items.forEach((item, index) => {
-          const pridMatch = item.link?.match(/PRID=(\d+)/);
-          const feedSlugName = feed.name.toLowerCase().replace(/[^a-z0-9]/g, "-");
-          const prid = pridMatch ? pridMatch[1] : `${feedSlugName}-${index}`;
-          const hash = Buffer.from(item.link || `${feed.name}-${index}`).toString("base64url");
-          const slug = feed.source === "pib" ? `pib-${prid}` : `hindustan-${hash}`;
-          const itemCategory = feed.defaultCategory || getCategoryFromTitle(item.title || "");
-          const pubDate = item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString();
+        // For PIB items, scrape images in parallel (same as fetchPibArticles)
+        const ibItemsWithImages = await Promise.all(
+          parsed.items.map(async (item, index) => {
+            const pridMatch = item.link?.match(/PRID=(\d+)/);
+            const feedSlugName = feed.name.toLowerCase().replace(/[^a-z0-9]/g, "-");
+            const prid = pridMatch ? pridMatch[1] : `${feedSlugName}-${index}`;
+            const hash = Buffer.from(item.link || `${feed.name}-${index}`).toString("base64url");
+            const slug = feed.source === "pib" ? `pib-${prid}` : `hindustan-${hash}`;
+            const itemCategory = feed.defaultCategory || getCategoryFromTitle(item.title || "");
+            const pubDate = item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString();
 
-          let heroImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800";
-          if (item.enclosure?.url) {
-            heroImage = item.enclosure.url;
-          } else {
-            const mediaContent = (item as any)["media:content"] || (item as any).mediaContent;
-            if (mediaContent) {
-              if (Array.isArray(mediaContent) && mediaContent[0]) {
-                heroImage = mediaContent[0].url || mediaContent[0].$.url || mediaContent[0].$?.url || heroImage;
-              } else if (typeof mediaContent === "object") {
-                heroImage = mediaContent.url || mediaContent.$.url || mediaContent.$?.url || heroImage;
-              }
-            }
-            if (heroImage.startsWith("https://images.unsplash.com")) {
-              const mediaThumbnail = (item as any)["media:thumbnail"] || (item as any).mediaThumbnail;
-              if (mediaThumbnail) {
-                if (Array.isArray(mediaThumbnail) && mediaThumbnail[0]) {
-                  heroImage = mediaThumbnail[0].url || mediaThumbnail[0].$.url || mediaThumbnail[0].$?.url || heroImage;
-                } else if (typeof mediaThumbnail === "object") {
-                  heroImage = mediaThumbnail.url || mediaThumbnail.$.url || mediaThumbnail.$?.url || heroImage;
+            let heroImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800";
+
+            if (item.enclosure?.url) {
+              heroImage = item.enclosure.url;
+            } else {
+              const mediaContent = (item as any)["media:content"] || (item as any).mediaContent;
+              if (mediaContent) {
+                if (Array.isArray(mediaContent) && mediaContent[0]) {
+                  heroImage = mediaContent[0].url || mediaContent[0].$.url || mediaContent[0].$?.url || heroImage;
+                } else if (typeof mediaContent === "object") {
+                  heroImage = mediaContent.url || mediaContent.$.url || mediaContent.$?.url || heroImage;
                 }
               }
-            }
-            if (heroImage.startsWith("https://images.unsplash.com")) {
-              const searchFields = [
-                (item as any)["content:encoded"] || "",
-                item.content || "",
-                (item as any).description || ""
-              ];
-              for (const field of searchFields) {
-                const imgMatch = field.match(/<img\s+[^>]*src=["']([^"']+)["']/i);
-                if (imgMatch) {
-                  heroImage = imgMatch[1];
-                  break;
+              if (heroImage.startsWith("https://images.unsplash.com")) {
+                const mediaThumbnail = (item as any)["media:thumbnail"] || (item as any).mediaThumbnail;
+                if (mediaThumbnail) {
+                  if (Array.isArray(mediaThumbnail) && mediaThumbnail[0]) {
+                    heroImage = mediaThumbnail[0].url || mediaThumbnail[0].$.url || mediaThumbnail[0].$?.url || heroImage;
+                  } else if (typeof mediaThumbnail === "object") {
+                    heroImage = mediaThumbnail.url || mediaThumbnail.$.url || mediaThumbnail.$?.url || heroImage;
+                  }
                 }
               }
+              if (heroImage.startsWith("https://images.unsplash.com")) {
+                const searchFields = [
+                  (item as any)["content:encoded"] || "",
+                  item.content || "",
+                  (item as any).description || ""
+                ];
+                for (const field of searchFields) {
+                  const imgMatch = field.match(/<img\s+[^>]*src=["']([^"']+)["']/i);
+                  if (imgMatch) {
+                    heroImage = imgMatch[1];
+                    break;
+                  }
+                }
+              }
+              // For PIB items: scrape the press release page for a real image
+              if (heroImage.startsWith("https://images.unsplash.com") && feed.source === "pib" && pridMatch) {
+                const scrapedImg = await getPibArticleImage(prid);
+                if (scrapedImg) heroImage = scrapedImg;
+              }
             }
-          }
 
-          articles.push({
-            id: slug,
-            slug,
-            title: item.title || "",
-            standfirst: item.contentSnippet || (item as any).description || (isHindi ? "विज्ञप्ति।" : "Official Release."),
-            body: item.content || item.contentSnippet || "",
-            category: itemCategory,
-            tags: feed.source === "pib" ? ["PIB"] : ["Hindustan"],
-            states: state ? [state] : [],
-            authorId: feed.source === "pib" ? "pib-scraper" : "hindustan-scraper",
-            publishedAt: pubDate,
-            views: 100 + index * 5,
-            heroImage,
-            heroCaption: feed.name,
-            heroCredit: feed.source === "pib" ? "PIB" : "Hindustan",
-            isFeatured: index === 0 && !category,
-            isBreaking: index < 2,
-            hasAudio: false,
-            author: {
-              id: feed.source === "pib" ? "pib-scraper" : "hindustan-scraper",
-              name: feed.source === "pib" ? "पत्र सूचना कार्यालय (PIB)" : "लाइव हिन्दुस्तान",
-              avatar: "https://ui-avatars.com/api/?name=" + (feed.source === "pib" ? "PIB" : "LH")
-            }
-          });
-        });
+            return {
+              id: slug,
+              slug,
+              title: item.title || "",
+              standfirst: item.contentSnippet || (item as any).description || (isHindi ? "विज्ञप्ति।" : "Official Release."),
+              body: item.content || item.contentSnippet || "",
+              category: itemCategory,
+              tags: feed.source === "pib" ? ["PIB"] : ["Hindustan"],
+              states: state ? [state] : [],
+              authorId: feed.source === "pib" ? "pib-scraper" : "hindustan-scraper",
+              publishedAt: pubDate,
+              views: 100 + index * 5,
+              heroImage,
+              heroCaption: feed.name,
+              heroCredit: feed.source === "pib" ? "PIB" : "Hindustan",
+              isFeatured: index === 0 && !category,
+              isBreaking: index < 2,
+              hasAudio: false,
+              author: {
+                id: feed.source === "pib" ? "pib-scraper" : "hindustan-scraper",
+                name: feed.source === "pib" ? "पत्र सूचना कार्यालय (PIB)" : "लाइव हिन्दुस्तान",
+                avatar: "https://ui-avatars.com/api/?name=" + (feed.source === "pib" ? "PIB" : "LH")
+              }
+            };
+          })
+        );
+        ibItemsWithImages.forEach(article => articles.push(article));
       } catch (e) {
         console.error("Failed to parse feed in fallback", feed.name, e);
       }
