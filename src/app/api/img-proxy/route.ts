@@ -46,12 +46,12 @@ const ALLOWED_TYPES = new Set([
   "image/tiff",
 ]);
 
-// Max image size: 10MB
-const MAX_SIZE = 10 * 1024 * 1024;
+// Max image size: 150KB
+const MAX_SIZE = 150 * 1024;
 
-// Default fallback image
+// Default fallback image (optimized ~50KB)
 const FALLBACK_IMAGE_URL =
-  "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=60";
+  "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=65";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo } from "react";
 
 const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=60";
+  "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=65";
 
 // Domains that are known to allow hotlinking — skip proxy for these
 const HOTLINK_SAFE_DOMAINS = new Set([
