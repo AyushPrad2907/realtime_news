@@ -164,6 +164,13 @@ const FEEDS: FeedConfig[] = [
   { name: "Jagran Technology (Hindi)", url: "https://rss.jagran.com/rss/technology/tech-news.xml", source: "general-rss", defaultCategory: "technology", lang: "hi" },
   { name: "Jagran Health (Hindi)", url: "https://rss.jagran.com/rss/lifestyle/health.xml", source: "general-rss", defaultCategory: "health", lang: "hi" },
 
+  // --- Top Tier Indian Media Feeds ---
+  { name: "NDTV India Latest (Hindi)", url: "https://feeds.feedburner.com/ndtvindia-latest", source: "general-rss", defaultCategory: "national", lang: "hi" },
+  { name: "Economic Times Top Stories", url: "https://economictimes.indiatimes.com/rssfeedstopstories.cms", source: "general-rss", defaultCategory: "economy", lang: "en" },
+  { name: "Financial Express", url: "https://www.financialexpress.com/feed/", source: "general-rss", defaultCategory: "economy", lang: "en" },
+  { name: "Livemint News", url: "https://www.livemint.com/rss/news", source: "general-rss", defaultCategory: "economy", lang: "en" },
+  { name: "Business Standard Top Stories", url: "https://www.business-standard.com/rss/home_page_top_stories.rss", source: "general-rss", defaultCategory: "economy", lang: "en" },
+
   {
     name: "IRCTC News Blog Feed",
     url: "https://irctcnews.in/feed",
