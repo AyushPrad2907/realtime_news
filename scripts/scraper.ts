@@ -858,6 +858,10 @@ async function runScraper() {
               const imgMatch = field.match(/<img\s+[^>]*src=["']([^"']+)["']/i);
               if (imgMatch) {
                 let src = imgMatch[1];
+                const ignoredKeywords = ["azadikaamritmahotsav", "piblogo", "emblem", "banner", "g20", "header", "footer", "logo", "75_"];
+                if (ignoredKeywords.some(kw => src.toLowerCase().includes(kw))) {
+                  continue;
+                }
                 if (!src.startsWith("http") && !src.startsWith("//")) {
                   if (feed.source === "pib") {
                     if (src.startsWith("/")) src = src.substring(1);

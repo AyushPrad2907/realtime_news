@@ -54,11 +54,21 @@ async function getPibArticleImage(prid: string): Promise<string> {
     const buffer = await res.arrayBuffer();
     const html = new TextDecoder("utf-8").decode(buffer);
     
-    // Match both relative and absolute image paths on the official site
-    const imgRegex = /(?:https:\/\/static\.pib\.gov\.in)?\/?WriteReadData\/(?:userfiles\/image|specificdocs\/photo)\/[^\s"'>]+/i;
-    const imgMatch = html.match(imgRegex);
-    if (imgMatch) {
-      let imgUrl = imgMatch[0];
+    // Match real article images in WriteReadData, ignoring site header/footer logos
+    const pdfDivIdx = html.indexOf('id="PdfDiv"');
+    const searchSpace = pdfDivIdx !== -1 ? html.substring(pdfDivIdx) : html;
+
+    const imgRegex = /(?:https:\/\/static\.pib\.gov\.in)?\/?WriteReadData\/(?:userfiles\/image|specificdocs\/photo)\/[^\s"'>]+/gi;
+    const matches = Array.from(searchSpace.matchAll(imgRegex));
+
+    const ignoredKeywords = ["azadikaamritmahotsav", "piblogo", "emblem", "banner", "g20", "header", "footer", "logo", "75_"];
+
+    for (const match of matches) {
+      let imgUrl = match[0];
+      const lower = imgUrl.toLowerCase();
+      if (ignoredKeywords.some(kw => lower.includes(kw))) {
+        continue;
+      }
       if (!imgUrl.startsWith("http")) {
         if (imgUrl.startsWith("/")) imgUrl = imgUrl.substring(1);
         imgUrl = `https://static.pib.gov.in/${imgUrl}`;
@@ -217,50 +227,75 @@ async function fetchLiveFallbackFeeds(
     });
   }
 
-  // Live Hindustan / international feeds (always include if no state is specified)
+  // Live Hindustan / International / Category feeds matching user language
   if (!state) {
     if (category === "sports") {
-      feedsToFetch.push({
-        name: "Hindustan Sports",
-        url: "https://feed.livehindustan.com/rss/sports",
-        source: "hindustan",
-        defaultCategory: "sports"
-      });
+      if (isHindi) {
+        feedsToFetch.push({ name: "Hindustan Sports", url: "https://feed.livehindustan.com/rss/sports", source: "hindustan", defaultCategory: "sports" });
+      } else {
+        feedsToFetch.push({ name: "ESPN Cricinfo", url: "https://www.espncricinfo.com/rss/content/story/feeds/6.xml", source: "hindustan", defaultCategory: "sports" });
+        feedsToFetch.push({ name: "India Today Sports", url: "https://www.indiatoday.in/rss/1206550", source: "hindustan", defaultCategory: "sports" });
+      }
     } else if (category === "economy") {
-      feedsToFetch.push({
-        name: "Hindustan Business",
-        url: "https://feed.livehindustan.com/rss/business",
-        source: "hindustan",
-        defaultCategory: "economy"
-      });
-    } else if (category === "technology" || category === "science") {
-      feedsToFetch.push({
-        name: "Hindustan SciTech",
-        url: "https://feed.livehindustan.com/rss/science-technology",
-        source: "hindustan",
-        defaultCategory: "technology"
-      });
+      if (isHindi) {
+        feedsToFetch.push({ name: "Hindustan Business", url: "https://feed.livehindustan.com/rss/business", source: "hindustan", defaultCategory: "economy" });
+      } else {
+        feedsToFetch.push({ name: "Inc42 Startup", url: "https://inc42.com/feed/", source: "hindustan", defaultCategory: "economy" });
+        feedsToFetch.push({ name: "PIB Finance", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=7", source: "pib", defaultCategory: "economy" });
+      }
+    } else if (category === "technology") {
+      if (isHindi) {
+        feedsToFetch.push({ name: "Hindustan SciTech", url: "https://feed.livehindustan.com/rss/science-technology", source: "hindustan", defaultCategory: "technology" });
+      } else {
+        feedsToFetch.push({ name: "TechCrunch", url: "https://techcrunch.com/feed/", source: "hindustan", defaultCategory: "technology" });
+        feedsToFetch.push({ name: "Digital India", url: "https://www.digitalindia.gov.in/rss.xml", source: "hindustan", defaultCategory: "technology" });
+      }
+    } else if (category === "science") {
+      if (isHindi) {
+        feedsToFetch.push({ name: "Hindustan SciTech", url: "https://feed.livehindustan.com/rss/science-technology", source: "hindustan", defaultCategory: "science" });
+        feedsToFetch.push({ name: "PIB ISRO Hi", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=14", source: "pib", defaultCategory: "science" });
+      } else {
+        feedsToFetch.push({ name: "Mongabay India", url: "https://india.mongabay.com/feed/", source: "hindustan", defaultCategory: "science" });
+        feedsToFetch.push({ name: "The Print Science", url: "https://theprint.in/category/science/feed/", source: "hindustan", defaultCategory: "science" });
+      }
+    } else if (category === "politics") {
+      if (isHindi) {
+        feedsToFetch.push({ name: "Hindustan National", url: "https://feed.livehindustan.com/rss/national", source: "hindustan", defaultCategory: "politics" });
+        feedsToFetch.push({ name: "PIB Cabinet Hi", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=61", source: "pib", defaultCategory: "politics" });
+      } else {
+        feedsToFetch.push({ name: "The Print Politics", url: "https://theprint.in/category/politics/feed/", source: "hindustan", defaultCategory: "politics" });
+        feedsToFetch.push({ name: "ProPublica", url: "https://www.propublica.org/feeds/propublica/main", source: "hindustan", defaultCategory: "politics" });
+      }
+    } else if (category === "entertainment") {
+      if (isHindi) {
+        feedsToFetch.push({ name: "Hindustan Entertainment", url: "https://feed.livehindustan.com/rss/entertainment", source: "hindustan", defaultCategory: "entertainment" });
+      } else {
+        feedsToFetch.push({ name: "Pinkvilla", url: "https://www.pinkvilla.com/rss.xml", source: "hindustan", defaultCategory: "entertainment" });
+        feedsToFetch.push({ name: "Koimoi", url: "https://www.koimoi.com/feed/", source: "hindustan", defaultCategory: "entertainment" });
+      }
+    } else if (category === "health") {
+      if (isHindi) {
+        feedsToFetch.push({ name: "Hindustan Lifestyle", url: "https://feed.livehindustan.com/rss/lifestyle", source: "hindustan", defaultCategory: "health" });
+        feedsToFetch.push({ name: "PIB Health Hi", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=2&MinId=13", source: "pib", defaultCategory: "health" });
+      } else {
+        feedsToFetch.push({ name: "Medical News Today", url: "https://www.medicalnewstoday.com/feed", source: "hindustan", defaultCategory: "health" });
+        feedsToFetch.push({ name: "PIB Health En", url: "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&MinId=13", source: "pib", defaultCategory: "health" });
+      }
     } else if (category === "international") {
-      // Dedicated international news feeds so the category page is never empty
-      feedsToFetch.push({
-        name: "TOI World",
-        url: "https://timesofindia.indiatimes.com/rssfeeds/296589292.cms",
-        source: "hindustan",
-        defaultCategory: "international"
-      });
-      feedsToFetch.push({
-        name: "NDTV World",
-        url: "https://feeds.feedburner.com/ndtvnews-world-news",
-        source: "hindustan",
-        defaultCategory: "international"
-      });
+      if (isHindi) {
+        feedsToFetch.push({ name: "Global Voices Hindi", url: "https://hi.globalvoices.org/feed/", source: "hindustan", defaultCategory: "international" });
+        feedsToFetch.push({ name: "BBC Hindi", url: "https://feeds.bbci.co.uk/hindi/rss.xml", source: "hindustan", defaultCategory: "international" });
+      } else {
+        feedsToFetch.push({ name: "Global Voices English", url: "https://globalvoices.org/feed", source: "hindustan", defaultCategory: "international" });
+        feedsToFetch.push({ name: "BBC World", url: "https://feeds.bbci.co.uk/news/world/rss.xml", source: "hindustan", defaultCategory: "international" });
+      }
     } else {
-      feedsToFetch.push({
-        name: "Hindustan National",
-        url: "https://feed.livehindustan.com/rss/national",
-        source: "hindustan",
-        defaultCategory: "national"
-      });
+      if (isHindi) {
+        feedsToFetch.push({ name: "Hindustan National", url: "https://feed.livehindustan.com/rss/national", source: "hindustan", defaultCategory: "national" });
+      } else {
+        feedsToFetch.push({ name: "The Conversation", url: "https://theconversation.com/articles.atom", source: "hindustan", defaultCategory: "national" });
+        feedsToFetch.push({ name: "Doordarshan", url: "https://ddnews.gov.in/feed/", source: "hindustan", defaultCategory: "national" });
+      }
     }
   }
 
