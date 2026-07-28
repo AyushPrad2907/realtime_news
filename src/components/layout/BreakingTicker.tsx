@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { ARTICLES_LIST } from "@/lib/mock-data";
 import { useBreaking } from "@/lib/use-data";
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle, X, RotateCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LiveClock } from "@/components/LiveClock";
 import { useT } from "@/hooks/use-t";
@@ -13,18 +13,24 @@ import { useHydrated } from "@/hooks/use-hydrated";
 export function BreakingTicker() {
   const [dismissed, setDismissed] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { navigate } = useStore();
-  const { data: headlines } = useBreaking();
+  const { data: headlines, refetch } = useBreaking();
   const t = useT();
   const mounted = useHydrated();
 
   if (dismissed || headlines.length === 0) return null;
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refetch();
+    setTimeout(() => setIsRefreshing(false), 500);
+  };
+
   // Triple the content so the loop is seamless
   const tickerContent = [...headlines, ...headlines, ...headlines];
 
   const onClickHeadline = (text: string) => {
-    // Try to find matching article by partial title match
     const match = ARTICLES_LIST.find((a) =>
       text.toLowerCase().includes(a.title.toLowerCase().slice(0, 25).toLowerCase())
     );
@@ -45,6 +51,10 @@ export function BreakingTicker() {
     >
       <div className="mx-auto max-w-[1280px] flex items-stretch">
         <div className="shrink-0 flex items-center gap-2 px-3 md:px-5 py-2 bg-black/30 border-r border-white/10">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+          </span>
           <AlertCircle className="h-3.5 w-3.5 text-red-300" />
           <span className="font-ui text-[11px] md:text-xs font-bold uppercase tracking-wider">
             {mounted ? t("nav.breaking") : "Breaking"}
@@ -71,9 +81,19 @@ export function BreakingTicker() {
           </div>
         </div>
 
+        {/* Manual Refresh Button */}
+        <button
+          onClick={handleRefresh}
+          className="shrink-0 px-2.5 flex items-center text-white/70 hover:text-white transition-colors border-l border-white/10"
+          title="Refresh breaking news"
+          aria-label="Refresh breaking news"
+        >
+          <RotateCw className={cn("h-3.5 w-3.5", isRefreshing && "animate-spin text-white")} />
+        </button>
+
         <button
           onClick={() => setDismissed(true)}
-          className="shrink-0 px-3 md:px-4 flex items-center text-white/70 hover:text-white transition-colors"
+          className="shrink-0 px-3 md:px-4 flex items-center text-white/70 hover:text-white transition-colors border-l border-white/10"
           aria-label={mounted ? t("aria.dismissTicker") : "Dismiss breaking news ticker"}
         >
           <X className="h-3.5 w-3.5" />

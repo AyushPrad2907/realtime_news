@@ -23,11 +23,25 @@ import type { Article, Category, PodcastEpisode, PodcastSeries, LiveUpdate } fro
 function useApiData<T>(
   fetcher: () => Promise<T>,
   fallback: T,
-  deps: any[] = []
-): { data: T; loading: boolean; error: Error | null } {
+  deps: any[] = [],
+  pollIntervalMs?: number
+): { data: T; loading: boolean; error: Error | null; refetch: () => Promise<void> } {
   const [data, setData] = useState<T>(fallback);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+
+  const refetch = async () => {
+    try {
+      setLoading(true);
+      const result = await fetcher();
+      setData(result);
+      setError(null);
+    } catch (e: any) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -46,12 +60,27 @@ function useApiData<T>(
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
+
+    let intervalId: NodeJS.Timeout | null = null;
+    if (pollIntervalMs && pollIntervalMs > 0) {
+      intervalId = setInterval(() => {
+        if (!cancelled) {
+          fetcher()
+            .then((res) => {
+              if (!cancelled) setData(res);
+            })
+            .catch(() => {});
+        }
+      }, pollIntervalMs);
+    }
+
     return () => {
       cancelled = true;
+      if (intervalId) clearInterval(intervalId);
     };
-  }, deps);
+  }, [...deps, pollIntervalMs]);
 
-  return { data, loading, error };
+  return { data, loading, error, refetch };
 }
 
 export function useArticles(params: {
@@ -107,5 +136,5 @@ export function useLive() {
 
 export function useBreaking() {
   const language = useStore((s) => s.language);
-  return useApiData(() => fetchBreaking(language), BREAKING_NEWS, [language]);
+  return useApiData(() => fetchBreaking(language), BREAKING_NEWS, [language], 45000); // Auto-poll every 45s
 }
