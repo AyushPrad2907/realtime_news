@@ -128,6 +128,22 @@ const FEEDS: FeedConfig[] = [
     lang: "en",
   },
   {
+    name: "Times of India World",
+    url: "https://timesofindia.indiatimes.com/rssfeeds/296589292.cms",
+    source: "general-rss",
+    defaultCategory: "international",
+    lang: "en",
+    summaryOnly: true,
+  },
+  {
+    name: "NDTV World News",
+    url: "https://feeds.feedburner.com/ndtvnews-world-news",
+    source: "general-rss",
+    defaultCategory: "international",
+    lang: "en",
+    summaryOnly: true,
+  },
+  {
     name: "Mongabay India (English)",
     url: "https://india.mongabay.com/feed/",
     source: "general-rss",
@@ -702,7 +718,7 @@ async function runScraper() {
     });
     deletedCount = deleteResult.count;
 
-    for (const feed of FEEDS) {
+    const feedPromises = FEEDS.map(async (feed) => {
       console.log(`Processing: ${feed.name}`);
       let addedForFeed = 0;
       let skippedForFeed = 0;
@@ -751,7 +767,7 @@ async function runScraper() {
         if (!fetchSuccess || !res) {
           errorsForFeed = 1;
           stats.push({ feedName: feed.name, added: 0, skipped: 0, errors: errorsForFeed });
-          continue;
+          return;
         }
 
         const buffer = await res.arrayBuffer();
@@ -761,7 +777,7 @@ async function runScraper() {
           console.warn(`Failed to parse feed ${feed.name}: Content is HTML, not XML.`);
           errorsForFeed = 1;
           stats.push({ feedName: feed.name, added: 0, skipped: 0, errors: errorsForFeed });
-          continue;
+          return;
         }
 
         const cleanEntities = xml
@@ -782,7 +798,7 @@ async function runScraper() {
           console.warn(`Failed to parse feed ${feed.name}: ${parseErr.message || parseErr}`);
           errorsForFeed = 1;
           stats.push({ feedName: feed.name, added: 0, skipped: 0, errors: errorsForFeed });
-          continue;
+          return;
         }
 
         for (const item of parsed.items) {
@@ -842,18 +858,22 @@ async function runScraper() {
             const mediaContent = (item as any)["media:content"] || (item as any).mediaContent;
             if (mediaContent) {
               if (Array.isArray(mediaContent) && mediaContent[0]) {
-                heroImage = mediaContent[0].url || mediaContent[0].$.url || mediaContent[0].$?.url || heroImage;
+                const itemMedia = mediaContent[0];
+                heroImage = itemMedia.url || itemMedia.$.url || itemMedia.$?.url || itemMedia.$.url || heroImage;
               } else if (typeof mediaContent === "object") {
-                heroImage = mediaContent.url || mediaContent.$.url || mediaContent.$?.url || heroImage;
+                const itemMedia = mediaContent as any;
+                heroImage = itemMedia.url || itemMedia.$.url || itemMedia.$?.url || itemMedia.$.url || heroImage;
               }
             }
             if (heroImage.startsWith("https://images.unsplash.com")) {
               const mediaThumbnail = (item as any)["media:thumbnail"] || (item as any).mediaThumbnail;
               if (mediaThumbnail) {
                 if (Array.isArray(mediaThumbnail) && mediaThumbnail[0]) {
-                  heroImage = mediaThumbnail[0].url || mediaThumbnail[0].$.url || mediaThumbnail[0].$?.url || heroImage;
+                  const itemThumb = mediaThumbnail[0];
+                  heroImage = itemThumb.url || itemThumb.$.url || itemThumb.$?.url || itemThumb.$.url || heroImage;
                 } else if (typeof mediaThumbnail === "object") {
-                  heroImage = mediaThumbnail.url || mediaThumbnail.$.url || mediaThumbnail.$?.url || heroImage;
+                  const itemThumb = mediaThumbnail as any;
+                  heroImage = itemThumb.url || itemThumb.$.url || itemThumb.$?.url || itemThumb.$.url || heroImage;
                 }
               }
             }
@@ -963,7 +983,9 @@ async function runScraper() {
         console.error(`Error scraping feed ${feed.name}:`, err);
         stats.push({ feedName: feed.name, added: addedForFeed, skipped: skippedForFeed, errors: 1 });
       }
-    }
+    });
+
+    await Promise.all(feedPromises);
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
     console.log("\n" + "═".repeat(70));

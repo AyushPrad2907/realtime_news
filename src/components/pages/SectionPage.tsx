@@ -66,7 +66,13 @@ function NewsSectionPage({ slug }: { slug: "breaking" | "national" | "internatio
   const Icon = config.Icon;
   const filterFn = config.filter;
 
-  const { data: fetchedArticles, loading } = useArticles({ limit: 100 });
+  const apiParams = useMemo(() => {
+    if (slug === "breaking") return { breaking: true, limit: 100 };
+    if (slug === "international") return { category: "international", limit: 100 };
+    return { limit: 100 };
+  }, [slug]);
+
+  const { data: fetchedArticles, loading } = useArticles(apiParams);
 
   const articles = useMemo(() => {
     const list = fetchedArticles.length > 0 ? fetchedArticles : ARTICLES_LIST;

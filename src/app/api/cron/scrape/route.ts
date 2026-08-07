@@ -443,7 +443,8 @@ async function cleanupExistingCommercialArticles() {
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("Authorization");
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return new Response("Unauthorized", { status: 401 });
   }
 
@@ -465,8 +466,8 @@ export async function GET(req: Request) {
     });
     deletedCount = deleteResult.count;
 
-    // 2. Fetch new feed items
-    for (const feed of FEEDS) {
+    // 2. Fetch and process new feed items in parallel
+    const feedPromises = FEEDS.map(async (feed) => {
       try {
         let res;
         let retries = 3;
@@ -501,13 +502,13 @@ export async function GET(req: Request) {
           }
         }
 
-        if (!fetchSuccess || !res) continue;
+        if (!fetchSuccess || !res) return;
 
         const buffer = await res.arrayBuffer();
         const xml = new TextDecoder("utf-8").decode(buffer);
         const trimmedXml = xml.trim();
         if (trimmedXml.startsWith("<!DOCTYPE html") || trimmedXml.startsWith("<html") || trimmedXml.startsWith("<!doctype html")) {
-          continue;
+          return;
         }
 
         const cleanEntities = xml
@@ -525,7 +526,7 @@ export async function GET(req: Request) {
         try {
           parsed = await parser.parseString(cleanXml);
         } catch (parseErr: any) {
-          continue;
+          return;
         }
 
         for (const item of parsed.items) {
@@ -583,18 +584,22 @@ export async function GET(req: Request) {
             const mediaContent = (item as any)["media:content"] || (item as any).mediaContent;
             if (mediaContent) {
               if (Array.isArray(mediaContent) && mediaContent[0]) {
-                heroImage = mediaContent[0].url || mediaContent[0].$.url || mediaContent[0].$?.url || heroImage;
+                const itemMedia = mediaContent[0];
+                heroImage = itemMedia.url || itemMedia.$.url || itemMedia.$?.url || itemMedia.$.url || heroImage;
               } else if (typeof mediaContent === "object") {
-                heroImage = mediaContent.url || mediaContent.$.url || mediaContent.$?.url || heroImage;
+                const itemMedia = mediaContent as any;
+                heroImage = itemMedia.url || itemMedia.$.url || itemMedia.$?.url || itemMedia.$.url || heroImage;
               }
             }
             if (heroImage.startsWith("https://images.unsplash.com")) {
               const mediaThumbnail = (item as any)["media:thumbnail"] || (item as any).mediaThumbnail;
               if (mediaThumbnail) {
                 if (Array.isArray(mediaThumbnail) && mediaThumbnail[0]) {
-                  heroImage = mediaThumbnail[0].url || mediaThumbnail[0].$.url || mediaThumbnail[0].$?.url || heroImage;
+                  const itemThumb = mediaThumbnail[0];
+                  heroImage = itemThumb.url || itemThumb.$.url || itemThumb.$?.url || itemThumb.$.url || heroImage;
                 } else if (typeof mediaThumbnail === "object") {
-                  heroImage = mediaThumbnail.url || mediaThumbnail.$.url || mediaThumbnail.$?.url || heroImage;
+                  const itemThumb = mediaThumbnail as any;
+                  heroImage = itemThumb.url || itemThumb.$.url || itemThumb.$?.url || itemThumb.$.url || heroImage;
                 }
               }
             }
@@ -685,7 +690,9 @@ export async function GET(req: Request) {
       } catch (err) {
         console.error(`Cron error scraping feed ${feed.name}:`, err);
       }
-    }
+    });
+
+    await Promise.all(feedPromises);
 
     return NextResponse.json({
       success: true,

@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { serializeArticle } from "@/lib/serializers";
 import https from "https";
 import { ARTICLES_LIST } from "@/lib/mock-data";
+import { getPibArticleImage } from "@/lib/pib-scraper";
 
 export const dynamic = "force-dynamic";
 
@@ -107,6 +108,12 @@ export async function GET(
       const standfirstMatch = bodyContent.match(/<h3[^>]*id="Subtitleh3"[^>]*>([\s\S]*?)<\/h3>/i);
       const standfirst = standfirstMatch ? standfirstMatch[1].replace(/<[^>]*>/g, "").trim() : "Official press release from Government of India.";
 
+      let heroImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&h=900&fit=crop&q=80";
+      const scrapedImg = await getPibArticleImage(prid);
+      if (scrapedImg) {
+        heroImage = scrapedImg;
+      }
+
       const mockArticle = {
         id: `pib-${prid}`,
         slug,
@@ -120,7 +127,7 @@ export async function GET(
         publishedAt: new Date().toISOString(), // Fallback
         readingTime: 3,
         views: 200,
-        heroImage: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&h=900&fit=crop&q=80",
+        heroImage,
         isFeatured: false,
         isBreaking: false,
         hasAudio: false,
